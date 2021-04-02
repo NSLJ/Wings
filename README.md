@@ -63,38 +63,47 @@ With Wings, You Never Walk Alone.
 - [ ] Users can report suspicious areas/activity.
 
 ### 2. Screen Archetypes
-* Log In screen
-   * Enter credentials to log into the app
-   * Give user option to create account
-* Home screen
-   * Button saying need a walking buddy?
-   * Buddies near me
-   * Emergency button
-   * Nearest police station
-* Buddy screen
-    * Find a walking buddy 
-    * Contact them
+* Login
+   * User can login
+* Register
+   * User can register a new account.
+* Profile
+    * User can view their own and other user profiles. 
+* Map-View
+    * User can pin their intended destination on a map. 
+    * Buddy Pairs are required to confirm a route on the map to follow. 
+* Stream
+    * User is shown all possible buddies
+    * User can search for other users.
 
 
 ### 3. Navigation
 
 **Tab Navigation** (Tab to Screen)
-
-* Home
-* Find a buddy
-* Profile = list of buddies
-* Others
+* Find a Buddy (Home)
+* Search for a Buddy
+* Profile
 
 
 **Flow Navigation** (Screen to Screen)
-
-* Login Screen
-   * => Home Screen
-* Home Screen 
-   * => Buddy Screen
-* Buddy Screen 
-    * None 
-
+Login
+   * Map-View
+   * Register
+* Register
+   * Map-View
+   * Login
+* Profile
+    * Map-View
+    * Stream
+    * Messaging
+* Map-View
+    * Stream
+    * Profile
+    * Messaging
+* Stream
+    * Profile
+    * Map-View
+    * Messaging
 
 ## Wireframes
 [Add picture of your hand sketched wireframes in this section]
