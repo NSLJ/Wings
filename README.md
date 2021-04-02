@@ -95,15 +95,12 @@ Login
 * Profile
     * Map-View
     * Stream
-    * Messaging
 * Map-View
     * Stream
     * Profile
-    * Messaging
 * Stream
     * Profile
     * Map-View
-    * Messaging
 
 ## Wireframes
 [Add picture of your hand sketched wireframes in this section]
