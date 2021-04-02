@@ -28,18 +28,39 @@ With Wings, You Never Walk Alone.
 ### 1. User Stories (Required and Optional)
 
 **Required Must-have Stories**
-- [ ] Allow users to create accounts
-- [ ] Allow users to add buddies
-- [ ] Allow users to notify their friends, if they need a walking buddy
-- [ ] Provide resources (i.e. campus map, nearest police station, contact info, etc.)
-- [ ] Provide registered safe spaces
-- [ ] Picture confirmation
-- [ ] Confirmation they arrived at destination
+- [ ] User can register a new account.
+- [ ] User can login.
+- [ ] User can log off.
+- [ ] User can view their own and other user profiles.
+- [ ] User can search for other users.
+- [ ]  User can add friends.
+- [ ] User can view friend list.
+- [ ]  User can input their intended destination on a map. 
+- [ ] User is shown all possible buddies.
+- [ ]  User can choose to be "able to be a Buddy" when not in need of a Buddy themself. 
+- [ ] User can choose to be a Solo Walker, where they walk to their destination on their own but is still open to being paired with a Buddy. 
+- [ ]  User can send, receive, and respond to multiple Buddy Requests.
+- [ ] User can verify their Buddy when meeting in person. 
+- [ ]  User can send Emergency Information quickly to Trusted Contacts.
+- [ ]  Buddy Pairs are required to confirm a route on the map to follow. 
+- [ ] Users are tracked while on a Buddy Trip.
+- [ ] User can confirm when they've safely arrived at their destination.
+
 
 
 **Optional Nice-to-have Stories**
-- [ ] Confirmation buddies through QR codes
-- [ ] Allow users to customize their profile
+- [ ] Buddies can rate each other after a Buddy Trip. 
+- [ ] Users can chat with their Buddies. 
+- [ ] User can request to chat with other users. 
+- [ ] Buddying can be extended to groups.
+- [ ] The user is shown best matched possible buddies first.
+- [ ] Filters are available when a user searches through a list of possible buddies. 
+- [ ] User can modify their profile information.
+- [ ] User can modify their account and app settings. 
+- [ ] Users can choose to receive notifications when there is a new possible buddy.
+- [ ] Users are banned if their rating is too low. 
+- [ ] Users are shown the nearest registered safe spaces.
+- [ ] Users can report suspicious areas/activity.
 
 ### 2. Screen Archetypes
 * Log In screen
