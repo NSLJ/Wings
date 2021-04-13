@@ -19,6 +19,7 @@ import com.example.wings.mainactivity.fragments.OtherProfileFragment;
 import com.example.wings.mainactivity.fragments.SearchUserFragment;
 import com.example.wings.mainactivity.fragments.UserProfileFragment;
 import com.example.wings.settingsactivity.SettingsActivity;
+import com.example.wings.startactivity.StartActivity;
 import com.example.wings.startactivity.fragments.LoginFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -86,28 +87,30 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     }
 
     /**
-     * Purpose:         Attaches events when menu items are pushed. Only one menu item: log off button --> intent request to StartingActivity{}, using GO_LOGIN_KEY to signal StartingActivity{} to start on Login page
+     * Purpose:         Attaches events when menu items are pushed.
      * @param item, which item was selected
      * @return
      */
     public boolean onOptionsItemSelected(MenuItem item){
+        Intent intent;
         switch(item.getItemId()){
             case R.id.action_logout:
                 //1.) Log off the user using Parse:
             //    ParseUser.logOut();
 
-                //2.) Intent to go to StartingActivity, finish() this activity
-              //  Intent intent = new Intent(this, StartingActivity.class);
-              //  intent.putExtra(GO_LOGIN_KEY, true);    //Tell StartingActivity to skip the Create account page!
-              //  startActivity(intent);
+                //2.) Intent to go to StartActivity, finish() this activity
+                intent = new Intent(this, StartActivity.class);
+                startActivity(intent);
                 finish();
                 return true;
-            case R.id.action_settings:  //Go to SettingsActivity
-                Intent intent = new Intent(this, SettingsActivity.class);
+            case R.id.action_settings:
+                //Intent to SettingsActivity
+                intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 finish();
                 break;
             case R.id.action_safety_toolkit:
+                //Open Dialog box here
                 break;
             default:
                 return false;
@@ -124,21 +127,6 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
     //Required implementation of methods from MAFragmentsListener
     //Purpose:      Displays the corresponding Fragment classes
-    @Override
-    public void toHomeFragment() {
-        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new HomeFragment()).commit();
-    }
-
-    @Override
-    public void toUserProfileFragment() {
-        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new UserProfileFragment()).commit();
-    }
-
-    @Override
-    public void toSearchUserFragment() {
-        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new SearchUserFragment()).commit();
-    }
-
     @Override
     public void toOtherProfileFragment() {
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new OtherProfileFragment()).commit();

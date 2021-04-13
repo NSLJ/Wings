@@ -8,4 +8,9 @@
     android:orientation="vertical"
     tools:context=".settingsactivity.SettingsActivity">
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="This is the settings!" />
 </LinearLayout>
