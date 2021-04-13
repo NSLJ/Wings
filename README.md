@@ -108,7 +108,7 @@ Login
     * Map-View
 
 ## Wireframes
-<img src="Wireframe/Wings.png" width=800>
+<img src="Wireframes/Wings.png" width=800>
 
 ### [BONUS] Digital Wireframes & Mockups
 https://www.figma.com/file/FvkFBW65HVYdpSDwqsKRMM/Wings?node-id=0%3A1
