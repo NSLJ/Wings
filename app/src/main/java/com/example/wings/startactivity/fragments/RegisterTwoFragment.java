@@ -27,6 +27,7 @@ public class RegisterTwoFragment extends Fragment {
     private SAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
     private Button registerOneBttn;
     private Button loginBttn;
+    private Button profileSetupBttn;
 
     public RegisterTwoFragment() {}    // Required empty public constructor
 
@@ -62,6 +63,7 @@ public class RegisterTwoFragment extends Fragment {
 
         loginBttn = view.findViewById(R.id.loginBttn);
         registerOneBttn = view.findViewById(R.id.registerOneBttn);
+        profileSetupBttn = view.findViewById(R.id.profileSetupBttn);
 
         //Changes the Fragment to the LoginFragment via the StartActivity!
         loginBttn.setOnClickListener(new View.OnClickListener() {
@@ -76,6 +78,13 @@ public class RegisterTwoFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 listener.toRegisterOneFragment();
+            }
+        });
+        //Changes the Fragment to RegisterTwoFragment via the StartActivity!
+        profileSetupBttn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.toProfileSetupFragment();
             }
         });
 
