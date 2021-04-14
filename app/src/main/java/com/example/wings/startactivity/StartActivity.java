@@ -1,7 +1,6 @@
 package com.example.wings.startactivity;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
@@ -38,7 +37,6 @@ public class StartActivity extends AppCompatActivity implements SAFragmentsListe
     }
 
     @Override
-    //On successful login --> intent to MainActivity and finish()
     public void onLogin() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);

@@ -59,7 +59,6 @@ public class LoginFragment extends Fragment {
      * Purpose;         Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
      */
     public void onViewCreated(View view, Bundle savedInstanceState) {
-
         registerBttn = view.findViewById(R.id.registerBttn);
         homeBttn = view.findViewById(R.id.homeBttn);
 
