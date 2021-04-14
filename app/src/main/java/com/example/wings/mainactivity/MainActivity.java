@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     /**
      * Purpose:         called automatically when activity is launched. Initializes the BottomNavigationView with listeners when each menu item is clicked. on click --> raise correct fragment class.
      */
+
+    //Laura was here. Testing git push
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
