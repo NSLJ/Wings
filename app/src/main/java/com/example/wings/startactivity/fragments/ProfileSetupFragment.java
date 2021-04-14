@@ -1,66 +1,50 @@
 package com.example.wings.startactivity.fragments;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.wings.R;
+import com.example.wings.mainactivity.MAFragmentsListener;
+import com.example.wings.startactivity.SAFragmentsListener;
+import com.example.wings.startactivity.StartActivity;
 
-//All auto-filled stuff, just follow the samples I left behind!
-
-
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ProfileSetupFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ProfileSetupFragment extends Fragment {
 
+    private static final String DEBUG_TAG = "ProfileSetupFragment";
+    private SAFragmentsListener listener;
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    public ProfileSetupFragment() {}        // Required empty public constructor
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public ProfileSetupFragment() {
-        // Required empty public constructor
-    }
-
+    @Override
     /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ProfileSetupFragment.
+     * Purpose:     Called automatically. When this Fragment is being attached to the parent activity, REQUIRE the activity to implement SAFragmentsListener. Otherwise throw an exception!
+     *              Connect the Fragment's listener to the activity!
      */
-    // TODO: Rename and change types and number of parameters
-    public static ProfileSetupFragment newInstance(String param1, String param2) {
-        ProfileSetupFragment fragment = new ProfileSetupFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof SAFragmentsListener) {
+            listener = (SAFragmentsListener) context;
+        } else {
+            throw new ClassCastException(context.toString() + " must implement SAFragmentsListener");
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        setHasOptionsMenu(true);        //let know that there is an options menu to inflate
     }
 
     @Override
@@ -69,6 +53,35 @@ public class ProfileSetupFragment extends Fragment {
      */
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_profilesetup_navigation, menu);
+    }
+
+    /**
+     * Purpose:         Attaches events when menu items are pushed.
+     * @param item, which item was selected
+     * @return
+     */
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch(item.getItemId()){
+            case R.id.action_logout:
+                /*1.) If there is an actual user logged in, log them out
+                    if(ParseUser.getCurrentUser() != null){
+                        ParseUser.logOut();
+                    }
+                */
+
+                //2.) Switch to LoginFragment:
+                listener.toLoginFragment();
+                return true;
+            case R.id.action_settings:
+                listener.toSettingsFragment();
+                break;
+            case R.id.action_help:
+                listener.toHelpFragment();
+                break;
+            default:
+                return false;
+        }
+        return false;
     }
 
     @Override

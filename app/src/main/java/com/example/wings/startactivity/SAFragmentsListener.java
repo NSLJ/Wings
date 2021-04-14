@@ -7,4 +7,6 @@ public interface SAFragmentsListener {
     public void toRegisterTwoFragment();
     public void toProfileSetupFragment();
     public void toEditTrustedContacts();
+    public void toSettingsFragment();
+    public void toHelpFragment();
 }

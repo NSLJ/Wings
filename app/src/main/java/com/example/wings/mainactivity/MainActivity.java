@@ -14,12 +14,12 @@ import android.widget.Toast;
 
 import com.example.wings.R;
 import com.example.wings.mainactivity.fragments.ChooseBuddyFragment;
-import com.example.wings.mainactivity.fragments.EditTrustedContactsFragment;
-import com.example.wings.mainactivity.fragments.HelpFragment;
+import com.example.wings.commonFragments.EditTrustedContactsFragment;
+import com.example.wings.commonFragments.HelpFragment;
 import com.example.wings.mainactivity.fragments.HomeFragment;
 import com.example.wings.mainactivity.fragments.OtherProfileFragment;
 import com.example.wings.mainactivity.fragments.SearchUserFragment;
-import com.example.wings.mainactivity.fragments.SettingsFragment;
+import com.example.wings.commonFragments.SettingsFragment;
 import com.example.wings.mainactivity.fragments.UserProfileFragment;
 import com.example.wings.startactivity.StartActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
