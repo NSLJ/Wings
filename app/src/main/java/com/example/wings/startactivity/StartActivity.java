@@ -3,9 +3,11 @@ package com.example.wings.startactivity;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import com.example.wings.R;
-import com.example.wings.settingsactivity.fragments.EditTrustedContactsFragment;
+import com.example.wings.mainactivity.MainActivity;
+import com.example.wings.mainactivity.fragments.EditTrustedContactsFragment;
 import com.example.wings.startactivity.fragments.LoginFragment;
 import com.example.wings.startactivity.fragments.ProfileSetupFragment;
 import com.example.wings.startactivity.fragments.RegisterOneFragment;
@@ -32,6 +34,14 @@ public class StartActivity extends AppCompatActivity implements SAFragmentsListe
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new LoginFragment()).commit();
     }
 
+    @Override
+    //On successful login --> intent to MainActivity and finish()
+    public void onLogin() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
     //Required implementation of methods from SAFragmentsListener
     //Purpose:      Displays the corresponding Fragment classes
     @Override
@@ -50,7 +60,7 @@ public class StartActivity extends AppCompatActivity implements SAFragmentsListe
     }
 
     @Override
-    public void toProfileSetup() {
+    public void toProfileSetupFragment() {
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new ProfileSetupFragment()).commit();
     }
 

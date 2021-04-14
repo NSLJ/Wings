@@ -14,13 +14,14 @@ import android.widget.Toast;
 
 import com.example.wings.R;
 import com.example.wings.mainactivity.fragments.ChooseBuddyFragment;
+import com.example.wings.mainactivity.fragments.EditTrustedContactsFragment;
+import com.example.wings.mainactivity.fragments.HelpFragment;
 import com.example.wings.mainactivity.fragments.HomeFragment;
 import com.example.wings.mainactivity.fragments.OtherProfileFragment;
 import com.example.wings.mainactivity.fragments.SearchUserFragment;
+import com.example.wings.mainactivity.fragments.SettingsFragment;
 import com.example.wings.mainactivity.fragments.UserProfileFragment;
-import com.example.wings.settingsactivity.SettingsActivity;
 import com.example.wings.startactivity.StartActivity;
-import com.example.wings.startactivity.fragments.LoginFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 /**
@@ -29,6 +30,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
  *
  */
 public class MainActivity extends AppCompatActivity implements MAFragmentsListener{
+    private static final String DEBUG_TAG = "MainActivity";
 
     final FragmentManager fragmentManager = getSupportFragmentManager();
     private static BottomNavigationView bottomNavigationView;
@@ -99,18 +101,20 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
             //    ParseUser.logOut();
 
                 //2.) Intent to go to StartActivity, finish() this activity
+                Log.d(DEBUG_TAG, ": Trying to do intent now.");
                 intent = new Intent(this, StartActivity.class);
                 startActivity(intent);
                 finish();
                 return true;
             case R.id.action_settings:
                 //Intent to SettingsActivity
-                intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
-                finish();
+                toSettingsFragment();
                 break;
             case R.id.action_safety_toolkit:
-                //Open Dialog box here
+                onClickSafetyToolkit();
+                break;
+            case R.id.action_help:
+                toHelpFragment();
                 break;
             default:
                 return false;
@@ -119,10 +123,29 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     }
 
     /**
-     * Purpose:     Needs to be implemented here so Safety Toolkit will execute on any screen
+     * Purpose:     Needs to be implemented in this activity so Safety Toolkit will execute on any screen
      */
     public void onClickSafetyToolkit(){
+        /*Open Dialog box here:
+            Option 1: User feels unsafe and suspicious --> notify all Trusted Contacts
+            Option 2: Immediate danger --> notify all Trusted Contacts + dial the police
+         */
+        Toast.makeText(this, "You pushed the Safety Toolkit button! Sorry, it's not implemented yet!", Toast.LENGTH_SHORT).show();
+    }
 
+    @Override
+    public void toHomeFragment() {
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new HomeFragment()).commit();
+    }
+
+    @Override
+    public void toUserProfileFragment() {
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new UserProfileFragment()).commit();
+    }
+
+    @Override
+    public void toSearchUserFragment() {
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new SearchUserFragment()).commit();
     }
 
     //Required implementation of methods from MAFragmentsListener
@@ -135,5 +158,20 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     @Override
     public void toChooseBuddyFragment() {
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new ChooseBuddyFragment()).commit();
+    }
+
+    @Override
+    public void toSettingsFragment() {
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new SettingsFragment()).commit();
+    }
+
+    @Override
+    public void toEditTrustedContactsFragment() {
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new EditTrustedContactsFragment()).commit();
+    }
+
+    @Override
+    public void toHelpFragment() {
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new HelpFragment()).commit();
     }
 }

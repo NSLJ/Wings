@@ -10,6 +10,9 @@ import android.view.ViewGroup;
 
 import com.example.wings.R;
 
+//All auto-filled stuff, just follow the samples I left behind!
+
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link UserProfileFragment#newInstance} factory method to

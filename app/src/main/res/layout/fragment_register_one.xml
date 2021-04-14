@@ -1,14 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".startactivity.fragments.RegisterOneFragment">
 
     <!-- TODO: Update blank fragment layout -->
+
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="This is the Register One Fragment!" />
+        android:layout_height="195dp"
+        android:text="This is the Register One Fragment!"
+        android:textSize="24sp" />
 
-</FrameLayout>
+    <Button
+        android:id="@+id/loginBttn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Back to Login fragment" />
+
+    <Button
+        android:id="@+id/registerTwoBttn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="To Register Two Fragment" />
+
+</LinearLayout>

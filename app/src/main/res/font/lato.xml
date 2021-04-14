@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--This is the font used for all normal text! -->
+<!-- "satisfy.ttf" is the font used for all decorative text! -->
+<font-family xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:fontProviderAuthority="com.google.android.gms.fonts"
+        app:fontProviderPackage="com.google.android.gms"
+        app:fontProviderQuery="Lato"
+        app:fontProviderCerts="@array/com_google_android_gms_fonts_certs">
+</font-family>

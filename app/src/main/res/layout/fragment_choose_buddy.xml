@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".mainactivity.fragments.ChooseBuddyFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="This is the Choose a Buddy Fragment!" />
+        android:layout_height="206dp"
+        android:fontFamily="@font/lato"
+        android:text="This is the Choose a Buddy Fragment!"
+        android:textSize="24sp" />
 
-</FrameLayout>
+    <Button
+        android:id="@+id/homeBttn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Back to Home" />
+
+</LinearLayout>
