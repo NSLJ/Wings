@@ -2,7 +2,12 @@ package com.example.wings.models;
 
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
+
+import org.json.JSONArray;
+
+import java.util.List;
 
 @ParseClassName("User")
 public class User extends ParseObject {
@@ -14,7 +19,7 @@ public class User extends ParseObject {
     public static final String KEY_LASTNAME = "LastName";
     public static final String KEY_PIN = "Pin";
     public static final String KEY_PROFILEPICTURE = "ProfilePicture";
-    public static final String KEY_TRUSTEDCONTACTS = "trusedContacts";
+    public static final String KEY_TRUSTEDCONTACTS = "trustedContacts";
     public static final String KEY_FRIENDS = "friends";
     public static final String KEY_CURRENTLOCATION = "currentLocation";
     public static final String KEY_PROFILESETUP  = "ProfileSetUp";
@@ -86,6 +91,19 @@ public class User extends ParseObject {
 
     public void setProfilePic(ParseFile imageURL){
         put(KEY_PROFILEPICTURE, imageURL);
+    }
+
+    //seems like we need a specific way to do this...
+//    public List getTrustedContacts(User user){
+//
+//    }
+
+    public ParseGeoPoint getLocation(){
+        return getParseGeoPoint(KEY_CURRENTLOCATION);
+    }
+
+    public void setLocation(ParseGeoPoint location){
+        put(KEY_CURRENTLOCATION, location);
     }
 
     public Boolean getProfileSetUp(){
