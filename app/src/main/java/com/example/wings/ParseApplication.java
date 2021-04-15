@@ -17,8 +17,8 @@ public class ParseApplication  extends Application {
 
         // Initializes Parse SDK as soon as the application is created
         Parse.initialize(new Parse.Configuration.Builder(this)
-                .applicationId("sElWNZw3UaPAVWDt1unXKuTKKV3KVG63iNoYtHMJ")
-                .clientKey("aQkw4udueaiRTNA3CGKeKNpxrVZ9T9xcFsu2ppCP")
+                .applicationId("72bJpnuYmdfcxDrigJ0PnmJyghvSk5dzRXTnWhc4")
+                .clientKey("lZY7K2bp0kmXkVJDbVHop4ZxDnOaZ6u58YLHmlok")
                 .server("https://parseapi.back4app.com")
                 .build()
         );
