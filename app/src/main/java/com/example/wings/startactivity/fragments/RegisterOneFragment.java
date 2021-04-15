@@ -56,7 +56,7 @@ public class RegisterOneFragment extends Fragment {
 
     @Override
     /**
-     * Purpose;         Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
+     * Purpose:         Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
      */
     public void onViewCreated(View view, Bundle savedInstanceState) {
 

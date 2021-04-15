@@ -1,29 +1,34 @@
 package com.example.wings.startactivity.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.example.wings.R;
 import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.startactivity.SAFragmentsListener;
 import com.example.wings.startactivity.StartActivity;
 
+/**
+ * ProfileSetupFragment.java
+ * Purpose:            This displays the profile setup screen for the user to complete all required user information before using the app. This includes
+ *                      PIN number, profile picture, and Trusted Contacts.
+ */
 public class ProfileSetupFragment extends Fragment {
 
     private static final String DEBUG_TAG = "ProfileSetupFragment";
     private SAFragmentsListener listener;
+    private Button completeBtn;
 
     public ProfileSetupFragment() {}        // Required empty public constructor
 
@@ -56,7 +61,7 @@ public class ProfileSetupFragment extends Fragment {
     }
 
     /**
-     * Purpose:         Attaches events when menu items are pushed.
+     * Purpose:     Attaches events when menu items are pushed.
      * @param item, which item was selected
      * @return
      */
@@ -85,9 +90,25 @@ public class ProfileSetupFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    /**
+     * Purpose:     Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
+     */
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_profile_setup, container, false);
+    }
+
+    @Override
+    /**
+     * Purpose:     Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
+     */
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        completeBtn = view.findViewById(R.id.completeBtn);
+
+        //Changes the Fragment to the Home Fragment via the StartActivity!
+        completeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { listener.onLogin();}
+        });
     }
 }
