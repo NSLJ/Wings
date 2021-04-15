@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
      */
 
     //Laura was here. Testing git push
+    //Testing laura branch push
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);

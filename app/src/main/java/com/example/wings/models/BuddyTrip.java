@@ -1,4 +1,6 @@
 package com.example.wings.models;
 
-public class BuddyTrip {
+import com.parse.ParseObject;
+
+public class BuddyTrip extends ParseObject {
 }

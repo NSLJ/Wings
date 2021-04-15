@@ -1,4 +1,6 @@
 package com.example.wings.models;
 
-public class TrustedContact {
+import com.parse.ParseObject;
+
+public class TrustedContact extends ParseObject {
 }

@@ -1,4 +1,6 @@
 package com.example.wings.models;
 
-public class BuddyRequest {
+import com.parse.ParseObject;
+
+public class BuddyRequest extends ParseObject {
 }

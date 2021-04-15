@@ -1,4 +1,6 @@
 package com.example.wings.models;
 
-public class User {
+import com.parse.ParseObject;
+
+public class User extends ParseObject {
 }
