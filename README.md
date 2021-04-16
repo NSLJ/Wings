@@ -28,6 +28,7 @@ With Wings, You Never Walk Alone.
 ### 1. User Stories (Required and Optional)
 
 **Required Must-have Stories**
+- [ ] Database set up in back4app.
 - [ ] User can register a new account.
 - [ ] User can login.
 - [ ] User can log off.
