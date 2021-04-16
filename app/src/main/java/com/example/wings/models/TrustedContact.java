@@ -12,6 +12,9 @@ public class TrustedContact extends ParseObject {
     public static final String KEY_EMAIL = "Email";
     public static final String KEY_OBJECTID = "objectId";
 
+    public TrustedContact() {
+    }
+
     public ParseUser getUserTrustedBy(){
         return getParseUser(KEY_TRUSTEDBY);
     }

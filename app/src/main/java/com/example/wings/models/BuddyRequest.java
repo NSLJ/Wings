@@ -14,6 +14,9 @@ public class BuddyRequest extends ParseObject {
     public static final String KEY_ISCONFIRMED = "isConfirmed";
     public static final String KEY_MEETINGMETHOD = "meetingMethod";
 
+    public BuddyRequest() {
+    }
+
     public ParseUser getSender(){
         return getParseUser(KEY_SENDER);
     }

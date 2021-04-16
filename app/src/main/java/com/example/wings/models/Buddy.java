@@ -18,6 +18,9 @@ public class Buddy extends ParseObject {
     public static final String KEY_ONBUDDYTRIP = "onBuddyTrip";
     public static final String KEY_BUDDYTRIP = "buddyTrip";
 
+    public Buddy() {
+    }
+
 
     public ParseUser getSender(){
         return getParseUser(KEY_SENDER);
@@ -66,7 +69,7 @@ public class Buddy extends ParseObject {
     public void setBuddyTripID(String tripID){
         put(KEY_BUDDYTRIP, tripID);
     }
-    
+
     public String getObjectID() {
         return getString(KEY_OBJECTID);
     }

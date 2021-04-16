@@ -12,6 +12,9 @@ public class BuddyTrip extends ParseObject {
     public static final String KEY_TIMEELASPED = "timeElasped";
     public static final String KEY_OBJECTID = "objectId";
 
+    public BuddyTrip() {
+    }
+
     public ParseGeoPoint getDestination(){
         return getParseGeoPoint(KEY_DESTINATION);
     }

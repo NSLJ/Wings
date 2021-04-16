@@ -4,8 +4,10 @@ import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 import org.json.JSONArray;
+import org.w3c.dom.Node;
 
 import java.util.List;
 
@@ -26,6 +28,8 @@ public class User extends ParseObject {
     public static final String KEY_RATING = "rating";
     //not sure if we will need this
     public static final String KEY_OBJECTID = "objectId";
+
+    public User(){}
 
     //returns the username part of the cpp email (Example: billybronco@cpp.edu would return billybronco)
     public String getUsername(){
@@ -97,6 +101,13 @@ public class User extends ParseObject {
 //    public List getTrustedContacts(User user){
 //
 //    }
+
+    public void setTrustedContacts(List contacts){
+
+        while(!contacts.isEmpty()){
+
+        }
+    }
 
     public ParseGeoPoint getLocation(){
         return getParseGeoPoint(KEY_CURRENTLOCATION);

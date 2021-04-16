@@ -6,13 +6,17 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.wings.R;
+import com.example.wings.models.User;
 import com.example.wings.startactivity.SAFragmentsListener;
+import com.parse.Parse;
+import com.parse.ParseUser;
 
 /**
  * RegisterOneFragment.java
@@ -24,6 +28,7 @@ import com.example.wings.startactivity.SAFragmentsListener;
  */
 public class RegisterOneFragment extends Fragment {
 
+    public static final String TAG = "RegisterOneFragment";
     private SAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
     private Button loginBttn;
     private Button registerTwoBttn;
@@ -63,6 +68,8 @@ public class RegisterOneFragment extends Fragment {
         loginBttn = view.findViewById(R.id.loginBttn);
         registerTwoBttn = view.findViewById(R.id.registerTwoBttn);
 
+        User user = new User();
+
         //Changes the Fragment to the LoginFragment via the StartActivity!
         loginBttn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,5 +85,8 @@ public class RegisterOneFragment extends Fragment {
                 listener.toRegisterTwoFragment();
             }
         });
+
+
+
     }
 }
