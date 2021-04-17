@@ -40,10 +40,8 @@ public class UserProfileFragment extends Fragment {
     private String mParam2;
 
 
+    public UserProfileFragment() {}   // Required empty public constructor
 
-    public UserProfileFragment() {
-        // Required empty public constructor
-    }
 
     /**
      * Use this factory method to create a new instance of
@@ -80,33 +78,5 @@ public class UserProfileFragment extends Fragment {
 
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
 
-      //temp for testing
-        //Won't let us use User methods
-//        Object user = create(User.class);
-        //ParseObject cant be cast to user
-//        ParseObject user = new User();
-//        User user = ParseObject.create(User.class);*/
-
-        //You must create this type of ParseObject using ParseObject.create() or the proper subclass.
-//        User user = new User();
-
-//        User user = ParseObject.createWithoutData(User.class, "username");
-//        user.setEmail("lmsiu@cpp.edu");
-//        user.setFirstName("Laura");
-//        user.setLastName("Siu");
-//        user.setProfileSetUp(false);
-//        user.setRating(5);
-//        user.setPin(1111);
-
-
-//        Log.i(TAG, "username: " + user.getUsername() + " FirstName: " + user.getFirstName() + " Last Name: " + user.getLastName() + " Email: " + user.getEmail() + " Pin: " + user.getPin());
-
-
-
-
-    }
 }

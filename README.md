@@ -1,6 +1,9 @@
 # Wings
 With Wings, You Never Walk Alone
 
+## Progress so far...
+<img src="walkthrough.gif" width=250>
+
 ## Table of Contents
 1. [Overview](#Overview)
 1. [Product Spec](#Product-Spec)
@@ -28,6 +31,7 @@ With Wings, You Never Walk Alone.
 ### 1. User Stories (Required and Optional)
 
 **Required Must-have Stories**
+- [X] Database set up in back4app.
 - [ ] User can register a new account.
 - [ ] User can login.
 - [ ] User can log off.
@@ -231,4 +235,4 @@ timeElasped	| Number| how long it has been since the BuddyTrip began (minutes)
    - (Read/GET) All User’s who’s “Able to be a Buddy” is on <br>
       ```ParseQuery<Buddy> query = ParseQuery.getQuery(Buddy.class);
          query.whereEqualTo(Buddy.KEY_CANBUDDY, true;
-
+        

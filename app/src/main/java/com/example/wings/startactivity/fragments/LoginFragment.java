@@ -2,18 +2,26 @@ package com.example.wings.startactivity.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.example.wings.R;
-import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.startactivity.SAFragmentsListener;
+
+import com.parse.LogInCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
+
+
 /**
  * LoginFragment.java
  * Purpose:         This displays the first screen of the app, the Login page!
@@ -23,10 +31,14 @@ import com.example.wings.startactivity.SAFragmentsListener;
  *
  */
 public class LoginFragment extends Fragment {
-
+    private static final String DEBUG_TAG = "LoginFragment";
     private SAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
-    private Button registerBttn;
-    private Button homeBttn;
+    private Button btnLogin;
+    private Button btnRegister;
+    private String usernameTxt;
+    private String passwordTxt;
+    private EditText etPassword;
+    private EditText etUsername;
 
     public LoginFragment() {}    // Required empty public constructor
 
@@ -59,22 +71,47 @@ public class LoginFragment extends Fragment {
      * Purpose;         Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
      */
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        registerBttn = view.findViewById(R.id.registerBttn);
-        homeBttn = view.findViewById(R.id.homeBttn);
+        //1.) Initialize Views:
+        btnRegister = view.findViewById(R.id.btnRegister);
+        btnLogin = view.findViewById(R.id.btnLogin);
+        etUsername = view.findViewById(R.id.etUsername);
+        etPassword = view.findViewById(R.id.etPassword);
 
-        //Changes the Fragment to the RegisterOneFragment via the StartActivity!
-        registerBttn.setOnClickListener(new View.OnClickListener() {
+        //2.) Set listeners::
+        // 2a.) btnLogin --> obtain user input and attempts to login through Parse Server
+        btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.toRegisterOneFragment();
+                Log.i(DEBUG_TAG, "btnLogin : onClick()");
+                usernameTxt = etUsername.getText().toString();
+                passwordTxt = etPassword.getText().toString();
+
+                ParseUser.logInInBackground(usernameTxt, passwordTxt, new LogInCallback() {
+                    @Override
+                    public void done(ParseUser user, ParseException e) {
+                        //if there is a user --> tell StartActivity of successful login
+                        if(user != null){
+                            listener.onLogin();
+
+                            //Notify user of successful login:
+                            Toast toast = Toast.makeText(getContext(), "You're logged in!", Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.TOP, 0,0);
+                            toast.show();
+                        } else {
+                            Toast.makeText(getContext(), "This user doesn't exist. Please Sign-up!", Toast.LENGTH_SHORT).show();
+                            Log.d(DEBUG_TAG, "logInInBackground(): failed" + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }
+                });
             }
         });
 
-        //Calls onLogin() when want to go to Home page (MainActivity)!
-        homeBttn.setOnClickListener(new View.OnClickListener() {
+        //Changes the Fragment to the RegisterOneFragment via the StartActivity!
+        btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onLogin();
+                listener.toRegisterOneFragment();
             }
         });
     }

@@ -17,4 +17,5 @@
         android:icon="@drawable/safety_toolkit_button"
         android:title="Safety Toolkit"
         app:showAsAction="always" />
+
 </menu>
