@@ -9,15 +9,21 @@ import com.example.wings.models.TrustedContact;
 import com.example.wings.models.User;
 import com.parse.Parse;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
-public class ParseApplication  extends Application {
+/**
+ * ParseApplication.java
+ * Purpose:         To initialize the Parse SDK as soon as the application is launched.
+ */
+public class ParseApplication extends Application {
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         // Register your parse models
-        ParseObject.registerSubclass(User.class);
+        ParseUser.registerSubclass(User.class);
+        //ParseObject.registerSubclass(User.class);
         ParseObject.registerSubclass(Buddy.class);
         ParseObject.registerSubclass(BuddyRequest.class);
         ParseObject.registerSubclass(BuddyTrip.class);
