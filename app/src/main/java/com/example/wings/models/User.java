@@ -12,7 +12,12 @@ import org.w3c.dom.Node;
 import java.util.List;
 
 @ParseClassName("User")
-public class User extends ParseObject {
+public class User extends ParseUser {
+
+    //empty constructor for Parse
+    public User(){
+    }
+
 
     public static final String KEY_USERNAME = "username";
     public static final String KEY_PASSWORD = "password";
@@ -29,7 +34,7 @@ public class User extends ParseObject {
     //not sure if we will need this
     public static final String KEY_OBJECTID = "objectId";
 
-    public User(){}
+
 
     //returns the username part of the cpp email (Example: billybronco@cpp.edu would return billybronco)
     public String getUsername(){
