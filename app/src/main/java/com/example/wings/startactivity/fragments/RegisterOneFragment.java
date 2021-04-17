@@ -101,7 +101,8 @@ public class RegisterOneFragment extends Fragment {
         signUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                usernametxt = username.getText().toString();
+                listener.toProfileSetupFragment();
+                /*usernametxt = username.getText().toString();
                 passwordtxt1 = password1.getText().toString();
                 passwordtxt2 = password2.getText().toString();
 
@@ -118,12 +119,13 @@ public class RegisterOneFragment extends Fragment {
                         public void done(ParseException e) {
                             if(e==null) {
                                 Toast.makeText(getContext(), "Successfully signed up!", Toast.LENGTH_SHORT).show();
+                                listener.toProfileSetupFragment();
                             } else {
                                 Toast.makeText(getContext(), "Sign up error", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
-                }
+                }*/
             }
         });
 
