@@ -2,18 +2,24 @@ package com.example.wings.startactivity.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.example.wings.R;
-import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.startactivity.SAFragmentsListener;
+
+import com.parse.LogInCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
+
+
 /**
  * LoginFragment.java
  * Purpose:         This displays the first screen of the app, the Login page!
@@ -25,8 +31,12 @@ import com.example.wings.startactivity.SAFragmentsListener;
 public class LoginFragment extends Fragment {
 
     private SAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
-    private Button registerBttn;
-    private Button homeBttn;
+    private Button login;
+    private Button register;
+    private String usernametxt;
+    private String passwordtxt;
+    private EditText password;
+    private EditText username;
 
     public LoginFragment() {}    // Required empty public constructor
 
@@ -59,22 +69,37 @@ public class LoginFragment extends Fragment {
      * Purpose;         Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
      */
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        registerBttn = view.findViewById(R.id.registerBttn);
-        homeBttn = view.findViewById(R.id.homeBttn);
+        register = view.findViewById(R.id.register);
+        login = view.findViewById(R.id.login);
 
-        //Changes the Fragment to the RegisterOneFragment via the StartActivity!
-        registerBttn.setOnClickListener(new View.OnClickListener() {
+        username = view.findViewById(R.id.username);
+        password = view.findViewById(R.id.password);
+
+        //Calls onLogin() when want to go to Home page (MainActivity)!
+        login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.toRegisterOneFragment();
+                usernametxt = username.getText().toString();
+                passwordtxt = password.getText().toString();
+
+                ParseUser.logInInBackground(usernametxt, passwordtxt, new LogInCallback() {
+                    @Override
+                    public void done(ParseUser user, ParseException e) {
+                        if(user != null){
+                            listener.onLogin();
+                        } else {
+                            Toast.makeText(getContext(), "This user doesn't exist. Please Sign-up!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
 
-        //Calls onLogin() when want to go to Home page (MainActivity)!
-        homeBttn.setOnClickListener(new View.OnClickListener() {
+        //Changes the Fragment to the RegisterOneFragment via the StartActivity!
+        register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onLogin();
+                listener.toRegisterOneFragment();
             }
         });
     }

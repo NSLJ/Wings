@@ -11,12 +11,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.wings.R;
 import com.example.wings.models.User;
 import com.example.wings.startactivity.SAFragmentsListener;
 import com.parse.Parse;
+import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 
 /**
  * RegisterOneFragment.java
@@ -30,8 +34,22 @@ public class RegisterOneFragment extends Fragment {
 
     public static final String TAG = "RegisterOneFragment";
     private SAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
-    private Button loginBttn;
-    private Button registerTwoBttn;
+    private Button backLoginBtn;
+    private Button signUpBtn;
+    private String usernametxt; //temp
+    private String passwordtxt1;
+    private String passwordtxt2;
+    private EditText password1;
+    private EditText password2;
+    private EditText username; //temp
+
+    //new
+    private String firstNametxt;
+    private String lastNametxt;
+    private EditText firstName;
+    private EditText lastName;
+    private String emailtxt;
+    private EditText email;
 
     public RegisterOneFragment() {}    // Required empty public constructor
 
@@ -65,28 +83,57 @@ public class RegisterOneFragment extends Fragment {
      */
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
-        loginBttn = view.findViewById(R.id.loginBttn);
-        registerTwoBttn = view.findViewById(R.id.registerTwoBttn);
+        signUpBtn = view.findViewById(R.id.signUpBtn);
+        backLoginBtn = view.findViewById(R.id.backLoginBtn);
 
-        User user = new User();
+        username = view.findViewById(R.id.username);
+        password1 = view.findViewById(R.id.password1);
+        password2 = view.findViewById(R.id.password2);
 
         //Changes the Fragment to the LoginFragment via the StartActivity!
-        loginBttn.setOnClickListener(new View.OnClickListener() {
+        backLoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 listener.toLoginFragment();
             }
         });
 
-        //Changes the Fragment to RegisterTwoFragment via the StartActivity!
+        signUpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                usernametxt = username.getText().toString();
+                passwordtxt1 = password1.getText().toString();
+                passwordtxt2 = password2.getText().toString();
+
+                if (usernametxt.equals("") || passwordtxt1.equals("") || passwordtxt1.equals("")) {
+                    Toast.makeText(getContext(), "Please complete the form.", Toast.LENGTH_SHORT).show();
+                } else if (!(passwordtxt1.equals(passwordtxt2))) {
+                    Toast.makeText(getContext(), "Passwords do not match.", Toast.LENGTH_SHORT).show();
+                } else {
+                    ParseUser user = new ParseUser();
+                    user.setUsername(usernametxt);
+                    user.setPassword(passwordtxt1);
+                    user.signUpInBackground(new SignUpCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if(e==null) {
+                                Toast.makeText(getContext(), "Successfully signed up!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getContext(), "Sign up error", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+        /*Changes the Fragment to RegisterTwoFragment via the StartActivity!
         registerTwoBttn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 listener.toRegisterTwoFragment();
             }
-        });
-
-
+        });*/
 
     }
 }
