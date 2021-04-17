@@ -17,7 +17,7 @@
         android:textSize="24sp" />
 
     <EditText
-        android:id="@+id/username"
+        android:id="@+id/etUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/txtuser"
@@ -27,30 +27,30 @@
         android:id="@+id/txtpassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/username"
+        android:layout_below="@+id/etUsername"
         android:text="Password"
         android:fontFamily="@font/lato"
         android:textSize="24sp" />
 
     <EditText
-        android:id="@+id/password"
+        android:id="@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/txtpassword"
         android:inputType="textPassword"/>
 
     <Button
-        android:id="@+id/login"
+        android:id="@+id/btnLogin"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_below="@+id/password"
+        android:layout_below="@+id/etPassword"
         android:text="Login"/>
 
     <Button
-        android:id="@+id/register"
+        android:id="@+id/btnRegister"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_below="@+id/login"
+        android:layout_below="@+id/btnLogin"
         android:text="Do not have an account? Register here"/>
 
     <!--
