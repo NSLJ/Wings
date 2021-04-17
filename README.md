@@ -1,6 +1,9 @@
 # Wings
 With Wings, You Never Walk Alone
 
+## Progress so far...
+<img src="walkthrough.gif" width=250>
+
 ## Table of Contents
 1. [Overview](#Overview)
 1. [Product Spec](#Product-Spec)
@@ -232,4 +235,4 @@ timeElasped	| Number| how long it has been since the BuddyTrip began (minutes)
    - (Read/GET) All User’s who’s “Able to be a Buddy” is on <br>
       ```ParseQuery<Buddy> query = ParseQuery.getQuery(Buddy.class);
          query.whereEqualTo(Buddy.KEY_CANBUDDY, true;
-
+        
