@@ -35,9 +35,8 @@ public class UserProfileFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public UserProfileFragment() {
-        // Required empty public constructor
-    }
+    public UserProfileFragment() {}   // Required empty public constructor
+
 
     /**
      * Use this factory method to create a new instance of

@@ -86,7 +86,7 @@ public class RegisterOneFragment extends Fragment {
         signUpBtn = view.findViewById(R.id.signUpBtn);
         backLoginBtn = view.findViewById(R.id.backLoginBtn);
 
-        username = view.findViewById(R.id.username);
+        username = view.findViewById(R.id.etUsername);
         password1 = view.findViewById(R.id.password1);
         password2 = view.findViewById(R.id.password2);
 
