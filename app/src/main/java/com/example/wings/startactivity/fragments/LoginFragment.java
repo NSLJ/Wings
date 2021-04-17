@@ -15,7 +15,10 @@ import androidx.fragment.app.Fragment;
 import com.example.wings.R;
 import com.example.wings.startactivity.SAFragmentsListener;
 
-//import com.parse...
+import com.parse.LogInCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
+
 
 /**
  * LoginFragment.java
@@ -81,24 +84,23 @@ public class LoginFragment extends Fragment {
         });
 
         //Calls onLogin() when want to go to Home page (MainActivity)!
-        /*login.setOnClickListener(new View.OnClickListener() {
+        login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 usernametxt = username.getText().toString();
                 passwordtxt = password.getText().toString();
 
-                ParseUser.LogInInBackground(usernametxt, passwordtxt, new LogInCallBack() {
-
+                ParseUser.logInInBackground(usernametxt, passwordtxt, new LogInCallback() {
                     @Override
                     public void done(ParseUser user, ParseException e) {
                         if(user != null){
                             listener.onLogin();
                         } else {
-                            Toast.makeText(getApplicationContext(), "This user doesn't exist", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "This user doesn't exist. Please Sign-up!", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
             }
-        });*/
+        });
     }
 }

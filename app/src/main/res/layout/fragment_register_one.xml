@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,21 +10,79 @@
     <!-- TODO: Update blank fragment layout -->
 
     <TextView
+        android:id="@+id/txtuser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/lato"
+        android:text="Username"
+        android:paddingTop="50dp"
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtuser"
+        android:inputType="text"/>
+
+    <TextView
+        android:id="@+id/txtpassword1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/username"
+        android:text="Password"
+        android:fontFamily="@font/lato"
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/password1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtpassword1"
+        android:inputType="textPassword"/>
+
+    <TextView
+        android:id="@+id/txtpassword2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/password1"
+        android:text="Reenter password"
+        android:fontFamily="@font/lato"
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/password2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtpassword2"
+        android:inputType="textPassword"/>
+
+    <Button
+        android:id="@+id/signUpBtn"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_below="@+id/password2"
+        android:text="Sign up"/>
+
+    <Button
+        android:id="@+id/backLoginBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/signUpBtn"
+        android:text="Back to Login" />
+
+    <!--
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="195dp"
         android:text="This is the Register One Fragment!"
         android:textSize="24sp" />
 
     <Button
-        android:id="@+id/loginBttn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Back to Login fragment" />
-
-    <Button
         android:id="@+id/registerTwoBttn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="To Register Two Fragment" />
+     -->
 
-</LinearLayout>
+</RelativeLayout>
