@@ -23,7 +23,8 @@ import com.example.wings.commonFragments.SettingsFragment;
 import com.example.wings.mainactivity.fragments.UserProfileFragment;
 import com.example.wings.startactivity.StartActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-//and another change hither
+
+//new change
 /**
  * MainActivity.java
  * Purpose:         Displays the appropriate fragments that executes the main functions of the app. Essentially is a container to swap between each fragment.
