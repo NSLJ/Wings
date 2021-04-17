@@ -36,12 +36,20 @@ public class RegisterOneFragment extends Fragment {
     private SAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
     private Button backLoginBtn;
     private Button signUpBtn;
-    private String usernametxt;
+    private String usernametxt; //temp
     private String passwordtxt1;
     private String passwordtxt2;
     private EditText password1;
     private EditText password2;
-    private EditText username;
+    private EditText username; //temp
+
+    //new
+    private String firstNametxt;
+    private String lastNametxt;
+    private EditText firstName;
+    private EditText lastName;
+    private String emailtxt;
+    private EditText email;
 
     public RegisterOneFragment() {}    // Required empty public constructor
 
@@ -81,8 +89,6 @@ public class RegisterOneFragment extends Fragment {
         username = view.findViewById(R.id.username);
         password1 = view.findViewById(R.id.password1);
         password2 = view.findViewById(R.id.password2);
-
-        User user = new User();
 
         //Changes the Fragment to the LoginFragment via the StartActivity!
         backLoginBtn.setOnClickListener(new View.OnClickListener() {

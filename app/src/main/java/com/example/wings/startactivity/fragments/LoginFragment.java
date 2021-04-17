@@ -75,14 +75,6 @@ public class LoginFragment extends Fragment {
         username = view.findViewById(R.id.username);
         password = view.findViewById(R.id.password);
 
-        //Changes the Fragment to the RegisterOneFragment via the StartActivity!
-        register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.toRegisterOneFragment();
-            }
-        });
-
         //Calls onLogin() when want to go to Home page (MainActivity)!
         login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,6 +92,14 @@ public class LoginFragment extends Fragment {
                         }
                     }
                 });
+            }
+        });
+
+        //Changes the Fragment to the RegisterOneFragment via the StartActivity!
+        register.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.toRegisterOneFragment();
             }
         });
     }
