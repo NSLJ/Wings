@@ -1,5 +1,4 @@
 package com.example.wings.mainactivity;
-//Another change hither
 /**
  * MAFragmentsListener.java
  * Purpose:         Allows a medium for Fragments to communicate with MainActivity in order to display the correct Fragments at the right time. Essentially shows all Fragments NOT in the Bottom Navigation
