@@ -43,16 +43,18 @@ import static android.app.Activity.RESULT_OK;
 public class ProfileSetupFragment extends Fragment {
 
     private static final String TAG = "ProfileSetupFragment";
+    private static final String CODEPATH_FILE_PROVIDER_KEY = "com.codepath.fileprovider";
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
-    private SAFragmentsListener listener;
-    private Button completeBtn;
+    private static final String PHOTO_FILE_NAME = "photo.jpg";                             //arbitrary file name to store Post photo in
 
+    private SAFragmentsListener listener;
+
+    private Button completeBtn;
     private Button galleryBtn;
     private Button tPhotoBtn;
 
     public File photoFile;
     private ImageView profileImage;
-    private String photoFileName = "photo.jpg";
 
 
     public ProfileSetupFragment() {}        // Required empty public constructor
@@ -77,13 +79,15 @@ public class ProfileSetupFragment extends Fragment {
      * Purpose:     Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
      */
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        //super.onViewCreated(view, savedInstanceState);
+
+        //1.) Get references to Views:
         completeBtn = view.findViewById(R.id.completeBtn);
         profileImage = view.findViewById(R.id.profileImage);
         tPhotoBtn = view.findViewById(R.id.takePhotoBtn);
         galleryBtn = view.findViewById(R.id.galleryBtn);
 
-        // Changes the Fragment to the Home Fragment via the StartActivity!
+        // TODO : check if all profile req set up: profile pic, Trusted contacts, and PIN
         completeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,12 +128,12 @@ public class ProfileSetupFragment extends Fragment {
         // create Intent to take a picture and return control to the calling application
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Create a File reference for future access
-        photoFile = getPhotoFileUri(photoFileName);
+        photoFile = getPhotoFileUri(PHOTO_FILE_NAME);
 
         // wrap File object into a content provider
         // required for API >= 24
         // See https://guides.codepath.com/android/Sharing-Content-with-Intents#sharing-files-with-api-24-or-higher
-         Uri fileProvider = FileProvider.getUriForFile(getContext(), "com.codepath.fileprovider", photoFile);
+         Uri fileProvider = FileProvider.getUriForFile(getContext(), CODEPATH_FILE_PROVIDER_KEY, photoFile);
          intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
 
         // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
