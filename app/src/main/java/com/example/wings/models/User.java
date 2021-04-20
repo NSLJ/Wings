@@ -6,6 +6,7 @@ import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ParseClassName("User")
-public class User extends ParseObject {
+public class User extends ParseUser {
     private static final String DEBUG_TAG = "User";
 
     public static final String KEY_USERNAME = "username";
