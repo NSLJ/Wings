@@ -14,6 +14,7 @@
     <!--For all gray containers: use at 100% transparency -->
     <!--For the gray text in the containers: use at 25% transparency -->
     <color name="gray">#C4C4C4</color>
+    <color name="gray_100">#545454</color>
 
     <!-- for all screen backgrounds -->
     <color name="gray_background">#121212</color>

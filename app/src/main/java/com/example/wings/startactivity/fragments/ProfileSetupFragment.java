@@ -32,7 +32,9 @@ import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.startactivity.SAFragmentsListener;
 import com.example.wings.startactivity.StartActivity;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import static android.app.Activity.RESULT_OK;
@@ -158,10 +160,13 @@ public class ProfileSetupFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
             // by this point we have the camera photo on disk
             Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-            // RESIZE BITMAP, see section below
+            // resize bitmap
+            //Bitmap resizedBitmap = Bitmap.createScaledBitmap(takenImage, 150, 150, true);
             // Load the taken image into a preview
             profileImage.setImageBitmap(takenImage);
         } else if (resultCode == RESULT_OK && requestCode == PICK_PHOTO_CODE) {
@@ -177,6 +182,7 @@ public class ProfileSetupFragment extends Fragment {
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(gallery, PICK_PHOTO_CODE);
     }
+
 
 
     @Override
