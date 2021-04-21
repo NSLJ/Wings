@@ -7,11 +7,11 @@
     android:orientation="vertical"
     tools:context=".startactivity.fragments.ProfileSetupFragment">
 
-    <TextView
+    <ImageView
+        android:id="@+id/profileImage"
         android:layout_width="match_parent"
-        android:layout_height="195dp"
-        android:text="This is the Profile Setup Fragment!"
-        android:textSize="24sp" />
+        android:layout_height="wrap_content"
+        tools:src="@tools:sample/avatars" />
 
     <Button
         android:id="@+id/completeBtn"
@@ -31,10 +31,6 @@
         android:layout_height="wrap_content"
         android:text="Upload from gallery" />
 
-    <ImageView
-        android:id="@+id/profileImage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:src="@tools:sample/avatars" />
+
 
 </LinearLayout>

@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -31,6 +33,7 @@ import com.example.wings.startactivity.SAFragmentsListener;
 import com.example.wings.startactivity.StartActivity;
 
 import java.io.File;
+import java.io.IOException;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -45,6 +48,7 @@ public class ProfileSetupFragment extends Fragment {
     private static final String TAG = "ProfileSetupFragment";
     private static final String CODEPATH_FILE_PROVIDER_KEY = "com.codepath.fileprovider";
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
+    public static final int PICK_PHOTO_CODE = 1046;
     private static final String PHOTO_FILE_NAME = "photo.jpg";                             //arbitrary file name to store Post photo in
 
     private SAFragmentsListener listener;
@@ -95,6 +99,8 @@ public class ProfileSetupFragment extends Fragment {
                 if (photoFile == null || profileImage.getDrawable() == null) {
                     Toast.makeText(getContext(), "There is no image!", Toast.LENGTH_SHORT).show();
                     return;
+                } else {
+                    Toast.makeText(getContext(), "Profile Completed! Now find your buddies!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -105,6 +111,11 @@ public class ProfileSetupFragment extends Fragment {
             public void onClick(View v) {
                 launchCamera();
             }
+        });
+
+        galleryBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { openGallery(); }
         });
     }
 
@@ -147,18 +158,26 @@ public class ProfileSetupFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                // by this point we have the camera photo on disk
-                Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                // RESIZE BITMAP, see section below
-                // Load the taken image into a preview
-                profileImage.setImageBitmap(takenImage);
-            } else { // Result was a failure
-                Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
-            }
+        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
+            // by this point we have the camera photo on disk
+            Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+            // RESIZE BITMAP, see section below
+            // Load the taken image into a preview
+            profileImage.setImageBitmap(takenImage);
+        } else if (resultCode == RESULT_OK && requestCode == PICK_PHOTO_CODE) {
+            Uri imageUri = data.getData();
+            profileImage.setImageURI(imageUri);
+        } else { // Result was a failure
+            Toast.makeText(getContext(), "Picture wasn't taken nor selected!", Toast.LENGTH_SHORT).show();
         }
     }
+
+    // Trigger gallery selection for a photo
+    private void openGallery() {
+        Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(gallery, PICK_PHOTO_CODE);
+    }
+
 
     @Override
     /**
