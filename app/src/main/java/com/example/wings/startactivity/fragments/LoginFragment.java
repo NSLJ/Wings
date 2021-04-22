@@ -111,7 +111,7 @@ public class LoginFragment extends Fragment {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.toProfileSetupFragment();
+                listener.toRegisterOneFragment();
             }
         });
     }

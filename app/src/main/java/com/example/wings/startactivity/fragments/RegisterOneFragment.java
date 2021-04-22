@@ -121,10 +121,10 @@ public class RegisterOneFragment extends Fragment {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Log.d(TAG, "onClick() signUpBtn: errorString="+errorString);
+                Log.d(TAG, "onClick() signUpBtn: errorString=" + errorString);
 
                 //2.) If no error string --> user's info is valid!
-                if(errorString.equals("")){
+                if(errorString.equals("")) {
                     String fName = etFName.getText().toString();
                     String lName = etLName.getText().toString();
                     createAccount(fName, lName, email, password);
