@@ -1,9 +1,11 @@
 package com.example.wings.mainactivity.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Build;
@@ -16,6 +18,7 @@ import androidx.fragment.app.Fragment;
 
 import android.os.Environment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,11 +27,14 @@ import android.view.View;
 import android.provider.MediaStore;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wings.R;
 import com.example.wings.mainactivity.MAFragmentsListener;
+import com.example.wings.models.User;
 import com.example.wings.startactivity.SAFragmentsListener;
 import com.example.wings.startactivity.StartActivity;
 
@@ -50,19 +56,25 @@ public class ProfileSetupFragment extends Fragment {
     private static final String CODEPATH_FILE_PROVIDER_KEY = "com.codepath.fileprovider";
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
     public static final int PICK_PHOTO_CODE = 1046;
-    private static final String PHOTO_FILE_NAME = "photo.jpg";                             //arbitrary file name to store Post photo in
+    private static final String PHOTO_FILE_NAME = "photo.jpg";         //arbitrary file name to store Post photo in
+    public File photoFile;
+    private ImageView profileImage;
+    User user = new User();
+
+    private int numtc = 1;
 
     private SAFragmentsListener listener;
+    private MAFragmentsListener mlistener;
 
     private Button completeBtn;
     private Button galleryBtn;
     private Button tPhotoBtn;
+    private TextView tcstatus;
+    private Button setupTCBtn;
+    private EditText numPIN;
 
-    public File photoFile;
-    private ImageView profileImage;
-
-
-    public ProfileSetupFragment() {}        // Required empty public constructor
+    public ProfileSetupFragment() {
+    }        // Required empty public constructor
 
     @Override
     /**
@@ -79,6 +91,7 @@ public class ProfileSetupFragment extends Fragment {
         setHasOptionsMenu(true);        //let know that there is an options menu to inflate
     }
 
+    @SuppressLint("ResourceAsColor")
     @Override
     /**
      * Purpose:     Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
@@ -89,17 +102,34 @@ public class ProfileSetupFragment extends Fragment {
         profileImage = view.findViewById(R.id.profileImage);
         tPhotoBtn = view.findViewById(R.id.takePhotoBtn);
         galleryBtn = view.findViewById(R.id.galleryBtn);
+        tcstatus = view.findViewById(R.id.tcStatus);
+        setupTCBtn = view.findViewById(R.id.setupTCBtn);
+        numPIN = view.findViewById(R.id.numPIN);
+
+        // To update the status of creating a Trusted Contact List on fragment
+        if (numtc > 0) {
+            tcstatus.setTextColor(Color.GREEN);
+            tcstatus.setText("completed");
+
+        }
+
+//        // To create a Trusted Contact List
+//        setupTCBtn.setOnClickListener(new View.OnClickListener() {
+//            listener.toEditTrustedContactsFragment(User object);
+//        });
 
         // TODO : check if all profile req set up: profile pic, Trusted contacts, and PIN
         completeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onLogin();
-                if (photoFile == null || profileImage.getDrawable() == null) {
-                    Toast.makeText(getContext(), "There is no image!", Toast.LENGTH_SHORT).show();
-                    return;
-                } else {
-                    Toast.makeText(getContext(), "Profile Completed! Now find your buddies!", Toast.LENGTH_SHORT).show();
+                String errorString = isValid();
+
+                if(errorString.equals("")){
+                    user.setProfileSetUp(true);
+                    mlistener.toHomeFragment();
+                }
+                else{
+                    showLongTopToast(errorString);
                 }
             }
         });
@@ -114,8 +144,37 @@ public class ProfileSetupFragment extends Fragment {
 
         galleryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) { openGallery(); }
+            public void onClick(View v) {
+                openGallery();
+            }
         });
+    }
+
+    private String isValid() {
+        Log.d(TAG, "in isValid()");
+        String result = "";
+
+        //1.) Check if the profile picture works
+        if(profileImage.getDrawable() == null) {    // if picture don't exist in both strategy
+            result += "Profile picture not available\n";
+        }
+
+        boolean hasTrustedContacts = false;
+
+        //2). Check if the user has PIN
+        if (numPIN == null) {
+            result += "Please create your 4 digit PIN";
+        }
+        if (numPIN.length() != 4) {
+            result += "Your PIN must have 4 digits\n";
+        }
+
+        //3). Check Trusted Contacts is null
+        if (!hasTrustedContacts) {
+            result += "Create at least 1 Trusted Contacts\n";
+        }
+
+        return result;
     }
 
     // Returns the File for a photo stored on disk given the fileName
@@ -126,7 +185,7 @@ public class ProfileSetupFragment extends Fragment {
         File mediaStorageDir = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
 
         // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
+        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
             Log.d(TAG, "failed to create directory");
         }
 
@@ -141,6 +200,7 @@ public class ProfileSetupFragment extends Fragment {
         photoFile = getPhotoFileUri(PHOTO_FILE_NAME);
 
         // wrap File object into a content provider
+
          Uri fileProvider = FileProvider.getUriForFile(getContext(), CODEPATH_FILE_PROVIDER_KEY, photoFile);
          intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
 
@@ -159,8 +219,6 @@ public class ProfileSetupFragment extends Fragment {
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
             // by this point we have the camera photo on disk
             Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-            // resize bitmap
-            //Bitmap resizedBitmap = Bitmap.createScaledBitmap(takenImage, 150, 150, true);
             // Load the taken image into a preview
             profileImage.setImageBitmap(takenImage);
         } else if (resultCode == RESULT_OK && requestCode == PICK_PHOTO_CODE) {
@@ -201,18 +259,18 @@ public class ProfileSetupFragment extends Fragment {
 
     /**
      * Purpose:     Attaches events when menu items are pushed.
+     *
      * @param item, which item was selected
      * @return
      */
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch(item.getItemId()){
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.action_logout:
                 /*1.) If there is an actual user logged in, log them out
                     if(ParseUser.getCurrentUser() != null){
                         ParseUser.logOut();
                     }
                 */
-
                 //2.) Switch to LoginFragment:
                 listener.toLoginFragment();
                 return true;
@@ -227,4 +285,11 @@ public class ProfileSetupFragment extends Fragment {
         }
         return false;
     }
+
+    private void showLongTopToast(String message){
+        Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.TOP, 0, 0);
+        toast.show();
+    }
+
 }

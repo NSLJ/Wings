@@ -119,12 +119,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/instruction3"
-        android:layout_alignParentStart="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="81dp"
+        android:layout_marginStart="26dp"
         android:layout_marginTop="20dp"
+        android:layout_toEndOf="@+id/tcStatus"
         android:backgroundTint="@color/gray_100"
         android:text="Set up Trusted Contacts" />
+
+    <TextView
+        android:id="@+id/tcStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/instruction3"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="35dp"
+        android:text="not done"
+        android:textColor="@color/red" />
 
 
 </RelativeLayout>
