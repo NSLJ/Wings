@@ -6,6 +6,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -27,6 +29,7 @@ import com.parse.SignUpCallback;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 
 /**
@@ -111,7 +114,15 @@ public class RegisterOneFragment extends Fragment {
                 String password = etPassword.getText().toString();
                 String retypedPass = etRetypedPass.getText().toString();
 
-                String errorString = isValid(email, password, retypedPass);          //Check if email, username, and password are valid
+                Log.d(TAG, "onClick() signUpBtn: checking if all user input is valid.");
+                String errorString = null;          //Check if email, username, and password are valid
+                try {
+                    errorString = isValid(email, password, retypedPass);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Log.d(TAG, "onClick() signUpBtn: errorString="+errorString);
+
                 //2.) If no error string --> user's info is valid!
                 if(errorString.equals("")){
                     String fName = etFName.getText().toString();
@@ -174,7 +185,7 @@ public class RegisterOneFragment extends Fragment {
      * @param password
      * @return
      */
-    private String isValid(String email, String password, String retypedPass) {
+    private String isValid(String email, String password, String retypedPass) throws InterruptedException {
         Log.d(TAG, "in isValid()");
         String result = "";
 
@@ -224,8 +235,12 @@ public class RegisterOneFragment extends Fragment {
             //otherwise --> email is valid, we can check if the username is unique! i.e. this email has not already been registered
             else{
                 String username = email.substring(0, email.length()-8);
-                queryUsernames();                   // == obtain and fill currUsers List
-                if(!validUsername(username)) {
+                Log.d(TAG, "Checking if username=" + username + " is valid! Querying for all existing users");
+                queryUsernames();
+
+                boolean validUsername = validUsername(username);
+                Log.d(TAG, "validUsername = "+validUsername);
+                if(!validUsername) {
                     result += "This username/email is already registered!";
                 }
             }
@@ -239,26 +254,17 @@ public class RegisterOneFragment extends Fragment {
     /**
      * Purpose;             Obtains a list of all current users and updates the "currUsers" List field
      */
-    private void queryUsernames() {
+    private void queryUsernames(){
         Log.d(TAG, "in queryUsernames() ");
         ParseQuery<ParseUser> query = ParseUser.getQuery();
 
         //To get all users:
-        query.findInBackground(new FindCallback<ParseUser>() {
-            public void done(List<ParseUser> users, ParseException e) {
-                //If no error --> success!
-                if (e == null) {
-                    Log.d(TAG, "queryUsernames(): success!");
-
-                    currUsers.addAll(users);
-                    Log.i(TAG, "users: " + currUsers.toString());
-                }
-                //on failure:
-                else {
-                    Log.e(TAG, "queryUsernames(): failure:  error=", e);
-                }
-            }
-        });
+        try {
+            currUsers.addAll(query.find());
+            Log.i(TAG, "queryUsernames():  -users: " + currUsers.toString());
+        } catch (ParseException e) {
+            Log.e(TAG, "queryUsernames(): failure:  error=", e);
+        }
     }
 
     /**
@@ -267,6 +273,8 @@ public class RegisterOneFragment extends Fragment {
      * @return whether or not the username is unique/valid
      */
     private boolean validUsername(String username) {
+        Log.d(TAG, "in validUsername(" + username + ")");
+        Log.d(TAG, "validUsername(): currUsers = " + currUsers.toString());
         for(ParseUser user: currUsers) {
             if(user.getUsername().equalsIgnoreCase(username)){
                 return false;

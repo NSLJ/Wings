@@ -1,4 +1,4 @@
-package com.example.wings.startactivity.fragments;
+package com.example.wings.mainactivity.fragments;
 
 import android.content.Context;
 import android.content.Intent;

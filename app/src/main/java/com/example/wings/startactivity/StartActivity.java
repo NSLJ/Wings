@@ -11,7 +11,7 @@ import com.example.wings.mainactivity.MainActivity;
 import com.example.wings.commonFragments.EditTrustedContactsFragment;
 import com.example.wings.commonFragments.SettingsFragment;
 import com.example.wings.startactivity.fragments.LoginFragment;
-import com.example.wings.startactivity.fragments.ProfileSetupFragment;
+import com.example.wings.mainactivity.fragments.ProfileSetupFragment;
 import com.example.wings.startactivity.fragments.RegisterOneFragment;
 import com.example.wings.startactivity.fragments.RegisterTwoFragment;
 
