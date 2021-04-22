@@ -61,7 +61,7 @@ public class RegisterTwoFragment extends Fragment {
      */
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
-        loginBttn = view.findViewById(R.id.loginBttn);
+     /*   loginBttn = view.findViewById(R.id.loginBttn);
         registerOneBttn = view.findViewById(R.id.registerOneBttn);
         profileSetupBttn = view.findViewById(R.id.profileSetupBttn);
 
@@ -86,7 +86,7 @@ public class RegisterTwoFragment extends Fragment {
             public void onClick(View v) {
                 listener.toProfileSetupFragment();
             }
-        });
+        });*/
 
     }
 }
