@@ -17,7 +17,7 @@ import com.example.wings.mainactivity.fragments.ProfileSetupFragment;
 import com.example.wings.startactivity.fragments.RegisterOneFragment;
 import com.example.wings.startactivity.fragments.RegisterTwoFragment;
 
-import org.parceler.Parcels;
+//import org.parceler.Parcels;
 
 /**
  * StartActivity.java
@@ -62,14 +62,14 @@ public class StartActivity extends AppCompatActivity implements SAFragmentsListe
 
     @Override
     public void toRegisterTwoFragment(User user) {
-        //1.) Package a bundle
+      /*  //1.) Package a bundle
         Bundle bundle = new Bundle();
         bundle.putParcelable(KEY_SEND_USER, Parcels.wrap(user));
 
         //2.) Create the Fragment with the bundle and display it
         Fragment profileSetUpFrag = new ProfileSetupFragment();
         profileSetUpFrag.setArguments(bundle);
-        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, profileSetUpFrag).commit();
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, profileSetUpFrag).commit();*/
     }
 
     @Override
