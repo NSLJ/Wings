@@ -57,9 +57,12 @@ public class ProfileSetupFragment extends Fragment {
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
     public static final int PICK_PHOTO_CODE = 1046;
     private static final String PHOTO_FILE_NAME = "photo.jpg";         //arbitrary file name to store Post photo in
+    private static final String KEY_RECEIVE_USER = "user";
+
     public File photoFile;
     private ImageView profileImage;
     User user = new User();
+    User userToSetUp;
 
     private int numtc = 1;
 
@@ -86,9 +89,15 @@ public class ProfileSetupFragment extends Fragment {
     }
 
     @Override
+    //Purpose:      called once Fragment created, will obtain the User object it was passed in
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);        //let know that there is an options menu to inflate
+
+        if(getArguments() != null){
+            Log.d(TAG, "in onCreate: received the User instance to set up!");
+            userToSetUp = getArguments().getParcelable(KEY_RECEIVE_USER);
+        }
     }
 
     @SuppressLint("ResourceAsColor")
