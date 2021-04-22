@@ -1,6 +1,7 @@
 package com.example.wings.startactivity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
@@ -16,12 +17,15 @@ import com.example.wings.mainactivity.fragments.ProfileSetupFragment;
 import com.example.wings.startactivity.fragments.RegisterOneFragment;
 import com.example.wings.startactivity.fragments.RegisterTwoFragment;
 
+import org.parceler.Parcels;
+
 /**
  * StartActivity.java
  * Purpose:         Displays the appropriate fragments that executes the beginning functions of the app. Essentially is a container to swap between each fragment.
  *
  */
 public class StartActivity extends AppCompatActivity implements SAFragmentsListener {
+    public static final String KEY_SEND_USER = "user";
 
     final FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -58,7 +62,14 @@ public class StartActivity extends AppCompatActivity implements SAFragmentsListe
 
     @Override
     public void toRegisterTwoFragment(User user) {
-        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new RegisterTwoFragment()).commit();
+        //1.) Package a bundle
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(KEY_SEND_USER, Parcels.wrap(user));
+
+        //2.) Create the Fragment with the bundle and display it
+        Fragment profileSetUpFrag = new ProfileSetupFragment();
+        profileSetUpFrag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, profileSetUpFrag).commit();
     }
 
     @Override

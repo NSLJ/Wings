@@ -10,11 +10,13 @@ import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.parceler.Parcel;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Parcel
 @ParseClassName("User")
 public class User extends ParseUser {
     private static final String DEBUG_TAG = "User";
@@ -34,7 +36,7 @@ public class User extends ParseUser {
     //not sure if we will need this
     public static final String KEY_OBJECTID = "objectId";
 
-    public User(){}
+    public User(){}     //req by the Parceler library
 
     //returns the username part of the cpp email (Example: billybronco@cpp.edu would return billybronco)
     public String getUsername(){
