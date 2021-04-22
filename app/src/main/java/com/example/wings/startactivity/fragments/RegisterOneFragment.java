@@ -45,8 +45,8 @@ public class RegisterOneFragment extends Fragment {
     private SAFragmentsListener listener;
     private List<ParseUser> currUsers;          //To error check if new user is already a user
 
-    private Button backLoginBtn;
     private Button signUpBtn;
+    private TextView tvToLogin;
     private EditText etFName;
     private EditText etLName;
     private EditText etEmail;
@@ -88,7 +88,7 @@ public class RegisterOneFragment extends Fragment {
 
         //1.) Get references to Views:
         signUpBtn = view.findViewById(R.id.signUpBtn);
-        backLoginBtn = view.findViewById(R.id.backLoginBtn);
+        tvToLogin = view.findViewById(R.id.tvToLogin);
         etFName = view.findViewById(R.id.etFName);
         etLName = view.findViewById(R.id.etLName);
         etEmail= view.findViewById(R.id.etEmail);
@@ -96,8 +96,8 @@ public class RegisterOneFragment extends Fragment {
         etRetypedPass = view.findViewById(R.id.etRetypedPassword);
 
         //2.) Set on click listeners:
-        //2a.) backBttn --> back to Login page
-        backLoginBtn.setOnClickListener(new View.OnClickListener() {
+        //2a.) clickable login link --> back to Login page
+        tvToLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 listener.toLoginFragment();

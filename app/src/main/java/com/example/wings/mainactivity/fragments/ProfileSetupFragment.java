@@ -46,7 +46,6 @@ import static android.app.Activity.RESULT_OK;
  *                     PIN number, profile picture, and Trusted Contacts.
  */
 public class ProfileSetupFragment extends Fragment {
-
     private static final String TAG = "ProfileSetupFragment";
     private static final String CODEPATH_FILE_PROVIDER_KEY = "com.codepath.fileprovider";
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
@@ -85,8 +84,6 @@ public class ProfileSetupFragment extends Fragment {
      * Purpose:     Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
      */
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        //super.onViewCreated(view, savedInstanceState);
-
         //1.) Get references to Views:
         completeBtn = view.findViewById(R.id.completeBtn);
         profileImage = view.findViewById(R.id.profileImage);
@@ -144,8 +141,6 @@ public class ProfileSetupFragment extends Fragment {
         photoFile = getPhotoFileUri(PHOTO_FILE_NAME);
 
         // wrap File object into a content provider
-        // required for API >= 24
-        // See https://guides.codepath.com/android/Sharing-Content-with-Intents#sharing-files-with-api-24-or-higher
          Uri fileProvider = FileProvider.getUriForFile(getContext(), CODEPATH_FILE_PROVIDER_KEY, photoFile);
          intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
 
@@ -160,7 +155,6 @@ public class ProfileSetupFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
 
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
             // by this point we have the camera photo on disk
@@ -182,8 +176,6 @@ public class ProfileSetupFragment extends Fragment {
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(gallery, PICK_PHOTO_CODE);
     }
-
-
 
     @Override
     /**

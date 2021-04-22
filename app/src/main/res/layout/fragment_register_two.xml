@@ -1,34 +1,168 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#121212"
     android:orientation="vertical"
     tools:context=".startactivity.fragments.RegisterTwoFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="266dp"
-        android:text="This is the Register Two Fragment!"
+        android:id="@+id/tvCreateAccountTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivLogo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"
+        android:fontFamily="@font/lato"
+        android:text="Create Account"
+        android:textColor="@color/logo_teal"
+        android:textSize="36sp" />
+
+
+    <LinearLayout
+        android:id="@+id/LLPassRequirements"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvCreateAccountTitle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvCapLetterReq"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ivLogo"
+            android:layout_centerHorizontal="true"
+            android:fontFamily="@font/lato"
+            android:text="• At least one capital letter"
+            android:textColor="#FF0000"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvLowLetterReq"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ivLogo"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="7dp"
+            android:fontFamily="@font/lato"
+            android:text="• At least one lowercase letter"
+            android:textColor="#FF0000"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/lengthReq"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ivLogo"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="7dp"
+            android:fontFamily="@font/lato"
+            android:text="• At least 7 characters"
+            android:textColor="#FF0000"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/numReq"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ivLogo"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="7dp"
+            android:fontFamily="@font/lato"
+            android:text="• At least one number"
+            android:textColor="#FF0000"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/LLPassRequirements"
+        android:layout_alignLeft="@id/etRetypedPassword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="45dp"
+        android:background="@drawable/et_rounded_corners_style"
+        android:fontFamily="@font/lato"
+        android:hint="password"
+        android:inputType="textPassword"
+        android:paddingLeft="15dp"
+        android:paddingTop="13dp"
+        android:paddingRight="160dp"
+        android:paddingBottom="13dp"
+        android:textColor="@color/gray"
+        android:textColorHint="@color/gray"
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/etRetypedPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etPassword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/et_rounded_corners_style"
+        android:fontFamily="@font/lato"
+        android:hint="re-type password"
+        android:inputType="textPassword"
+        android:paddingLeft="15dp"
+        android:paddingTop="13dp"
+        android:paddingRight="78dp"
+        android:paddingBottom="13dp"
+        android:textColor="@color/gray"
+        android:textColorHint="@color/gray"
         android:textSize="24sp" />
 
     <Button
-        android:id="@+id/registerOneBttn"
-        android:layout_width="match_parent"
+        app:backgroundTint="@null"
+        android:id="@+id/signUpBtn"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Back to Register one fragment" />
+        android:layout_below="@+id/etRetypedPassword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="56dp"
+        android:background="@drawable/btn_rounded_corners_style"
+        android:fontFamily="@font/lato"
+        android:text="Create account"
+        android:textColor="@color/logo_teal" />
 
-    <Button
-        android:id="@+id/loginBttn"
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/ivLogo"
+        android:layout_width="46dp"
+        android:layout_height="45dp"
+        android:layout_marginLeft="145dp"
+        android:src="@drawable/logo" />
+
+    <TextView
+        android:id="@+id/tvLogo"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Back to login Fragment" />
+        android:layout_above="@+id/tvCreateAccountTitle"
+        android:layout_alignBottom="@id/ivLogo"
+        android:layout_marginStart="5dp"
+        android:layout_toEndOf="@+id/ivLogo"
+        android:fontFamily="@font/satisfy"
+        android:text="Wings"
+        android:textColor="@color/logo_teal"
+        android:textSize="30sp" />
 
-    <Button
-        android:id="@+id/profileSetupBttn"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/tvToLogin"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="To profile setup" />
+        android:layout_below="@+id/signUpBtn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="28dp"
+        android:clickable="true"
+        android:fontFamily="@font/satisfy"
+        android:text="Already have an account? Login here!"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
 
-</LinearLayout>
+</RelativeLayout>
