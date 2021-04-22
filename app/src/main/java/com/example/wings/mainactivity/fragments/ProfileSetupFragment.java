@@ -1,4 +1,4 @@
-package com.example.wings.startactivity.fragments;
+package com.example.wings.mainactivity.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
