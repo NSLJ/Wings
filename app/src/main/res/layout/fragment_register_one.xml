@@ -89,18 +89,4 @@
         android:layout_below="@+id/signUpBtn"
         android:text="Back to Login" />
 
-    <!--
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="195dp"
-        android:text="This is the Register One Fragment!"
-        android:textSize="24sp" />
-
-    <Button
-        android:id="@+id/registerTwoBttn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="To Register Two Fragment" />
-     -->
-
 </RelativeLayout>

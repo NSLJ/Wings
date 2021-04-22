@@ -53,20 +53,4 @@
         android:layout_below="@+id/btnLogin"
         android:text="Do not have an account? Register here"/>
 
-    <!--
-    <Button
-        android:id="@+id/registerBttn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="To Register 1 Fragment" />
-
-    <Button
-        android:id="@+id/homeBttn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="To Home Activity" />
-        -->
-
 </RelativeLayout>
