@@ -10,13 +10,13 @@ import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.parceler.Parcel;
+//import org.parceler.Parcel;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Parcel
+//@Parcel
 @ParseClassName("User")
 public class User extends ParseUser {
     private static final String DEBUG_TAG = "User";
