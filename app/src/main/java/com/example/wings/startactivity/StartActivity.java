@@ -10,8 +10,9 @@ import com.example.wings.commonFragments.HelpFragment;
 import com.example.wings.mainactivity.MainActivity;
 import com.example.wings.commonFragments.EditTrustedContactsFragment;
 import com.example.wings.commonFragments.SettingsFragment;
+import com.example.wings.models.User;
 import com.example.wings.startactivity.fragments.LoginFragment;
-import com.example.wings.startactivity.fragments.ProfileSetupFragment;
+import com.example.wings.mainactivity.fragments.ProfileSetupFragment;
 import com.example.wings.startactivity.fragments.RegisterOneFragment;
 import com.example.wings.startactivity.fragments.RegisterTwoFragment;
 
@@ -56,7 +57,7 @@ public class StartActivity extends AppCompatActivity implements SAFragmentsListe
     }
 
     @Override
-    public void toRegisterTwoFragment() {
+    public void toRegisterTwoFragment(User user) {
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new RegisterTwoFragment()).commit();
     }
 

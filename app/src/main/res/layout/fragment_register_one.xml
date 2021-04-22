@@ -1,106 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="#121212"
     android:orientation="vertical"
     tools:context=".startactivity.fragments.RegisterOneFragment">
 
+    <TextView
+        android:id="@+id/tvCreateAccountTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivLogo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        android:fontFamily="@font/lato"
+        android:text="Create Account"
+        android:textColor="@color/logo_teal"
+        android:textSize="36sp" />
 
     <EditText
         android:id="@+id/etFName"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#40C4C4C4"
+        android:layout_below="@id/tvCreateAccountTitle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/et_rounded_corners_style"
         android:fontFamily="@font/lato"
         android:hint="First name"
         android:inputType="text"
+        android:paddingLeft="15dp"
+        android:paddingTop="10dp"
+        android:paddingRight="160dp"
+        android:paddingBottom="10dp"
         android:textColor="@color/gray"
         android:textColorHint="@color/gray"
         android:textSize="24sp" />
 
     <EditText
         android:id="@+id/etLName"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/etFName"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/et_rounded_corners_style"
         android:fontFamily="@font/lato"
         android:hint="Last name"
         android:inputType="text"
-        android:background="#40C4C4C4"
+        android:paddingLeft="15dp"
+        android:paddingTop="10dp"
+        android:paddingRight="160dp"
+        android:paddingBottom="10dp"
         android:textColor="@color/gray"
         android:textColorHint="@color/gray"
         android:textSize="24sp" />
 
     <EditText
         android:id="@+id/etEmail"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/etLName"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/et_rounded_corners_style"
+        android:paddingLeft="15dp"
+        android:paddingTop="10dp"
+        android:paddingRight="160dp"
+        android:paddingBottom="10dp"
         android:fontFamily="@font/lato"
         android:hint="CPP Email"
         android:inputType="text"
-        android:background="#40C4C4C4"
         android:textColor="@color/gray"
         android:textColorHint="@color/gray"
         android:textSize="24sp" />
 
     <EditText
         android:id="@+id/etPassword"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/etEmail"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/et_rounded_corners_style"
         android:fontFamily="@font/lato"
         android:hint="password"
+        android:paddingLeft="15dp"
+        android:paddingTop="10dp"
+        android:paddingRight="160dp"
+        android:paddingBottom="10dp"
         android:inputType="textPassword"
-        android:background="#40C4C4C4"
         android:textColor="@color/gray"
         android:textColorHint="@color/gray"
         android:textSize="24sp" />
 
     <EditText
         android:id="@+id/etRetypedPassword"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/etPassword"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/et_rounded_corners_style"
         android:fontFamily="@font/lato"
         android:hint="re-type password"
         android:inputType="textPassword"
-        android:background="#40C4C4C4"
+        android:paddingLeft="15dp"
+        android:paddingTop="10dp"
+        android:paddingRight="160dp"
+        android:paddingBottom="10dp"
         android:textColor="@color/gray"
         android:textColorHint="@color/gray"
         android:textSize="24sp" />
 
     <Button
         android:id="@+id/signUpBtn"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/etRetypedPassword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="56dp"
         android:backgroundTint="#40C4C4C4"
         android:fontFamily="@font/lato"
         android:text="Create account"
         android:textColor="@color/logo_teal" />
 
-    <Button
-        android:id="@+id/backLoginBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/signUpBtn"
-        android:text="Back to Login" />
+    <ImageView
+        android:id="@+id/ivLogo"
+        android:layout_width="46dp"
+        android:layout_height="45dp"
+        android:layout_marginLeft="145dp"
+        android:src="@drawable/logo" />
 
-    <!--
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="195dp"
-        android:text="This is the Register One Fragment!"
-        android:textSize="24sp" />
-
-    <Button
-        android:id="@+id/registerTwoBttn"
+        android:id="@+id/tvLogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="To Register Two Fragment" />
-     -->
+        android:layout_above="@+id/tvCreateAccountTitle"
+        android:layout_alignBottom="@id/ivLogo"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="2dp"
+        android:layout_toEndOf="@+id/ivLogo"
+        android:fontFamily="@font/satisfy"
+        android:text="Wings"
+        android:textColor="@color/logo_teal"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/tvToLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/signUpBtn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="45dp"
+        android:clickable="true"
+        android:fontFamily="@font/satisfy"
+        android:text="Already have an account? Login here!"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
 
 </RelativeLayout>
