@@ -1,15 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".mainactivity.fragments.OtherProfileFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="This is the Other User Profile Fragment!"
-        android:textSize="24sp" />
+    <ImageView
+        android:id="@+id/otherPic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="61dp"
+        tools:src="@tools:sample/avatars" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/otherName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/otherPic"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp"
+        android:text="Annie" />
+
+    <TextView
+        android:id="@+id/otherEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/otherName"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="20dp"
+        android:text="annie@cpp.edu" />
+
+    <TextView
+        android:id="@+id/otherFriends"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/otherEmail"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="My Friends" />
+
+    <TextView
+        android:id="@+id/distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/profileRating"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="23dp"
+        android:text="0.2m away from you" />
+
+    <RatingBar
+        android:id="@+id/profileRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginEnd="85dp"
+        android:layout_marginBottom="33dp" />
+
+</RelativeLayout>
