@@ -121,42 +121,8 @@ public class RegisterOneFragment extends Fragment {
                 else{
                     showLongTopToast(errorString);
                 }
-                //listener.toProfileSetupFragment();
-                /*
-                passwordtxt1 = password1.getText().toString();
-                passwordtxt2 = password2.getText().toString();
-
-                if (usernametxt.equals("") || passwordtxt1.equals("") || passwordtxt1.equals("")) {
-                    Toast.makeText(getContext(), "Please complete the form.", Toast.LENGTH_SHORT).show();
-                } else if (!(passwordtxt1.equals(passwordtxt2))) {
-                    Toast.makeText(getContext(), "Passwords do not match.", Toast.LENGTH_SHORT).show();
-                } else {
-                    ParseUser user = new ParseUser();
-                    user.setUsername(usernametxt);
-                    user.setPassword(passwordtxt1);
-                    user.signUpInBackground(new SignUpCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if(e==null) {
-                                Toast.makeText(getContext(), "Successfully signed up!", Toast.LENGTH_SHORT).show();
-                                listener.toProfileSetupFragment();
-                            } else {
-                                Toast.makeText(getContext(), "Sign up error", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-                }*/
             }
         });
-
-        /*Changes the Fragment to RegisterTwoFragment via the StartActivity!
-        registerTwoBttn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.toRegisterTwoFragment();
-            }
-        });*/
-
     }
 
     private void createAccount(String fName, String lName, String email, String password) {
