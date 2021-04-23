@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,10 +26,23 @@ import com.example.wings.startactivity.SAFragmentsListener;
 public class EditTrustedContactsFragment extends Fragment {
     private static final String TAG = "EditTrustedContactsFragment";
     private SAFragmentsListener listener;
-
+    private int numTCList = 0;
 
     public EditTrustedContactsFragment() {
     }        // Required empty public constructor
+
+    @SuppressLint("ResourceAsColor")
+    @Override
+    /**
+     * Purpose:     Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
+     */
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        // Set limit max 5 members in the Trusted Contact List
+        if (numTCList > 5) {
+            Toast toast = Toast.makeText(getContext(), "Can only have up to 5 members!", Toast.LENGTH_LONG);
+        }
+
+    }
 
     @Override
     /**
@@ -43,15 +57,6 @@ public class EditTrustedContactsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);        //let know that there is an options menu to inflate
-    }
-
-    @SuppressLint("ResourceAsColor")
-    @Override
-    /**
-     * Purpose:     Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
-     */
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
     }
 
     @Override
