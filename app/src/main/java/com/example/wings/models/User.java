@@ -6,11 +6,9 @@ import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
@@ -18,15 +16,7 @@ import java.util.List;
 
 @ParseClassName("User")
 public class User extends ParseObject {
-
-    //empty constructor for Parse
-    public User(){
-    }
-
-
-
     private static final String DEBUG_TAG = "User";
-
 
     public static final String KEY_USERNAME = "username";
     public static final String KEY_PASSWORD = "password";
@@ -43,7 +33,7 @@ public class User extends ParseObject {
     //not sure if we will need this
     public static final String KEY_OBJECTID = "objectId";
 
-
+    public User(){}
 
     //returns the username part of the cpp email (Example: billybronco@cpp.edu would return billybronco)
     public String getUsername(){
@@ -105,9 +95,14 @@ public class User extends ParseObject {
     }
 
     //seems like we need a specific way to do this...
-    public List getTrustedContacts() {
-
-
+    public List getTrustedContacts() throws JSONException {
+        JSONArray jsonArray = getJSONArray(KEY_TRUSTEDCONTACTS);
+        Log.d(DEBUG_TAG, jsonArray.toString());
+       List<TrustedContact> trustedContacts = new ArrayList<TrustedContact>();
+       /* for(int i = 0; i < jsonArray.length(); i++){
+           trustedContacts.add(new TrustedContact(jsonArray.getJSONObject(i)));
+        }*/
+        return trustedContacts;
     }
 
     public void setTrustedContacts(List contacts){
@@ -124,11 +119,8 @@ public class User extends ParseObject {
 
     public int getRating(){ return getInt(KEY_RATING);}
 
-    public void setRating(int rating){
-        if((rating <= 5) && (rating > 0)){
-            put(KEY_RATING, rating);
-        }
-    }
+    //TODO: Set error handling so rating must <= 5
+    public void setRating(int rating){ put(KEY_RATING, rating); }
 
     public String getObjectID(){ return getString(KEY_OBJECTID); }
 }

@@ -84,13 +84,9 @@ public class RegisterOneFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
         signUpBtn = view.findViewById(R.id.signUpBtn);
-        backLoginBtn = view.findViewById(R.id.backLoginBtn);
+
 
         username = view.findViewById(R.id.etUsername);
-        password1 = view.findViewById(R.id.password1);
-        password2 = view.findViewById(R.id.password2);
-
-
         //Changes the Fragment to the LoginFragment via the StartActivity!
         backLoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override

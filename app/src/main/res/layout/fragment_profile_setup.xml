@@ -1,23 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".startactivity.fragments.ProfileSetupFragment">
+    tools:context=".mainactivity.fragments.ProfileSetupFragment"
+    android:background="#121212">
 
-    <!-- TODO: Update blank fragment layout -->
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="195dp"
-        android:text="This is the Profile Setup Fragment!"
-        android:textSize="24sp" />
+    <ImageView
+        android:id="@+id/profileImage"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_below="@+id/instruction1"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        tools:src="@tools:sample/avatars" />
 
     <Button
         android:id="@+id/completeBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/setupTCBtn"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="-4dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginEnd="-1dp"
+        android:layout_marginBottom="-2dp"
+        android:backgroundTint="@color/logo_teal"
         android:text="Complete setting up profile" />
 
-</LinearLayout>
+    <Button
+        android:id="@+id/takePhotoBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/instruction1"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="41dp"
+        android:layout_toEndOf="@+id/profileImage"
+        android:backgroundTint="@color/gray_100"
+        android:text="Take a photo!" />
+
+    <Button
+        android:id="@+id/galleryBtn"
+        android:layout_width="120dp"
+        android:layout_height="85dp"
+        android:layout_below="@+id/takePhotoBtn"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="41dp"
+        android:layout_toEndOf="@+id/profileImage"
+        android:backgroundTint="@color/gray_100"
+        android:text="Upload from gallery" />
+
+    <TextView
+        android:id="@+id/instruction1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="181dp"
+        android:text="1. Upload or take a profile picture"
+        android:textColor="@color/white" />
+
+    <TextView
+        android:id="@+id/instruction2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/profileImage"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="40dp"
+        android:text="2. Set up a 4-digit PIN number. Do NOT share this!
+
+
+        (This will be used to confirm all important decisions)"
+        android:textColor="@color/white" />
+
+    <EditText
+        android:id="@+id/numPIN"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/instruction2"
+        android:layout_alignParentStart="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="22dp"
+        android:backgroundTint="@color/gray_100"
+        android:ems="10"
+        android:inputType="number"
+        android:textColor="@color/white" />
+
+    <TextView
+        android:id="@+id/instruction3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/numPIN"
+
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:text="3. Set up AT LEAST 1 Trusted Contacts (3+ recommended!)
+
+        Trusted Contacts are the people we notify in case any emergency concerning you!"
+        android:textColor="@color/white" />
+
+    <Button
+        android:id="@+id/setupTCBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/instruction3"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="20dp"
+        android:layout_toEndOf="@+id/tcStatus"
+        android:backgroundTint="@color/gray_100"
+        android:text="Set up Trusted Contacts" />
+
+    <TextView
+        android:id="@+id/tcStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/instruction3"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="35dp"
+        android:text="not done"
+        android:textColor="@color/red" />
+
+
+</RelativeLayout>

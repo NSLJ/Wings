@@ -13,11 +13,7 @@ import android.view.ViewGroup;
 
 import com.example.wings.R;
 import com.example.wings.models.User;
-import com.parse.Parse;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
-
-import static com.parse.ParseObject.create;
 
 //All auto-filled stuff, just follow the samples I left behind!
 
@@ -38,7 +34,6 @@ public class UserProfileFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
 
     public UserProfileFragment() {}   // Required empty public constructor
 
@@ -78,5 +73,23 @@ public class UserProfileFragment extends Fragment {
 
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
+//        //temp for testing
+//        User user = new User();
+//        user.setEmail("lms@cpp.edu");
+//        user.setFirstName("Laura");
+//        user.setLastName("Siu");
+//        user.setProfileSetUp(false);
+//        user.setRating(5);
+//        user.setPin(1111);
+//
+//        Log.i(TAG, "username: " + ((User) user).getUsername() + " FirstName: " + ((User) user).getFirstName() + " Last Name: " + ((User) user).getLastName() + " Email: " + ((User) user).getEmail() + " Pin: " + ((User) user).getPin());
+
+
+
+
+    }
 }
