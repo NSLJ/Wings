@@ -37,6 +37,7 @@ import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.User;
 import com.example.wings.startactivity.SAFragmentsListener;
 import com.example.wings.startactivity.StartActivity;
+import com.parse.ParseUser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -59,15 +60,13 @@ public class ProfileSetupFragment extends Fragment {
     private static final String PHOTO_FILE_NAME = "photo.jpg";         //arbitrary file name to store Post photo in
     private static final String KEY_RECEIVE_USER = "user";
 
+    private MAFragmentsListener listener;
+
     public File photoFile;
     private ImageView profileImage;
-    User user = new User();
-    User userToSetUp;
+    ParseUser user = ParseUser.getCurrentUser();
 
     private int numtc = 1;
-
-    private SAFragmentsListener listener;
-    private MAFragmentsListener mlistener;
 
     private Button completeBtn;
     private Button galleryBtn;
@@ -76,8 +75,7 @@ public class ProfileSetupFragment extends Fragment {
     private Button setupTCBtn;
     private EditText numPIN;
 
-    public ProfileSetupFragment() {
-    }        // Required empty public constructor
+    public ProfileSetupFragment() {}        // Required empty public constructor
 
     @Override
     /**
@@ -92,9 +90,21 @@ public class ProfileSetupFragment extends Fragment {
     //Purpose:      called once Fragment created, will obtain the User object it was passed in
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);        //let know that there is an options menu to inflate
     }
 
+    @Override
+    /**
+     * Purpose:     Called automatically. When this Fragment is being attached to the parent activity, REQUIRE the activity to implement SAFragmentsListener. Otherwise throw an exception!
+     *              Connect the Fragment's listener to the activity!
+     */
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof MAFragmentsListener) {
+            listener = (MAFragmentsListener) context;
+        } else {
+            throw new ClassCastException(context.toString() + " must implement MAFragmentsListener");
+        }
+    }
     @SuppressLint("ResourceAsColor")
     @Override
     /**
@@ -114,7 +124,6 @@ public class ProfileSetupFragment extends Fragment {
         if (numtc > 0) {
             tcstatus.setTextColor(Color.GREEN);
             tcstatus.setText("completed");
-
         }
 
 //        // To create a Trusted Contact List
@@ -129,8 +138,9 @@ public class ProfileSetupFragment extends Fragment {
                 String errorString = isValid();
 
                 if(errorString.equals("")){
-                    user.setProfileSetUp(true);
-                    mlistener.toHomeFragment();
+                    user.put(User.KEY_PROFILESETUP, true);
+                    listener.setRestrictScreen(false);
+                    listener.toHomeFragment();
                 }
                 else{
                     showLongTopToast(errorString);
@@ -239,56 +249,6 @@ public class ProfileSetupFragment extends Fragment {
         startActivityForResult(gallery, PICK_PHOTO_CODE);
     }
 
-    @Override
-    /**
-     * Purpose:     Called automatically. When this Fragment is being attached to the parent activity, REQUIRE the activity to implement SAFragmentsListener. Otherwise throw an exception!
-     *              Connect the Fragment's listener to the activity!
-     */
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        if (context instanceof SAFragmentsListener) {
-            listener = (SAFragmentsListener) context;
-        } else {
-            throw new ClassCastException(context.toString() + " must implement SAFragmentsListener");
-        }
-    }
-
-    @Override
-    /**
-     * Purpose:     Inflates a specific top navigation bar for this fragment, allowing the user to logout without setting up their profile, to go to SettingsFragments, or go to HelpFragment
-     */
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_profilesetup_navigation, menu);
-    }
-
-    /**
-     * Purpose:     Attaches events when menu items are pushed.
-     *
-     * @param item, which item was selected
-     * @return
-     */
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_logout:
-                /*1.) If there is an actual user logged in, log them out
-                    if(ParseUser.getCurrentUser() != null){
-                        ParseUser.logOut();
-                    }
-                */
-                //2.) Switch to LoginFragment:
-                listener.toLoginFragment();
-                return true;
-            case R.id.action_settings:
-                listener.toSettingsFragment();
-                break;
-            case R.id.action_help:
-                listener.toHelpFragment();
-                break;
-            default:
-                return false;
-        }
-        return false;
-    }
 
     private void showLongTopToast(String message){
         Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_LONG);
