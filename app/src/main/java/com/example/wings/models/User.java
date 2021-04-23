@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ParseClassName("User")
-public class User extends ParseUser {
+public class User extends ParseObject {
 
     //empty constructor for Parse
     public User(){
