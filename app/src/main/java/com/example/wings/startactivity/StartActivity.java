@@ -6,16 +6,21 @@ import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+
 import com.example.wings.R;
 import com.example.wings.commonFragments.HelpFragment;
 import com.example.wings.mainactivity.MainActivity;
 import com.example.wings.commonFragments.EditTrustedContactsFragment;
 import com.example.wings.commonFragments.SettingsFragment;
+import com.example.wings.models.ParcelUser;
 import com.example.wings.models.User;
 import com.example.wings.startactivity.fragments.LoginFragment;
 import com.example.wings.mainactivity.fragments.ProfileSetupFragment;
 import com.example.wings.startactivity.fragments.RegisterOneFragment;
 import com.example.wings.startactivity.fragments.RegisterTwoFragment;
+
+import org.parceler.Parcels;
 
 //import org.parceler.Parcels;
 
@@ -26,6 +31,8 @@ import com.example.wings.startactivity.fragments.RegisterTwoFragment;
  */
 public class StartActivity extends AppCompatActivity implements SAFragmentsListener {
     public static final String KEY_SEND_USER = "user";
+    public static final String KEY_PROFILESETUPFRAG = "ProfileSetupFrag?";
+    private static final String TAG = "StartActivity";
 
     final FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -42,8 +49,12 @@ public class StartActivity extends AppCompatActivity implements SAFragmentsListe
     }
 
     @Override
-    public void onLogin() {
+    //Purpose:      based on the given key --> goes to either ProfileSetUpFrag or HomeFrag
+    public void onLogin(String key) {
         Intent intent = new Intent(this, MainActivity.class);
+        if(key.equals(KEY_PROFILESETUPFRAG)){
+            intent.putExtra(KEY_PROFILESETUPFRAG, true);        //tell MainActivity to start on ProfileSetupFrag
+        }
         startActivity(intent);
         finish();
     }
@@ -62,14 +73,15 @@ public class StartActivity extends AppCompatActivity implements SAFragmentsListe
 
     @Override
     public void toRegisterTwoFragment(User user) {
-      /*  //1.) Package a bundle
+        Log.d(TAG, "in toRegisterTwoFragment()");
+        //1.) Package a bundle
         Bundle bundle = new Bundle();
-        bundle.putParcelable(KEY_SEND_USER, Parcels.wrap(user));
+        bundle.putParcelable(KEY_SEND_USER, Parcels.wrap(new ParcelUser(user)));
 
         //2.) Create the Fragment with the bundle and display it
-        Fragment profileSetUpFrag = new ProfileSetupFragment();
-        profileSetUpFrag.setArguments(bundle);
-        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, profileSetUpFrag).commit();*/
+        Fragment registerTwoFrag= new RegisterTwoFragment();
+        registerTwoFrag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, registerTwoFrag).commit();
     }
 
     @Override
