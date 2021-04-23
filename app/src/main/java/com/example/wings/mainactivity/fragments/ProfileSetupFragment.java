@@ -93,11 +93,6 @@ public class ProfileSetupFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);        //let know that there is an options menu to inflate
-
-        if(getArguments() != null){
-            Log.d(TAG, "in onCreate: received the User instance to set up!");
-            userToSetUp = getArguments().getParcelable(KEY_RECEIVE_USER);
-        }
     }
 
     @SuppressLint("ResourceAsColor")

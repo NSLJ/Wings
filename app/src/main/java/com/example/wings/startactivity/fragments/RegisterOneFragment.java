@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wings.R;
+import com.example.wings.models.ParcelUser;
 import com.example.wings.models.User;
 import com.example.wings.startactivity.SAFragmentsListener;
 import com.parse.FindCallback;
@@ -50,8 +51,6 @@ public class RegisterOneFragment extends Fragment {
     private EditText etFName;
     private EditText etLName;
     private EditText etEmail;
-    private EditText etPassword;
-    private EditText etRetypedPass;
 
     public RegisterOneFragment() {}    // Required empty public constructor
 
@@ -92,8 +91,6 @@ public class RegisterOneFragment extends Fragment {
         etFName = view.findViewById(R.id.etFName);
         etLName = view.findViewById(R.id.etLName);
         etEmail= view.findViewById(R.id.etEmail);
-        etPassword = view.findViewById(R.id.etPassword);
-        etRetypedPass = view.findViewById(R.id.etRetypedPassword);
 
         //2.) Set on click listeners:
         //2a.) clickable login link --> back to Login page
@@ -109,122 +106,48 @@ public class RegisterOneFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, ": sign up button clicked!");
-                //1.) Obtain all info needed:
-                String email = etEmail.getText().toString();
-                String password = etPassword.getText().toString();
-                String retypedPass = etRetypedPass.getText().toString();
+                if(etEmail != null) {
+                    String email = etEmail.getText().toString();
 
-                Log.d(TAG, "onClick() signUpBtn: checking if all user input is valid.");
-                String errorString = null;          //Check if email, username, and password are valid
-                try {
-                    errorString = isValid(email, password, retypedPass);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                Log.d(TAG, "onClick() signUpBtn: errorString=" + errorString);
+                    //Check if email and username is valid:
+                    String errorString = null;
+                    try {
+                        errorString = isValid(email);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
-                //2.) If no error string --> user's info is valid!
-                if(errorString.equals("")) {
-                    String fName = etFName.getText().toString();
-                    String lName = etLName.getText().toString();
-                    createAccount(fName, lName, email, password);
+                    // If no error string --> user's info is valid!
+                    //      Create a user and send to RegisterTwoFragment:
+                    if (errorString.equals("")) {
+                        User user = new User();
+                        user.setFirstName(etFName.getText().toString());
+                        user.setLastName(etLName.getText().toString());
+                        user.setEmail(email);
+                        user.setUsername(email.substring(0, email.length() - 8));
+                        user.setProfileSetUp(false);            //ensure flag on --> show this user has not set up profile
+
+                        listener.toRegisterTwoFragment(user);
+                    } else {
+                        showLongTopToast(errorString);
+                    }
                 }
                 else{
-                    showLongTopToast(errorString);
+                    showLongTopToast("There's no email!");
                 }
             }
         });
     }
 
-    private void createAccount(String fName, String lName, String email, String password) {
-        Log.d(TAG, " in createAccount()");
-        //1.) Obtain the username:
-        String username = email.substring(0, email.length()-8);
-
-        //2.) Create a User and set with all sign up info:
-        User user = new User();
-        user.setFirstName(fName);
-        user.setLastName(lName);
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setUsername(username);
-        user.setProfileSetUp(false);
-
-        //3.) Attempt sign up in another thread, and set up callback handler:
-        user.signUpInBackground(new SignUpCallback() {
-            @Override
-            public void done(ParseException e) {
-                //No error --> success!
-                if(e == null){
-                    Log.i(TAG, "createAccount():  User successful sign up!" );
-
-                    //Notify user of success (set to display at top of screen):
-                    Toast toast = Toast.makeText(getContext(), "You're now signed up!", Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.TOP, 0, 0);
-                    toast.show();
-
-                    //Go to ProfileSetupFragment automatically:
-                    listener.toProfileSetupFragment();
-                }
-
-                //On failure:
-                else{
-                    Log.e(TAG, "createAccount():  User sign up failure:  error=", e);
-
-                    Toast toast = Toast.makeText(getContext(), "Sorry, we couldn't sign you up!", Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.TOP, 0, 0);
-                    toast.show();
-                }
-            }
-        });
-    }
 
     /**
-     * Purpose:         Determines if the given email, username, and password are valid. If not, the method returns the corresponding error String to display. If valid, the String will be empty.
+     * Purpose:         Determines if the given email and username. If not, the method returns the corresponding error String to display. If valid, the String will be empty.
      * @param email
-     * @param password
      * @return
      */
-    private String isValid(String email, String password, String retypedPass) throws InterruptedException {
+    private String isValid(String email) throws InterruptedException {
         Log.d(TAG, "in isValid()");
         String result = "";
-
-        //1.) Check if the password meets all requirements:
-        if(!password.equals(retypedPass)){
-            //Log.d(TAG, "in isValid():   password and re-typed password don't match");
-            result += "Your password and re-typed password don't match!";
-        }
-        if(password.length() < 7){
-
-            result += "Your password must be longer than 7 characters!\n";
-        }
-
-        boolean hasCapital = false;
-        boolean hasLowerCase = false;
-        boolean hasNumber = false;
-        //loop through string, change flags if requirement is met:
-        for(int index = 0; index < password.length(); index++){
-            char ch = password.charAt(index);
-            if(Character.isUpperCase(ch)){
-                hasCapital = true;
-            }
-            if(Character.isLowerCase(ch)){
-                hasLowerCase = true;
-            }
-            if(Character.isDigit(ch)){
-                hasNumber = true;
-            }
-        }
-        if(!hasCapital){
-            result += "Your password must have at least one capital letter! \n";
-        }
-        if(!hasLowerCase){
-            result += "Your password must have at least one lowercase letter! \n";
-        }
-        if(!hasNumber){
-            result += "Your password must have at least one number! \n";
-        }
-
 
         //2.) Check if email ends with "@cpp.edu":
         if(email.length() > 8) {
@@ -283,12 +206,6 @@ public class RegisterOneFragment extends Fragment {
         return true;
     }
 
-    private void showShortTopToast(String message){
-        //Notify user of success (set to display at top of screen):
-        Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.TOP, 0, 0);
-        toast.show();
-    }
     private void showLongTopToast(String message){
         Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_LONG);
         toast.setGravity(Gravity.TOP, 0, 0);

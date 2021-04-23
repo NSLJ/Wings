@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.wings.R;
+import com.example.wings.models.User;
 import com.example.wings.startactivity.SAFragmentsListener;
 
 import com.parse.LogInCallback;
@@ -32,6 +33,8 @@ import com.parse.ParseUser;
  */
 public class LoginFragment extends Fragment {
     private static final String DEBUG_TAG = "LoginFragment";
+    public static final String KEY_SEND_PROFILESETUPFRAG = "ProfileSetupFrag?";
+
     private SAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
     private Button btnLogin;
     private Button btnRegister;
@@ -87,11 +90,18 @@ public class LoginFragment extends Fragment {
                 passwordTxt = etPassword.getText().toString();
 
                 ParseUser.logInInBackground(usernameTxt, passwordTxt, new LogInCallback() {
+
                     @Override
-                    public void done(ParseUser user, ParseException e) {
+                    public void done(ParseUser pUser, ParseException e) {
                         //if there is a user --> tell StartActivity of successful login
-                        if(user != null){
-                            listener.onLogin();
+                        if(pUser != null){
+                            User user = (User) pUser;
+
+                            //Send user to HomeFrag or ProfileSetupFrag depending if they setup their profile yet:
+                            if(user.getProfileSetUp()){
+                                listener.onLogin("go to HomeFrag");
+                            }
+                            listener.onLogin(KEY_SEND_PROFILESETUPFRAG);
 
                             //Notify user of successful login:
                             Toast toast = Toast.makeText(getContext(), "You're logged in!", Toast.LENGTH_SHORT);
