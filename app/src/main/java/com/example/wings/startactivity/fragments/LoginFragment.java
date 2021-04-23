@@ -92,21 +92,23 @@ public class LoginFragment extends Fragment {
                 ParseUser.logInInBackground(usernameTxt, passwordTxt, new LogInCallback() {
 
                     @Override
-                    public void done(ParseUser pUser, ParseException e) {
+                    public void done(ParseUser user, ParseException e) {
                         //if there is a user --> tell StartActivity of successful login
-                        if(pUser != null){
-                            User user = (User) pUser;
-
-                            //Send user to HomeFrag or ProfileSetupFrag depending if they setup their profile yet:
-                            if(user.getProfileSetUp()){
-                                listener.onLogin("go to HomeFrag");
-                            }
-                            listener.onLogin(KEY_SEND_PROFILESETUPFRAG);
-
+                        if(user != null){
                             //Notify user of successful login:
                             Toast toast = Toast.makeText(getContext(), "You're logged in!", Toast.LENGTH_SHORT);
                             toast.setGravity(Gravity.TOP, 0,0);
                             toast.show();
+
+                            //Send user to HomeFrag or ProfileSetupFrag depending if they setup their profile yet:
+                            Log.d(DEBUG_TAG, "profileSetUp = " + user.getBoolean(User.KEY_PROFILESETUP));
+                            if(user.getBoolean(User.KEY_PROFILESETUP)){
+                                listener.onLogin("go to HomeFrag");     //just something not the ProfileSetupFrag key
+                            }
+                            else {
+                                listener.onLogin(KEY_SEND_PROFILESETUPFRAG);
+                            }
+
                         } else {
                             Toast.makeText(getContext(), "This user doesn't exist. Please Sign-up!", Toast.LENGTH_SHORT).show();
                             Log.d(DEBUG_TAG, "logInInBackground(): failed" + e.getMessage());

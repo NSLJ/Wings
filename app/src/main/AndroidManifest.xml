@@ -25,14 +25,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Wings">
 
-        <activity android:name=".startactivity.StartActivity" />
-        <activity android:name=".mainactivity.MainActivity">
+        <activity android:name=".startactivity.StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".mainactivity.MainActivity"> </activity>
 
         <meta-data
             android:name="preloaded_fonts"

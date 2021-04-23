@@ -51,9 +51,13 @@ public class StartActivity extends AppCompatActivity implements SAFragmentsListe
     @Override
     //Purpose:      based on the given key --> goes to either ProfileSetUpFrag or HomeFrag
     public void onLogin(String key) {
+        Log.d(TAG, "in onLogin(): key="+key);
         Intent intent = new Intent(this, MainActivity.class);
         if(key.equals(KEY_PROFILESETUPFRAG)){
             intent.putExtra(KEY_PROFILESETUPFRAG, true);        //tell MainActivity to start on ProfileSetupFrag
+        }
+        else{
+            intent.putExtra(KEY_PROFILESETUPFRAG, false);
         }
         startActivity(intent);
         finish();

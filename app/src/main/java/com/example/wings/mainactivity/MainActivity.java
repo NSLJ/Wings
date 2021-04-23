@@ -18,11 +18,13 @@ import com.example.wings.commonFragments.EditTrustedContactsFragment;
 import com.example.wings.commonFragments.HelpFragment;
 import com.example.wings.mainactivity.fragments.HomeFragment;
 import com.example.wings.mainactivity.fragments.OtherProfileFragment;
+import com.example.wings.mainactivity.fragments.ProfileSetupFragment;
 import com.example.wings.mainactivity.fragments.SearchUserFragment;
 import com.example.wings.commonFragments.SettingsFragment;
 import com.example.wings.mainactivity.fragments.UserProfileFragment;
 import com.example.wings.startactivity.StartActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.parse.ParseUser;
 
 /**
  * MainActivity.java
@@ -31,9 +33,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
  */
 public class MainActivity extends AppCompatActivity implements MAFragmentsListener{
     private static final String DEBUG_TAG = "MainActivity";
+    public static final String KEY_PROFILESETUPFRAG = "ProfileSetupFrag?";
 
     final FragmentManager fragmentManager = getSupportFragmentManager();
     private static BottomNavigationView bottomNavigationView;
+    private boolean restrictUserScreen = false;
 
     @Override
     /**
@@ -43,39 +47,49 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Initialize and set up listener:
-        bottomNavigationView = findViewById(R.id.bottomNavigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(
-                new BottomNavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    /**
-                     * Purpose:         called when a specific item is clicked/selected --> raise correct fragment
-                     */
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        Fragment fragment = null;
-                        switch (item.getItemId()) {
-                            case R.id.action_search_friends:
-                                fragment = new SearchUserFragment();
-                                break;
+        //1.) Find out whether or not need to force ProfileSetupFrag:
+        if(getIntent().getBooleanExtra(KEY_PROFILESETUPFRAG, false)){
+            Log.d(DEBUG_TAG, "onCreate(): going to ProfileSetUpFragment");
+            setRestrictScreen(true);
+            toProfileSetupFragment();
+        }
 
-                            case R.id.action_home:
-                                fragment = new HomeFragment();
-                                break;
+        //else create bottom nav menu and go to HomeFrag
+        else {
+            //Initialize and set up listener:
+            bottomNavigationView = findViewById(R.id.bottomNavigation);
+            bottomNavigationView.setOnNavigationItemSelectedListener(
+                    new BottomNavigationView.OnNavigationItemSelectedListener() {
+                        @Override
+                        /**
+                         * Purpose:         called when a specific item is clicked/selected --> raise correct fragment
+                         */
+                        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                            Fragment fragment = null;
+                            switch (item.getItemId()) {
+                                case R.id.action_search_friends:
+                                    fragment = new SearchUserFragment();
+                                    break;
 
-                            case R.id.action_profile:
-                                fragment = new UserProfileFragment();
-                                break;
-                            default:
-                                break;
+                                case R.id.action_home:
+                                    fragment = new HomeFragment();
+                                    break;
+
+                                case R.id.action_profile:
+                                    fragment = new UserProfileFragment();
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            //Raise the fragment:
+                            fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, fragment).commit();
+                            return true;
                         }
-
-                        //Raise the fragment:
-                        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, fragment).commit();
-                        return true;
-                    }
-                });
-        //By default: select/press the action_home action --> start user on home timeline page once logged in!
-        bottomNavigationView.setSelectedItemId(R.id.action_home);
+                    });
+            //By default: select/press the action_home action --> start user on home timeline page once logged in!
+            bottomNavigationView.setSelectedItemId(R.id.action_home);
+        }
     }
 
     /**
@@ -85,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
      */
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.menu_top_navigation, menu);
+        //MenuItem safetyToolkit = (MenuItem) findViewById(R.id.action_safety_toolkit);
+        menu.findItem(R.id.action_safety_toolkit).setVisible(!restrictUserScreen);
         return true;
     }
 
@@ -98,10 +114,10 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         switch(item.getItemId()){
             case R.id.action_logout:
                 //1.) Log off the user using Parse:
-            //    ParseUser.logOut();
+                 ParseUser.logOut();
 
                 //2.) Intent to go to StartActivity, finish() this activity
-                Log.d(DEBUG_TAG, ": Trying to do intent now.");
+                Log.d(DEBUG_TAG, ": logging out");
                 intent = new Intent(this, StartActivity.class);
                 startActivity(intent);
                 finish();
@@ -133,11 +149,17 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         Toast.makeText(this, "You pushed the Safety Toolkit button! Sorry, it's not implemented yet!", Toast.LENGTH_SHORT).show();
     }
 
+    public void setRestrictScreen(boolean answer){
+        restrictUserScreen = answer;
+        this.invalidateOptionsMenu();
+    }
     @Override
     public void toHomeFragment() {
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new HomeFragment()).commit();
     }
-
+    public void toProfileSetupFragment(){
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new ProfileSetupFragment()).commit();
+    }
     @Override
     public void toUserProfileFragment() {
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new UserProfileFragment()).commit();
