@@ -173,7 +173,7 @@ public class ProfileSetupFragment extends Fragment {
             result += "Profile picture not available\n";
         }
 
-        boolean hasTrustedContacts = false;
+        boolean hasTrustedContacts = true;
 
         //2). Check if the user has PIN
         if (numPIN == null) {
