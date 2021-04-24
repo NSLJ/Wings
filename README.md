@@ -2,7 +2,7 @@
 With Wings, You Never Walk Alone
 
 ## Progress so far...
-<img src="walkthrough.gif" width=250>
+<img src="Demo.gif" width=250>
 
 ## Table of Contents
 1. [Overview](#Overview)
@@ -32,9 +32,9 @@ With Wings, You Never Walk Alone.
 
 **Required Must-have Stories**
 - [X] Database set up in back4app.
-- [ ] User can register a new account.
-- [ ] User can login.
-- [ ] User can log off.
+- [x] User can register a new account.
+- [x] User can login.
+- [x] User can log off.
 - [ ] User can view their own and other user profiles.
 - [ ] User can search for other users.
 - [ ] User can add friends.
