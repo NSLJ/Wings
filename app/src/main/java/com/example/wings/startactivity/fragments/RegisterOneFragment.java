@@ -106,7 +106,7 @@ public class RegisterOneFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, ": sign up button clicked!");
-                if(etEmail != null) {
+                if(etEmail != null && etFName != null && etLName != null) {
                     String email = etEmail.getText().toString();
 
                     //Check if email and username is valid:
@@ -133,7 +133,7 @@ public class RegisterOneFragment extends Fragment {
                     }
                 }
                 else{
-                    showLongTopToast("There's no email!");
+                    showLongTopToast("You did not fill in all of the fields!");
                 }
             }
         });
@@ -159,7 +159,7 @@ public class RegisterOneFragment extends Fragment {
             else{
                 String username = email.substring(0, email.length()-8);
                 Log.d(TAG, "Checking if username=" + username + " is valid! Querying for all existing users");
-                queryUsernames();
+                result += queryUsernames();
 
                 boolean validUsername = validUsername(username);
                 Log.d(TAG, "validUsername = "+validUsername);
@@ -175,9 +175,9 @@ public class RegisterOneFragment extends Fragment {
         return result;
     }
     /**
-     * Purpose;             Obtains a list of all current users and updates the "currUsers" List field
+     * Purpose;             Obtains a list of all current users and updates the "currUsers" List field. Returns an error string if error occurs, and "" if not
      */
-    private void queryUsernames(){
+    private String queryUsernames(){
         Log.d(TAG, "in queryUsernames() ");
         ParseQuery<ParseUser> query = ParseUser.getQuery();
 
@@ -185,8 +185,10 @@ public class RegisterOneFragment extends Fragment {
         try {
             currUsers.addAll(query.find());
             Log.i(TAG, "queryUsernames():  -users: " + currUsers.toString());
+            return "";
         } catch (ParseException e) {
             Log.e(TAG, "queryUsernames(): failure:  error=", e);
+            return "Your session is expired! Please try again.";
         }
     }
 
