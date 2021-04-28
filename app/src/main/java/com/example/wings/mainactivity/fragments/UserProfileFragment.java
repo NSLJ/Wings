@@ -109,7 +109,7 @@ public class UserProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 //1.) Log off the user using Parse:
-                //current.logOut();
+                current.logOut();
 
                 //2.) Intent to go to StartActivity, finish() this activity
                 Intent intent;
