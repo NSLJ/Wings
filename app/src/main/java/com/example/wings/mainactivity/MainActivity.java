@@ -10,7 +10,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.example.wings.R;
 import com.example.wings.mainactivity.fragments.ChooseBuddyFragment;
@@ -22,6 +24,7 @@ import com.example.wings.mainactivity.fragments.ProfileSetupFragment;
 import com.example.wings.mainactivity.fragments.SearchUserFragment;
 import com.example.wings.commonFragments.SettingsFragment;
 import com.example.wings.mainactivity.fragments.UserProfileFragment;
+import com.example.wings.models.User;
 import com.example.wings.startactivity.StartActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseUser;
@@ -36,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     public static final String KEY_PROFILESETUPFRAG = "ProfileSetupFrag?";
 
     final FragmentManager fragmentManager = getSupportFragmentManager();
-    private static BottomNavigationView bottomNavigationView;
+    private BottomNavigationView bottomNavigationView;
     private boolean restrictUserScreen = false;
 
     @Override
@@ -46,51 +49,23 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        bottomNavigationView = findViewById(R.id.bottomNavigation);
 
         //1.) Find out whether or not need to force ProfileSetupFrag:
         if(getIntent().getBooleanExtra(KEY_PROFILESETUPFRAG, false)){
             Log.d(DEBUG_TAG, "onCreate(): going to ProfileSetUpFragment");
-            setRestrictScreen(true);
+            restrictUserScreen = true;
+            setRestrictScreen(restrictUserScreen);          //hides bottom nav bar and safety toolkit button
             toProfileSetupFragment();
         }
 
         //else create bottom nav menu and go to HomeFrag
         else {
-            //Initialize and set up listener:
-            bottomNavigationView = findViewById(R.id.bottomNavigation);
-            bottomNavigationView.setOnNavigationItemSelectedListener(
-                    new BottomNavigationView.OnNavigationItemSelectedListener() {
-                        @Override
-                        /**
-                         * Purpose:         called when a specific item is clicked/selected --> raise correct fragment
-                         */
-                        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                            Fragment fragment = null;
-                            switch (item.getItemId()) {
-                                case R.id.action_search_friends:
-                                    fragment = new SearchUserFragment();
-                                    break;
-
-                                case R.id.action_home:
-                                    fragment = new HomeFragment();
-                                    break;
-
-                                case R.id.action_profile:
-                                    fragment = new UserProfileFragment();
-                                    break;
-                                default:
-                                    break;
-                            }
-
-                            //Raise the fragment:
-                            fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, fragment).commit();
-                            return true;
-                        }
-                    });
-            //By default: select/press the action_home action --> start user on home timeline page once logged in!
-            bottomNavigationView.setSelectedItemId(R.id.action_home);
+            restrictUserScreen = false;
+            setRestrictScreen(restrictUserScreen);
         }
     }
+
 
     /**
      * Purpose:         called automatically when activity launched --> inflates and displays menu items across the activity using "menu_main_navigation.xml".
@@ -149,8 +124,58 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         Toast.makeText(this, "You pushed the Safety Toolkit button! Sorry, it's not implemented yet!", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Purpose:         Restricts or unrestricts the screen of MainActivity given boolean answer. Restricting the screen deletes the Safety Toolkit button from the Top Nav bar, and hides the Biottom nav bar.
+     *                  Unrestricting does this vice versa.
+     * @param answer
+     */
     public void setRestrictScreen(boolean answer){
-        restrictUserScreen = answer;
+        Log.d(DEBUG_TAG, "setRestrictScreen():   profile setup?: " + ParseUser.getCurrentUser().getBoolean(User.KEY_PROFILESETUP));
+        //If we need to restrict screen --> hide Bottom Nav Bar
+        if(answer){
+            bottomNavigationView.setVisibility(View.GONE);
+        }
+
+        //Otherwise, show and initialize Bottom Nav Bar, and start on HomeFragment:
+        else {
+            bottomNavigationView.setVisibility(View.VISIBLE);
+            bottomNavigationView.setOnNavigationItemSelectedListener(
+                    new BottomNavigationView.OnNavigationItemSelectedListener() {
+                        @Override
+                        /**
+                         * Purpose:         called when a specific item is clicked/selected --> raise correct fragment
+                         */
+                        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                            Fragment fragment = null;
+                            switch (item.getItemId()) {
+                                case R.id.action_search_friends:
+                                    fragment = new SearchUserFragment();
+                                    break;
+
+                                case R.id.action_home:
+                                    fragment = new HomeFragment();
+                                    break;
+
+                                case R.id.action_profile:
+                                    fragment = new UserProfileFragment();
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            //Raise the fragment:
+                            fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, fragment).commit();
+                            return true;
+                        }
+                    });
+            //By default: select/press the action_home action --> start user on home timeline page once logged in!
+            bottomNavigationView.setSelectedItemId(R.id.action_home);
+        }
+
+        //2.) Shows or unshows the Safety toolkit button through re-initializing onCreateOptionsMenu():
+        if(restrictUserScreen != answer) {      //just in case restrictUserScreen not yet consistent with "answer"
+            restrictUserScreen = answer;
+        }
         this.invalidateOptionsMenu();
     }
     @Override
