@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         if(getIntent().getBooleanExtra(KEY_PROFILESETUPFRAG, false)){
             Log.d(DEBUG_TAG, "onCreate(): going to ProfileSetUpFragment");
             restrictUserScreen = true;
-            setRestrictScreen(restrictUserScreen);
+            setRestrictScreen(restrictUserScreen);          //hides bottom nav bar and safety toolkit button
             toProfileSetupFragment();
         }
 
@@ -64,39 +64,6 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
             restrictUserScreen = false;
             setRestrictScreen(restrictUserScreen);
         }
-            //Initialize and set up listener:
-           /* bottomNavigationView.setVisibility(View.VISIBLE);
-            bottomNavigationView.setOnNavigationItemSelectedListener(
-                    new BottomNavigationView.OnNavigationItemSelectedListener() {
-                        @Override
-                        /**
-                         * Purpose:         called when a specific item is clicked/selected --> raise correct fragment
-                         */
-                       /* public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                            Fragment fragment = null;
-                            switch (item.getItemId()) {
-                                case R.id.action_search_friends:
-                                    fragment = new SearchUserFragment();
-                                    break;
-
-                                case R.id.action_home:
-                                    fragment = new HomeFragment();
-                                    break;
-
-                                case R.id.action_profile:
-                                    fragment = new UserProfileFragment();
-                                    break;
-                                default:
-                                    break;
-                            }
-
-                            //Raise the fragment:
-                            fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, fragment).commit();
-                            return true;
-                        }
-                    });
-            //By default: select/press the action_home action --> start user on home timeline page once logged in!
-            bottomNavigationView.setSelectedItemId(R.id.action_home);*/
     }
 
 
