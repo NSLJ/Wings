@@ -17,10 +17,13 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.wings.R;
+import com.example.wings.models.ParcelUser;
 import com.example.wings.models.User;
 import com.example.wings.startactivity.StartActivity;
+import com.parse.Parse;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 //All auto-filled stuff, just follow the samples I left behind!
 
@@ -50,7 +53,6 @@ public class UserProfileFragment extends Fragment {
     private Button logOutBtn;
 
     public UserProfileFragment() {}   // Required empty public constructor
-
 
     /**
      * Use this factory method to create a new instance of
@@ -108,18 +110,19 @@ public class UserProfileFragment extends Fragment {
 //        user.setRating(5);
 //        user.setPin(1111);
 //
-    /*
-        profileName.setText(post.getName());
-        profilePin.setText(post.getUser().getPin());
-        profileEmail.setText(post.getUser().getEmail());
-        ParseFile image = post.getImage();
-    */
+        ParseUser current = ParseUser.getCurrentUser();
+        profileName.setText(current.getString(User.KEY_FIRSTNAME));
+        profilePin.setText(current.getInt(User.KEY_PIN));
+        profileEmail.setText(current.getString(User.KEY_EMAIL));
+        /*ParseFile image = current.getParseFile(User.KEY_PROFILEPICTURE);
+        profilePic.setImageResource(image);*/
+
 
         logOutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //1.) Log off the user using Parse:
-                //    ParseUser.logOut();
+                //current.logOut();
 
                 //2.) Intent to go to StartActivity, finish() this activity
                 Intent intent;
