@@ -74,9 +74,13 @@ public class User extends ParseUser {
         return getInt(KEY_PIN);
     }
     //can do more error handling in execution
-    public void setPin(int pin){
+    //returns true if pin was set and false if not. Can be used for error handaling
+    public boolean setPin(int pin){
         if((pin > 999) && (pin < 10000)){
             put(KEY_PIN, pin);
+            return true;
+        } else{
+            return false;
         }
     }
 
@@ -119,7 +123,16 @@ public class User extends ParseUser {
     public int getRating(){ return getInt(KEY_RATING);}
 
     //TODO: Set error handling so rating must <= 5
-    public void setRating(int rating){ put(KEY_RATING, rating); }
+    //returns true if rating was set and false if not
+    public boolean setRating(int rating){
+        if((rating < 6) && (rating > 0)) {
+            put(KEY_RATING, rating);
+            return true;
+        } else{
+            return false;
+
+        }
+    }
 
     public String getObjectID(){ return getString(KEY_OBJECTID); }
 

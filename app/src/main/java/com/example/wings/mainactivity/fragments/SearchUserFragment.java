@@ -2,63 +2,42 @@ package com.example.wings.mainactivity.fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.wings.R;
+import com.example.wings.UserAdapter;
+import com.example.wings.models.User;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 //All auto-filled stuff, just follow the samples I left behind!
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SearchUserFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class SearchUserFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    public static final String TAG = "SearchUsersFragment";
+    private RecyclerView rvUsers;
+    protected UserAdapter adapter;
+    protected List<User> users;
+    protected SwipeRefreshLayout swipeContainer;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     public SearchUserFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SearchUserFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SearchUserFragment newInstance(String param1, String param2) {
-        SearchUserFragment fragment = new SearchUserFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -66,5 +45,50 @@ public class SearchUserFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_search_user, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        rvUsers = view.findViewById(R.id.rvsearchforfriends);
+        users = new ArrayList<>();
+        adapter = new UserAdapter(getContext(), users);
+
+        rvUsers.setAdapter(adapter);
+        rvUsers.setLayoutManager(new LinearLayoutManager(getContext()));
+
+
+        queryUsers();
+
+    }
+
+    private void queryUsers() {
+        ParseQuery<User> query = ParseQuery.getQuery(User.class);
+        //dont think we need query include for the general one since it is to include the user but im not sure
+
+        //do we want a limit?
+        //order it maybe by who is closest? for now just order by when the user was made
+        query.addDescendingOrder(User.KEY_CREATED_AT);
+        query.findInBackground(new FindCallback<User>() {
+            @Override
+            public void done(List<User> objects, ParseException e) {
+                if(e != null){
+                    Log.e(TAG, "Issue getting users", e);
+                    return;
+                }
+
+                for(User user: objects){
+                    //for testing purposes
+                    Log.i(TAG, "Username: " + user.getUsername() + " Pin: " + user.getPin() + " Friends: " + user.getFriends());
+                }
+
+                adapter.clear();
+                users.addAll(objects);
+                adapter.notifyDataSetChanged();
+
+            }
+        });
+
     }
 }
