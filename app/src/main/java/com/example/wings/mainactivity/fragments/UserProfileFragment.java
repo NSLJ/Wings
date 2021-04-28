@@ -1,5 +1,6 @@
 package com.example.wings.mainactivity.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -17,6 +18,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.wings.R;
+import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.ParcelUser;
 import com.example.wings.models.User;
 import com.example.wings.startactivity.StartActivity;
@@ -34,16 +36,9 @@ import com.parse.ParseUser;
  * create an instance of this fragment.
  */
 public class UserProfileFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
     public static final String TAG = "UserProfileFragment";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private MAFragmentsListener listener;
 
     private ImageView profilePic;
     private TextView profileName;
@@ -54,31 +49,23 @@ public class UserProfileFragment extends Fragment {
 
     public UserProfileFragment() {}   // Required empty public constructor
 
+    @Override
     /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment UserProfileFragment.
+     * Purpose:     Called automatically. When this Fragment is being attached to the parent activity, REQUIRE the activity to implement MAFragmentsListener. Otherwise throw an exception!
+     *              Connect the Fragment's listener to the activity!
      */
-    // TODO: Rename and change types and number of parameters
-    public static UserProfileFragment newInstance(String param1, String param2) {
-        UserProfileFragment fragment = new UserProfileFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof MAFragmentsListener) {
+            listener = (MAFragmentsListener) context;
+        } else {
+            throw new ClassCastException(context.toString() + " must implement MAFragmentsListener");
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -112,11 +99,11 @@ public class UserProfileFragment extends Fragment {
 //
         ParseUser current = ParseUser.getCurrentUser();
         profileName.setText(current.getString(User.KEY_FIRSTNAME));
-        profilePin.setText(current.getInt(User.KEY_PIN));
+        profilePin.setText(Integer.toString(current.getInt(User.KEY_PIN)));
         profileEmail.setText(current.getString(User.KEY_EMAIL));
-        /*ParseFile image = current.getParseFile(User.KEY_PROFILEPICTURE);
-        profilePic.setImageResource(image);*/
-
+        ParseFile image = current.getParseFile(User.KEY_PROFILEPICTURE);
+        //profilePic.setImageResource(image);       we had to use Glide to upload pics in previous assignments!
+        //                                      I think it's like this? :   Glide.with(getContext()).load(image).into(profilePic);
 
         logOutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
