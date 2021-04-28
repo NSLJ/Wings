@@ -31,6 +31,9 @@ ext {
     appCompatVersion = '1.0.0'
     designSupportVersion = '1.0.0'
     recyclerViewVersion = '1.0.0'
+    googlePlayVersion = "17.0.0"
+    permissionDispatcherVersion = "4.7.0"
+    supportLibVersion = "1.0.0"
 }
 
 dependencies {
@@ -59,4 +62,15 @@ dependencies {
     //To use Parceler in order to send entities like User and Buddy over Fragments
     implementation 'org.parceler:parceler-api:1.1.12'
     annotationProcessor 'org.parceler:parceler:1.1.12'
+
+    //For Google Maps SDK:
+    implementation "com.google.android.gms:play-services-maps:$googlePlayVersion"
+    implementation "com.google.android.gms:play-services-location:$googlePlayVersion"
+
+    //For PermissionsDispatcher --> is a third party library to manage runtime permissions --> request access to features, etc
+    // B/c certain permissions are dangerous --> must be check and activated at runtime
+    //can be used later when need to dial on phone
+    // Recommended by Codepath, doesn't penalize performance
+    implementation "org.permissionsdispatcher:permissionsdispatcher:$permissionDispatcherVersion"
+    annotationProcessor "org.permissionsdispatcher:permissionsdispatcher-processor:$permissionDispatcherVersion"
 }

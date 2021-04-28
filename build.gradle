@@ -16,6 +16,7 @@ allprojects {
     repositories {
         google()
         jcenter()
+
         // for Parsing
         maven { url "https://jitpack.io" }
     }
