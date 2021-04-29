@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#121212"
     tools:context=".mainactivity.fragments.OtherProfileFragment">
 
     <ImageView
@@ -12,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="61dp"
+        android:layout_marginTop="25dp"
         tools:src="@tools:sample/avatars" />
 
     <TextView
@@ -22,7 +23,10 @@
         android:layout_below="@+id/otherPic"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="24dp"
-        android:text="Annie" />
+        android:text="Annie"
+        android:textColor="@color/logo_teal"
+        android:fontFamily="@font/satisfy"
+        android:textSize="38sp"/>
 
     <TextView
         android:id="@+id/otherEmail"
@@ -30,17 +34,22 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/otherName"
         android:layout_centerInParent="true"
-        android:layout_marginTop="20dp"
-        android:text="annie@cpp.edu" />
+        android:layout_marginTop="15dp"
+        android:text="annie@cpp.edu"
+        android:textColor="@color/gray"
+        android:textSize="18sp"/>
 
+    <!-- Text Link -->
     <TextView
         android:id="@+id/otherFriends"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/otherEmail"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="My Friends" />
+        android:layout_marginTop="18dp"
+        android:text="My Friends"
+        android:textColor="@color/logo_teal"
+        android:textSize="18sp"/>
 
     <TextView
         android:id="@+id/distance"
@@ -50,7 +59,9 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="23dp"
-        android:text="0.2m away from you" />
+        android:text="0.2m away from you"
+        android:textColor="@color/gray"
+        android:textSize="22sp"/>
 
     <RatingBar
         android:id="@+id/profileRating"
@@ -60,6 +71,10 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginEnd="85dp"
-        android:layout_marginBottom="33dp" />
+        android:layout_marginBottom="33dp"
+        android:isIndicator="true"
+        android:numStars="5"
+        android:rating="3"
+        android:theme="@style/RatingBar" />
 
 </RelativeLayout>
