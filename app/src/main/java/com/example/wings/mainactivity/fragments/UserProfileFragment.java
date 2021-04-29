@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.wings.R;
 import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.ParcelUser;
@@ -27,12 +28,14 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import com.bumptech.glide.Glide;
+
 //All auto-filled stuff, just follow the samples I left behind!
 
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link UserProfileFragment#newInstance} factory method to
+ * Use the {@link UserProfileFragment# newInstance} factory method to
  * create an instance of this fragment.
  */
 public class UserProfileFragment extends Fragment {
@@ -88,22 +91,21 @@ public class UserProfileFragment extends Fragment {
         logOutBtn = view.findViewById(R.id.logOutBtn);
 
 
-//        //temp for testing
-//        User user = new User();
-//        user.setEmail("lms@cpp.edu");
-//        user.setFirstName("Laura");
-//        user.setLastName("Siu");
-//        user.setProfileSetUp(false);
-//        user.setRating(5);
-//        user.setPin(1111);
-//
         ParseUser current = ParseUser.getCurrentUser();
         profileName.setText(current.getString(User.KEY_FIRSTNAME));
-        profilePin.setText(Integer.toString(current.getInt(User.KEY_PIN)));
+        profilePin.setText("Pin Code: " + Integer.toString(current.getInt(User.KEY_PIN)));
         profileEmail.setText(current.getString(User.KEY_EMAIL));
+        profileRating.setRating((float) current.getInt(User.KEY_RATING));
+
         ParseFile image = current.getParseFile(User.KEY_PROFILEPICTURE);
-        //profilePic.setImageResource(image);       we had to use Glide to upload pics in previous assignments!
-        //                                      I think it's like this? :   Glide.with(getContext()).load(image).into(profilePic);
+        if(image != null){
+            Glide.with(getContext())
+                    .load(image.getUrl())
+                    .override(400, 400)
+                    .fitCenter()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(profilePic);
+        }
 
         logOutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
