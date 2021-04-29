@@ -1,15 +1,23 @@
 package com.example.wings.models;
 
+import android.util.Log;
+
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseUser;
+import com.parse.ParseObject;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.w3c.dom.Node;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @ParseClassName("User")
-public class User extends ParseUser {
+public class User extends ParseObject {
     private static final String DEBUG_TAG = "User";
+
     public static final String KEY_USERNAME = "username";
     public static final String KEY_PASSWORD = "password";
     public static final String KEY_EMAIL = "email";
@@ -22,12 +30,10 @@ public class User extends ParseUser {
     public static final String KEY_CURRENTLOCATION = "currentLocation";
     public static final String KEY_PROFILESETUP  = "ProfileSetUp";
     public static final String KEY_RATING = "rating";
+    //not sure if we will need this
     public static final String KEY_OBJECTID = "objectId";
 
-    //@ParcelPropertyConverter(UserParcelConverter.class)
-    //private User user;
-
-    public User(){}     //req by the Parceler library
+    public User(){}
 
     //returns the username part of the cpp email (Example: billybronco@cpp.edu would return billybronco)
     public String getUsername(){
@@ -93,26 +99,21 @@ public class User extends ParseUser {
     }
 
     //seems like we need a specific way to do this...
-    public List getTrustedContacts(){
-        /*JSONArray jsonArray = getJSONArray(KEY_TRUSTEDCONTACTS);
+    public List getTrustedContacts() throws JSONException {
+        JSONArray jsonArray = getJSONArray(KEY_TRUSTEDCONTACTS);
         Log.d(DEBUG_TAG, jsonArray.toString());
        List<TrustedContact> trustedContacts = new ArrayList<TrustedContact>();
        /* for(int i = 0; i < jsonArray.length(); i++){
            trustedContacts.add(new TrustedContact(jsonArray.getJSONObject(i)));
         }*/
-        return getList(KEY_TRUSTEDCONTACTS);
-    }
-    public void setTrustedContacts(List contacts){
-        put(KEY_TRUSTEDCONTACTS, contacts);
+        return trustedContacts;
     }
 
-    public List getFriends(){
-        return getList(KEY_FRIENDS);
+    public void setTrustedContacts(List contacts){
+        while(!contacts.isEmpty()){
+
+        }
     }
-    public void setFriends(List friends){
-        put(KEY_FRIENDS, friends);
-    }
-    //TODO: implement an addFriend() method
 
     public ParseGeoPoint getLocation(){return getParseGeoPoint(KEY_CURRENTLOCATION); }
     public void setLocation(ParseGeoPoint location){put(KEY_CURRENTLOCATION, location); }
@@ -135,5 +136,4 @@ public class User extends ParseUser {
     }
 
     public String getObjectID(){ return getString(KEY_OBJECTID); }
-
 }

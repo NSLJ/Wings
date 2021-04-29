@@ -80,7 +80,9 @@ public class SearchUserFragment extends Fragment {
 
                 for(User user: objects){
                     //for testing purposes
-                    Log.i(TAG, "Username: " + user.getUsername() + " Pin: " + user.getPin() + " Friends: " + user.getFriends());
+
+                    Log.i(TAG, "Username: " + user.getUsername() + " Pin: " + user.getPin());
+
                 }
 
                 adapter.clear();
