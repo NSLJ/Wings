@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#121212"
     tools:context=".mainactivity.fragments.UserProfileFragment">
 
     <ImageView
@@ -13,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="61dp"
+        android:layout_marginTop="25dp"
         tools:src="@tools:sample/avatars" />
 
     <TextView
@@ -23,7 +24,10 @@
         android:layout_below="@+id/profilePic"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="24dp"
-        android:text="Annie" />
+        android:text="Annie"
+        android:textColor="@color/logo_teal"
+        android:fontFamily="@font/satisfy"
+        android:textSize="38sp"/>
 
     <TextView
         android:id="@+id/profilePin"
@@ -31,8 +35,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/profileName"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="Pin code: 9371" />
+        android:layout_marginTop="15dp"
+        android:text="Pin code: 9371"
+        android:textColor="@color/logo_teal"
+        android:textSize="24sp"/>
 
     <TextView
         android:id="@+id/profileEmail"
@@ -40,8 +46,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/profilePin"
         android:layout_centerInParent="true"
-        android:layout_marginTop="20dp"
-        android:text="annie@cpp.edu" />
+        android:layout_marginTop="18dp"
+        android:text="annie@cpp.edu"
+        android:textColor="@color/gray"
+        android:textSize="18sp"/>
 
     <RatingBar
         android:id="@+id/profileRating"
@@ -51,7 +59,11 @@
         android:layout_alignParentEnd="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="24dp"
-        android:layout_marginEnd="87dp" />
+        android:layout_marginEnd="86dp"
+        android:isIndicator="true"
+        android:numStars="5"
+        android:rating="3"
+        android:theme="@style/RatingBar" />
 
     <Button
         android:id="@+id/logOutBtn"
@@ -60,7 +72,9 @@
         android:layout_below="@+id/profileRating"
         android:layout_alignParentBottom="false"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="52dp"
-        android:text="Log out" />
+        android:layout_marginTop="50dp"
+        android:text="Log out"
+        android:backgroundTint="@color/logo_teal"
+        android:textColor="@color/white"/>
 
 </RelativeLayout>
