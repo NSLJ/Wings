@@ -77,4 +77,15 @@
         android:backgroundTint="@color/logo_teal"
         android:textColor="@color/white"/>
 
+    <ImageButton
+        android:id="@+id/editPicBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="30dp"
+        android:layout_toEndOf="@+id/profilePic"
+        android:backgroundTint="#121212"
+        android:src="@android:drawable/ic_menu_edit" />
+
 </RelativeLayout>

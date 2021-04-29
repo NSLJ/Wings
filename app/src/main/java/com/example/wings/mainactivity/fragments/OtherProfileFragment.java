@@ -1,14 +1,29 @@
 package com.example.wings.mainactivity.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RatingBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.wings.R;
+import com.example.wings.mainactivity.MAFragmentsListener;
+import com.example.wings.models.User;
+import com.parse.ParseFile;
+import com.parse.ParseUser;
 
 
 //All auto-filled stuff, just follow the samples I left behind!
@@ -16,49 +31,44 @@ import com.example.wings.R;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link OtherProfileFragment#newInstance} factory method to
+ * Use the {@link OtherProfileFragment# newInstance} factory method to
  * create an instance of this fragment.
  */
 public class OtherProfileFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    public static final String TAG = "OtherProfileFragment";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private MAFragmentsListener listener;
 
-    public OtherProfileFragment() {
-        // Required empty public constructor
-    }
+    private ImageView otherPic;
+    private TextView otherName;
+    private TextView otherEmail;
+    private TextView otherFriends;
+    private TextView distance;
+    private RatingBar profileRating;
+    private ImageButton editBtn;
+    private ImageButton deleteBtn;
 
+
+    public OtherProfileFragment() {}         // Required empty public constructor
+
+    @Override
     /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment OtherProfileFragment.
+     * Purpose:     Called automatically. When this Fragment is being attached to the parent activity, REQUIRE the activity to implement MAFragmentsListener. Otherwise throw an exception!
+     *              Connect the Fragment's listener to the activity!
      */
-    // TODO: Rename and change types and number of parameters
-    public static OtherProfileFragment newInstance(String param1, String param2) {
-        OtherProfileFragment fragment = new OtherProfileFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof MAFragmentsListener) {
+            listener = (MAFragmentsListener) context;
+        } else {
+            throw new ClassCastException(context.toString() + " must implement MAFragmentsListener");
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -66,5 +76,48 @@ public class OtherProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_other_profile, container, false);
+    }
+
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        otherPic = view.findViewById(R.id.otherPic);
+        otherName = view.findViewById(R.id.otherName);
+        otherEmail = view.findViewById(R.id.otherEmail);
+        otherFriends = view.findViewById(R.id.otherFriends);
+        distance = view.findViewById(R.id.distance);
+        profileRating = view.findViewById(R.id.profileRating);
+        editBtn = view.findViewById(R.id.editBtn);
+        deleteBtn = view.findViewById(R.id.deleteBtn);
+
+        ParseUser current = ParseUser.getCurrentUser();
+        otherName.setText(current.getString(User.KEY_FIRSTNAME));
+        otherEmail.setText(current.getString(User.KEY_EMAIL));
+        profileRating.setRating((float) current.getInt(User.KEY_RATING));
+
+        ParseFile image = current.getParseFile(User.KEY_PROFILEPICTURE);
+        if(image != null){
+            Glide.with(getContext())
+                    .load(image.getUrl())
+                    .override(400, 400)
+                    .fitCenter()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(otherPic);
+        }
+
+        editBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "Edit Button Clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        deleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "Delete Button Clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 }
