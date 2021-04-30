@@ -4,53 +4,91 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#121212"
     android:orientation="vertical"
     tools:context=".startactivity.fragments.LoginFragment">
 
+    <ImageView
+        android:id="@+id/logInLogo"
+        android:layout_marginTop="20dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/logo" />
+
     <TextView
-        android:id="@+id/txtuser"
+        android:id="@+id/logInLogoText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/lato"
-        android:text="Username"
-        android:paddingTop="50dp"
-        android:textSize="24sp" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/logInLogo"
+        android:fontFamily="@font/satisfy"
+        android:text="Wings"
+        android:textColor="@color/logo_teal"
+        android:textSize="50sp" />
 
     <EditText
         android:id="@+id/etUsername"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtuser"
-        android:inputType="text"/>
-
-    <TextView
-        android:id="@+id/txtpassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/etUsername"
-        android:text="Password"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/logInLogoText"
+        android:layout_marginTop="40dp"
+        android:inputType="text"
+        android:background="@drawable/et_rounded_corners_style"
         android:fontFamily="@font/lato"
+        android:hint="Username"
+        android:paddingLeft="15dp"
+        android:paddingTop="10dp"
+        android:paddingRight="160dp"
+        android:paddingBottom="10dp"
+        android:textColor="@color/gray"
+        android:textColorHint="@color/gray"
         android:textSize="24sp" />
+
 
     <EditText
         android:id="@+id/etPassword"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/txtpassword"
-        android:inputType="textPassword"/>
+        android:inputType="textPassword"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/etUsername"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/et_rounded_corners_style"
+        android:fontFamily="@font/lato"
+        android:hint="Password"
+        android:paddingLeft="15dp"
+        android:paddingTop="10dp"
+        android:paddingRight="160dp"
+        android:paddingBottom="10dp"
+        android:textColor="@color/gray"
+        android:textColorHint="@color/gray"
+        android:textSize="24sp" />
 
     <Button
         android:id="@+id/btnLogin"
         android:layout_height="wrap_content"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
         android:layout_below="@+id/etPassword"
-        android:text="Login"/>
+        android:backgroundTint="@color/gray_100"
+        android:text="Login"
+        android:textColor="@color/logo_teal"/>
 
-    <Button
-        android:id="@+id/btnRegister"
+    <TextView
+        android:id="@+id/tvRegister"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_width="match_parent"
         android:layout_below="@+id/btnLogin"
-        android:text="Do not have an account? Register here"/>
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="37dp"
+        android:clickable="true"
+        android:fontFamily="@font/satisfy"
+        android:text="Do not have an account? Register here!"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
 
 </RelativeLayout>
