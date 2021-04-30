@@ -1,13 +1,12 @@
 package com.example.wings.mainactivity.fragments;
 
-<<<<<<< HEAD
-=======
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
->>>>>>> b5c5779dc678d4a8ef30da8764621fff8bae8e5d
+
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -21,33 +20,30 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-<<<<<<< HEAD
-=======
+
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
->>>>>>> b5c5779dc678d4a8ef30da8764621fff8bae8e5d
 
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.wings.R;
 import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.User;
-<<<<<<< HEAD
-import com.parse.ParseObject;
-=======
+
 import com.example.wings.startactivity.StartActivity;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
-import com.bumptech.glide.Glide;
+
 
 import java.io.File;
 
 import static android.app.Activity.RESULT_OK;
->>>>>>> b5c5779dc678d4a8ef30da8764621fff8bae8e5d
+
 
 //All auto-filled stuff, just follow the samples I left behind!
 
@@ -62,9 +58,7 @@ public class UserProfileFragment extends Fragment {
 
     private MAFragmentsListener listener;
 
-<<<<<<< HEAD
-    public UserProfileFragment() {}   // Required empty public constructor
-=======
+
     private ImageView profilePic;
     private TextView profileName;
     private TextView profilePin;
@@ -81,7 +75,6 @@ public class UserProfileFragment extends Fragment {
     public static final int PICK_PHOTO_CODE = 1046;
     private static final String PHOTO_FILE_NAME = "photo.jpg";         //arbitrary file name to store Post photo in
 
->>>>>>> b5c5779dc678d4a8ef30da8764621fff8bae8e5d
 
     public UserProfileFragment() {}   // Required empty public constructor
 
@@ -116,20 +109,7 @@ public class UserProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-<<<<<<< HEAD
-//        //temp for testing
-//        User user = new User();
-//        user.setEmail("lms@cpp.edu");
-//        user.setFirstName("Laura");
-//        user.setLastName("Siu");
-//        user.setProfileSetUp(false);
-//        user.setRating(5);
-//        user.setPin(1111);
-//
-//        Log.i(TAG, "username: " + ((User) user).getUsername() + " FirstName: " + ((User) user).getFirstName() + " Last Name: " + ((User) user).getLastName() + " Email: " + ((User) user).getEmail() + " Pin: " + ((User) user).getPin());
 
-
-=======
         profilePic = view.findViewById(R.id.profilePic);
         profileName = view.findViewById(R.id.profileName);
         profilePin = view.findViewById(R.id.profilePin);
@@ -191,7 +171,7 @@ public class UserProfileFragment extends Fragment {
                 startActivity(intent);
             }
         });
->>>>>>> b5c5779dc678d4a8ef30da8764621fff8bae8e5d
+
 
 
     }

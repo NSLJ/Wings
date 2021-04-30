@@ -59,8 +59,6 @@ dependencies {
     implementation "com.github.parse-community.Parse-SDK-Android:parse:1.26.0"
     implementation 'com.squareup.okhttp3:logging-interceptor:3.8.1' // for logging API calls to LogCat
 
-<<<<<<< HEAD
-=======
     //To use Parceler in order to send entities like User and Buddy over Fragments
     implementation 'org.parceler:parceler-api:1.1.12'
     annotationProcessor 'org.parceler:parceler:1.1.12'
@@ -78,5 +76,4 @@ dependencies {
 
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
->>>>>>> b5c5779dc678d4a8ef30da8764621fff8bae8e5d
 }

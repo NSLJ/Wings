@@ -1,5 +1,6 @@
 package com.example.wings.mainactivity.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,10 +14,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.wings.R;
 
 import com.example.wings.UserAdapter;
+import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.User;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -31,15 +34,27 @@ import java.util.List;
 
 public class SearchUserFragment extends Fragment {
 
+    private MAFragmentsListener listener;
+
     public static final String TAG = "SearchUsersFragment";
     private RecyclerView rvUsers;
     protected UserAdapter adapter;
     protected List<User> users;
     protected SwipeRefreshLayout swipeContainer;
+    private TextView tester, tester2, tester3;
 
 
     public SearchUserFragment() {
         // Required empty public constructor
+    }
+
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof MAFragmentsListener) {
+            listener = (MAFragmentsListener) context;
+        } else {
+            throw new ClassCastException(context.toString() + " must implement MAFragmentsListener");
+        }
     }
 
     @Override
@@ -56,18 +71,30 @@ public class SearchUserFragment extends Fragment {
         rvUsers = view.findViewById(R.id.rvsearchforfriends);
         users = new ArrayList<>();
         adapter = new UserAdapter(getContext(), users);
+        tester = view.findViewById(R.id.tvtester);
+        tester2 = view.findViewById(R.id.tvtester2);
+        tester3 = view.findViewById(R.id.tvtester3);
 
         rvUsers.setAdapter(adapter);
         rvUsers.setLayoutManager(new LinearLayoutManager(getContext()));
 
-
+        tester.setText("onViewCreated");
         queryUsers();
+        tester3.setText("out of queryusers");
+
+
+
+
+
+
 
     }
 
     private void queryUsers() {
         ParseQuery<User> query = ParseQuery.getQuery(User.class);
         //dont think we need query include for the general one since it is to include the user but im not sure
+
+        tester2.setText("in queryUsers()");
 
         //do we want a limit?
         //order it maybe by who is closest? for now just order by when the user was made
@@ -95,4 +122,5 @@ public class SearchUserFragment extends Fragment {
         });
 
     }
+
 }

@@ -3,9 +3,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".mainactivity.fragments.SearchUserFragment"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context=".mainactivity.fragments.SearchUserFragment">
 
     <SearchView
         android:id="@+id/searchbarFriends"
@@ -17,6 +17,25 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvsearchforfriends"
         android:layout_width="match_parent"
-        android:layout_height="553dp" />
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/tvtester"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="this is a tester" />
+
+    <TextView
+        android:id="@+id/tvtester2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="this is the second tester" />
+
+    <TextView
+        android:id="@+id/tvtester3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="this is the third tester" />
+
 </LinearLayout>
 
