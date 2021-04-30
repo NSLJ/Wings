@@ -1,10 +1,12 @@
 package com.example.wings.mainactivity.fragments;
 
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -25,19 +28,22 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.wings.R;
 import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.User;
+
 import com.example.wings.startactivity.StartActivity;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
-import com.bumptech.glide.Glide;
+
 
 import java.io.File;
 
 import static android.app.Activity.RESULT_OK;
+
 
 //All auto-filled stuff, just follow the samples I left behind!
 
@@ -51,6 +57,7 @@ public class UserProfileFragment extends Fragment {
     public static final String TAG = "UserProfileFragment";
 
     private MAFragmentsListener listener;
+
 
     private ImageView profilePic;
     private TextView profileName;
@@ -101,6 +108,7 @@ public class UserProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
 
         profilePic = view.findViewById(R.id.profilePic);
         profileName = view.findViewById(R.id.profileName);
@@ -156,6 +164,7 @@ public class UserProfileFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
 
 
     }
