@@ -81,7 +81,7 @@ public class RegisterTwoFragment extends Fragment {
         if (getArguments() != null) {
             ParcelUser pUser = Parcels.unwrap(getArguments().getParcelable(KEY_GET_USER));
             userToRegister = pUser.getUser();
-            Log.d(TAG, "onCreate(): userToRegister = " + userToRegister.getFirstName());
+            Log.d(TAG, "onCreate(): userToRegister = " + userToRegister.getUsername());
         }
     }
     @Override

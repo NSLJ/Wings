@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import com.example.wings.R;
 import com.example.wings.mainactivity.MAFragmentsListener;
+import com.example.wings.mainactivity.MainActivity;
 import com.example.wings.models.User;
 import com.example.wings.startactivity.SAFragmentsListener;
 import com.example.wings.startactivity.StartActivity;
@@ -111,6 +112,7 @@ public class ProfileSetupFragment extends Fragment {
      * Purpose:     Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
      */
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         //1.) Get references to Views:
         completeBtn = view.findViewById(R.id.completeBtn);
         profileImage = view.findViewById(R.id.profileImage);
@@ -137,7 +139,8 @@ public class ProfileSetupFragment extends Fragment {
             public void onClick(View v) {
                 String errorString = isValid();
 
-                if(errorString.equals("")){
+                //For sake of testing, commenting out for now to mimic setup of profile!
+               /* if(errorString.equals("")){
                     user.put(User.KEY_PROFILESETUP, true);
                     listener.setRestrictScreen(false);
                     listener.toHomeFragment();
@@ -145,6 +148,11 @@ public class ProfileSetupFragment extends Fragment {
                 else{
                     showLongTopToast(errorString);
                 }
+                */
+                //Delete this once fragment is fully done!
+                saveProfileSetup();         //makes profileSetup = true and saves it!
+                listener.setRestrictScreen(false);
+                listener.toHomeFragment();
             }
         });
 
@@ -173,7 +181,7 @@ public class ProfileSetupFragment extends Fragment {
             result += "Profile picture not available\n";
         }
 
-        boolean hasTrustedContacts = false;
+        boolean hasTrustedContacts = true;
 
         //2). Check if the user has PIN
         if (numPIN == null) {
@@ -249,7 +257,21 @@ public class ProfileSetupFragment extends Fragment {
         startActivityForResult(gallery, PICK_PHOTO_CODE);
     }
 
-
+    private void saveProfileSetup(){
+        Log.d(TAG, "in saveProfileSetup():");
+        user.put(User.KEY_PROFILESETUP, true);
+        user.saveInBackground(e -> {
+            if(e==null){
+                //Save successfull
+                //TODO: There's a bug here where it can't find the context to show the toast, I have no idea why but it did it before on RegisterTwoFragment when it tries to create the user sooo
+               // showLongTopToast("Profile set up sucessfully!");
+            }else{
+                // Something went wrong while saving
+                Log.e(TAG, "saveProfileSetup():      failed e="+ e.getMessage());
+               // showLongTopToast("Error setting up profile!");
+            }
+        });
+    }
     private void showLongTopToast(String message){
         Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_LONG);
         toast.setGravity(Gravity.TOP, 0, 0);

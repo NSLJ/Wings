@@ -15,11 +15,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.wings.R;
+
 import com.example.wings.UserAdapter;
 import com.example.wings.models.User;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
