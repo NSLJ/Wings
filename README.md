@@ -35,7 +35,8 @@ With Wings, You Never Walk Alone.
 - [x] User can register a new account.
 - [x] User can login.
 - [x] User can log off.
-- [ ] User can view their own and other user profiles.
+- [ ] User can view their own profiles.
+- [ ] User can view other profiles
 - [ ] User can search for other users.
 - [ ] User can add friends.
 - [ ] User can view friend list.
