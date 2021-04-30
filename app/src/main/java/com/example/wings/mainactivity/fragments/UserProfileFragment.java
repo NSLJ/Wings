@@ -126,13 +126,6 @@ public class UserProfileFragment extends Fragment {
                     .fitCenter()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(profilePic);
-        } else {
-            Glide.with(getContext())
-                    .load("@drawable/wings_logo.png")
-                    .override(400, 400)
-                    .fitCenter()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(profilePic);
         }
 
         //Added for edit pic button...
