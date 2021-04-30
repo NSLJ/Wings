@@ -5,7 +5,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#121212"
     tools:context=".mainactivity.fragments.UserProfileFragment">
+
+    <ImageButton
+        android:id="@+id/galleryBttn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/cameraBttn"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="84dp"
+        android:backgroundTint="#121212"
+        android:src="@android:drawable/ic_menu_gallery" />
+
+    <ImageButton
+        android:id="@+id/cameraBttn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="84dp"
+        android:backgroundTint="#121212"
+        android:src="@android:drawable/ic_menu_camera" />
 
     <ImageView
         android:id="@+id/profilePic"
@@ -13,17 +36,21 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="61dp"
+        android:layout_marginTop="25dp"
+        android:background="#FF0000"
         tools:src="@tools:sample/avatars" />
 
     <TextView
         android:id="@+id/profileName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/profilePic"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="24dp"
-        android:text="Annie" />
+        android:layout_marginTop="177dp"
+        android:fontFamily="@font/satisfy"
+        android:text="Annie"
+        android:textColor="@color/logo_teal"
+        android:textSize="38sp" />
 
     <TextView
         android:id="@+id/profilePin"
@@ -31,36 +58,44 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/profileName"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="Pin code: 9371" />
+        android:layout_marginTop="15dp"
+        android:text="Pin code: 9371"
+        android:textColor="@color/logo_teal"
+        android:textSize="24sp"/>
 
     <TextView
         android:id="@+id/profileEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/profilePin"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="20dp"
-        android:text="annie@cpp.edu" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="18dp"
+        android:text="annie@cpp.edu"
+        android:textColor="@color/gray"
+        android:textSize="18sp"/>
 
     <RatingBar
         android:id="@+id/profileRating"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/profileEmail"
-        android:layout_alignParentEnd="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="24dp"
-        android:layout_marginEnd="87dp" />
+        android:layout_marginEnd="86dp"
+        android:isIndicator="true"
+        android:numStars="5"
+        android:rating="3"
+        android:theme="@style/RatingBar" />
 
     <Button
         android:id="@+id/logOutBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/profileRating"
-        android:layout_alignParentBottom="false"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="52dp"
-        android:text="Log out" />
+        android:layout_marginTop="50dp"
+        android:text="Log out"
+        android:backgroundTint="@color/logo_teal"
+        android:textColor="@color/white"/>
 
 </RelativeLayout>

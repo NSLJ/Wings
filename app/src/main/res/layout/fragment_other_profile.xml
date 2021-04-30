@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#121212"
     tools:context=".mainactivity.fragments.OtherProfileFragment">
 
     <ImageView
@@ -12,35 +14,65 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="61dp"
+        android:layout_marginTop="25dp"
         tools:src="@tools:sample/avatars" />
 
     <TextView
         android:id="@+id/otherName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/otherPic"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="24dp"
-        android:text="Annie" />
+        android:layout_marginTop="177dp"
+        android:fontFamily="@font/satisfy"
+        android:text="Annie"
+        android:textColor="@color/logo_teal"
+        android:textSize="38sp" />
 
     <TextView
         android:id="@+id/otherEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/otherName"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="20dp"
-        android:text="annie@cpp.edu" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:text="annie@cpp.edu"
+        android:textColor="@color/gray"
+        android:textSize="18sp"/>
 
+    <!-- Text Link -->
     <TextView
         android:id="@+id/otherFriends"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/otherEmail"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="18dp"
+        android:text="My Friends"
+        android:textColor="@color/logo_teal"
+        android:textSize="18sp"/>
+
+    <ImageButton
+        android:id="@+id/editBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/otherFriends"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="140dp"
         android:layout_marginTop="20dp"
-        android:text="My Friends" />
+        android:backgroundTint="#121212"
+        android:src="@android:drawable/ic_menu_edit" />
+
+    <ImageButton
+        android:id="@+id/deleteBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/otherFriends"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="140dp"
+        android:backgroundTint="#121212"
+        android:src="@android:drawable/ic_menu_close_clear_cancel" />
 
     <TextView
         android:id="@+id/distance"
@@ -48,9 +80,10 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/profileRating"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="23dp"
-        android:text="0.2m away from you" />
+        android:layout_marginBottom="10dp"
+        android:text="0.2m away from you"
+        android:textColor="@color/gray"
+        android:textSize="18sp"/>
 
     <RatingBar
         android:id="@+id/profileRating"
@@ -60,6 +93,10 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginEnd="85dp"
-        android:layout_marginBottom="33dp" />
+        android:layout_marginBottom="100dp"
+        android:isIndicator="true"
+        android:numStars="5"
+        android:rating="3"
+        android:theme="@style/RatingBar" />
 
 </RelativeLayout>
