@@ -13,9 +13,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/cameraBttn"
-        android:layout_marginStart="1dp"
+        android:layout_alignParentEnd="true"
         android:layout_marginTop="5dp"
-        android:layout_toEndOf="@+id/profilePic"
+        android:layout_marginEnd="84dp"
         android:backgroundTint="#121212"
         android:src="@android:drawable/ic_menu_gallery" />
 
@@ -24,9 +24,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="1dp"
+        android:layout_alignParentEnd="true"
         android:layout_marginTop="30dp"
-        android:layout_toEndOf="@+id/profilePic"
+        android:layout_marginEnd="84dp"
         android:backgroundTint="#121212"
         android:src="@android:drawable/ic_menu_camera" />
 
@@ -44,13 +44,13 @@
         android:id="@+id/profileName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/profilePic"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="177dp"
+        android:fontFamily="@font/satisfy"
         android:text="Annie"
         android:textColor="@color/logo_teal"
-        android:fontFamily="@font/satisfy"
-        android:textSize="38sp"/>
+        android:textSize="38sp" />
 
     <TextView
         android:id="@+id/profilePin"

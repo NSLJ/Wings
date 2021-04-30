@@ -21,13 +21,13 @@
         android:id="@+id/otherName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/otherPic"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="177dp"
+        android:fontFamily="@font/satisfy"
         android:text="Annie"
         android:textColor="@color/logo_teal"
-        android:fontFamily="@font/satisfy"
-        android:textSize="38sp"/>
+        android:textSize="38sp" />
 
     <TextView
         android:id="@+id/otherEmail"
