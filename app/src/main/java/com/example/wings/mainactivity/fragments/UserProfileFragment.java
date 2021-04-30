@@ -128,7 +128,7 @@ public class UserProfileFragment extends Fragment {
                     .into(profilePic);
         } else {
             Glide.with(getContext())
-                    .load("@drawable/wings_log.png")
+                    .load("@drawable/wings_logo.png")
                     .override(400, 400)
                     .fitCenter()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
