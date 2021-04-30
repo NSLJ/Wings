@@ -22,6 +22,7 @@ import com.example.wings.UserAdapter;
 import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.User;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -38,6 +39,7 @@ public class SearchUserFragment extends Fragment {
 
     public static final String TAG = "SearchUsersFragment";
     private RecyclerView rvUsers;
+    //make this a parseUser adapter
     protected UserAdapter adapter;
     protected List<User> users;
     protected SwipeRefreshLayout swipeContainer;
