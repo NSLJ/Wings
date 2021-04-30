@@ -73,4 +73,7 @@ dependencies {
     // Recommended by Codepath, doesn't penalize performance
     implementation "org.permissionsdispatcher:permissionsdispatcher:$permissionDispatcherVersion"
     annotationProcessor "org.permissionsdispatcher:permissionsdispatcher-processor:$permissionDispatcherVersion"
+
+    def work_version = "2.5.0"
+    implementation "androidx.work:work-runtime:$work_version"
 }
