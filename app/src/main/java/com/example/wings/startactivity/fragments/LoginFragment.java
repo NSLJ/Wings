@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -37,7 +38,7 @@ public class LoginFragment extends Fragment {
 
     private SAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
     private Button btnLogin;
-    private Button btnRegister;
+    private TextView tvRegister;
     private String usernameTxt;
     private String passwordTxt;
     private EditText etPassword;
@@ -75,7 +76,7 @@ public class LoginFragment extends Fragment {
      */
     public void onViewCreated(View view, Bundle savedInstanceState) {
         //1.) Initialize Views:
-        btnRegister = view.findViewById(R.id.btnRegister);
+        tvRegister = view.findViewById(R.id.tvRegister);
         btnLogin = view.findViewById(R.id.btnLogin);
         etUsername = view.findViewById(R.id.etUsername);
         etPassword = view.findViewById(R.id.etPassword);
@@ -120,7 +121,7 @@ public class LoginFragment extends Fragment {
         });
 
         //Changes the Fragment to the RegisterOneFragment via the StartActivity!
-        btnRegister.setOnClickListener(new View.OnClickListener() {
+        tvRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 listener.toRegisterOneFragment();

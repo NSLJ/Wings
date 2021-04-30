@@ -59,7 +59,8 @@ public class UserProfileFragment extends Fragment {
     private RatingBar profileRating;
     private Button logOutBtn;
     //Added for edit pic button...
-    private ImageButton editPicBtn;
+    private ImageButton cameraBttn;
+    private ImageButton galleryBttn;
     public File photoFile;
     //Added for edit pic button...
     private static final String CODEPATH_FILE_PROVIDER_KEY = "com.codepath.fileprovider";
@@ -108,7 +109,8 @@ public class UserProfileFragment extends Fragment {
         profileRating = view.findViewById(R.id.profileRating);
         logOutBtn = view.findViewById(R.id.logOutBtn);
         //Added for edit pic button...
-        editPicBtn = view.findViewById(R.id.editPicBtn);
+        cameraBttn = view.findViewById(R.id.cameraBttn);
+        galleryBttn = view.findViewById(R.id.galleryBttn);
 
         ParseUser current = ParseUser.getCurrentUser();
         profileName.setText(current.getString(User.KEY_FIRSTNAME));
@@ -124,13 +126,27 @@ public class UserProfileFragment extends Fragment {
                     .fitCenter()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(profilePic);
+        } else {
+            Glide.with(getContext())
+                    .load("@drawable/wings_log.png")
+                    .override(400, 400)
+                    .fitCenter()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(profilePic);
         }
 
         //Added for edit pic button...
-        editPicBtn.setOnClickListener(new View.OnClickListener() {
+        cameraBttn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 launchCamera();
+            }
+        });
+
+        galleryBttn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openGallery();
             }
         });
 
@@ -153,6 +169,12 @@ public class UserProfileFragment extends Fragment {
 
 
 // ADDED for Edit Pic Button...
+
+    // Trigger gallery selection for a photo
+    private void openGallery() {
+        Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(gallery, PICK_PHOTO_CODE);
+    }
 
     // Returns the File for a photo stored on disk given the fileName
     public File getPhotoFileUri(String fileName) {
