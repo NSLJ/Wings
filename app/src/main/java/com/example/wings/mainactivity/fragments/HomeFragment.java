@@ -23,6 +23,7 @@ import com.example.wings.R;
 import com.example.wings.mainactivity.MAFragmentsListener;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
@@ -35,7 +36,9 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -54,8 +57,11 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
  *
  */
 //@RuntimePermissions     //required by PermissionsDispatcher
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements LocationListener {
     private static final String TAG = "HomeFragment";
+    private static final long UPDATE_INTERVAL = 10000;
+    private static final long FASTEST_INTERVAL = 9000;
+
     private MAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
     private Button chooseBuddyBttn;
 
@@ -64,12 +70,6 @@ public class HomeFragment extends Fragment {
     private UiSettings mapUI;
     private SupportMapFragment mapFragment;
 
-
-    /*
-     * Define a request code to send to Google Play services This code is
-     * returned in Activity.onActivityResult
-     */
-    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
     public HomeFragment() {
     }    // Required empty public constructor
@@ -124,9 +124,9 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-
     //Purpose:          Initializes our "map" field, starts continuously checking for location updates
     protected void loadMap(GoogleMap googleMap) {
+        Log.d(TAG, "in loadMap():");
         map = googleMap;
 
         //SHOULD never have to worry about permissions as MainActivity does it for us
@@ -140,59 +140,17 @@ public class HomeFragment extends Fragment {
         //Set UI of google map:
         mapUI = map.getUiSettings();
         mapUI.setMyLocationButtonEnabled(true);
-        mapUI.setMapToolbarEnabled(true);
         mapUI.setZoomControlsEnabled(true);
         mapUI.setZoomGesturesEnabled(true);
 
-
+        startLocationUpdates();
     }
 
-
-
-  /*  public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putParcelable(KEY_LOCATION, currentLocation);
-        super.onSaveInstanceState(savedInstanceState);
-    }*/
-/*
-    @SuppressWarnings({"MissingPermission"})
-    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-        //@NeedsPermission = required by PermissionsDispatcher when a method will use
-        //"Manifest.permission.ACCESS_FINE_LOCATION"     = to access a precise location
-
-    void getMyLocation() {
-        //1.) Enable the "my-location layer" --> continuously draws the current location/bearing, displays UI controls for use
-        map.setMyLocationEnabled(true);
-        map.getUiSettings().setMyLocationButtonEnabled(true);           //returns a UiSettings object = encapsulates all the settings of the GoogleMap that user has set
-
-        //2.) Get a FusedLocationProviderClient --> to interact with the location provider:
-        //"getFusedLocationProviderClient()" is inherited from LocationServices class (extends from all Objects)
-        FusedLocationProviderClient locationClient = getFusedLocationProviderClient(getContext());
-
-        //3.) Get the best most recent location currently available + update the our Location field, "currentLocation"
-        locationClient.getLastLocation()
-                .addOnSuccessListener(new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if (location != null) {
-                            onLocationChanged(location);        //our method
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d("MapDemoActivity", "Error trying to get last GPS location");
-                        e.printStackTrace();
-                    }
-                });
-    }*/
-/*
-    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
     protected void startLocationUpdates() {
-        locationRequest = new LocationRequest();
+        Log.d(TAG, "in startLocationUpdates()");
 
-        //1.) Fill the request --> set high accuracy location, set update and fastest interval (from class constants)
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         locationRequest.setInterval(UPDATE_INTERVAL);
         locationRequest.setFastestInterval(FASTEST_INTERVAL);
 
@@ -208,10 +166,9 @@ public class HomeFragment extends Fragment {
         settingsClient.checkLocationSettings(locationSettingsRequest);
 
 
-        //4.) Obtain the FusedLocationProviderClient --> to interact with the location provider:
-
-        //  Check if we have granted permissions for "ACCESS_FINE_LOCATION" and "ACCESS_COURSE_LOCATION":
+        //4.) Check if we have granted permissions for "ACCESS_FINE_LOCATION" and "ACCESS_COURSE_LOCATION", MainActivity should have done this already
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "startLocationUpdates(): Permissions are not granted to do the map");
             return;
         }
 
@@ -226,34 +183,8 @@ public class HomeFragment extends Fragment {
                 },
                 Looper.myLooper()
         );
-    }*/
+    }
 /*
-
-    @Override
-    //Required by PermissionsDispatcher, handles all the permission results
-    //Basically just passes the info to the hanlder created for us by PermissionsDispatcher
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // NOTE: delegate the permission handling to generated method
-        HomeFragmentPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
-    }*/
-
-    /**
-     * Purpose:         updates our Location field, "mCurrentLocation", displays toast of update
-     *//*
-    public void onLocationChanged(Location location) {
-        // GPS may be turned off
-        if (location == null) {
-            return;
-        }
-
-        // Report to the UI that the location was updated
-        currentLocation = location;
-        String msg = "Updated Location: " +
-                Double.toString(location.getLatitude()) + "," +
-                Double.toString(location.getLongitude());
-        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
-    }*/
 
     @Override
     /**
@@ -263,7 +194,6 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         //Changes the Fragment to the ChooseBuddyFragment via the MainActivity!
-
         chooseBuddyBttn = view.findViewById(R.id.registerBttn);
         chooseBuddyBttn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -271,6 +201,21 @@ public class HomeFragment extends Fragment {
                 listener.toChooseBuddyFragment();
             }
         });
+    }
+
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+        Log.d(TAG, "in onLocationChanged");
+        if(location != null){
+            currentLocation = location;
+
+            //Place current location marker
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+            //move map camera
+            map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            map.animateCamera(CameraUpdateFactory.zoomTo(11));
+        }
     }
 /*
     @Override
@@ -287,6 +232,6 @@ public class HomeFragment extends Fragment {
         } else {
             Toast.makeText(getContext(), "Current location was null, enable GPS on emulator!", Toast.LENGTH_SHORT).show();
         }
-        HomeFragmentPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
+        startLocationUpdates();
     }*/
 }
