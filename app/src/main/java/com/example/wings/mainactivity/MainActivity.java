@@ -1,20 +1,32 @@
 package com.example.wings.mainactivity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.example.wings.R;
+import com.example.wings.UpdateLocationWorker;
 import com.example.wings.mainactivity.fragments.ChooseBuddyFragment;
 import com.example.wings.commonFragments.EditTrustedContactsFragment;
 import com.example.wings.commonFragments.HelpFragment;
@@ -29,43 +41,82 @@ import com.example.wings.startactivity.StartActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseUser;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 /**
  * MainActivity.java
  * Purpose:         Displays the appropriate fragments that executes the main functions of the app. Essentially is a container to swap between each fragment.
  *
  */
 public class MainActivity extends AppCompatActivity implements MAFragmentsListener{
-    private static final String DEBUG_TAG = "MainActivity";
-    public static final String KEY_PROFILESETUPFRAG = "ProfileSetupFrag?";
+    private static final String TAG = "MainActivity";
+    public static final String KEY_PROFILESETUPFRAG = "ProfileSetupFrag?";          //to get whether or not the current user's profile is set up from the StartActivity
+
+    //UpdateLocationWorker keys:
+    private static final int REQUEST_CODE_LOCATION_PERMISSION = 1;              //request code for permissions result
+    public static final String KEY_SENDCOUNTER = "activity_counter";
+    public static final String KEY_RESULTSTRING = "result_string";
+    public static final String KEY_GETCOUNTER = "worker_counter";
+
 
     final FragmentManager fragmentManager = getSupportFragmentManager();
     private BottomNavigationView bottomNavigationView;
     private boolean restrictUserScreen = false;
+
+    //fields for getting current location:
+    private boolean keepTracking;                    //whether or not we should continue tracking user's current location
+    private int counter = 0;               //TODO: this is for testing purposes, delete later:
+    LifecycleOwner owner = this;                    //used in the startTracking() to listen to WorkInfo responses from the UpdateLocationWorker
 
     @Override
     /**
      * Purpose:         called automatically when activity is launched. Initializes the BottomNavigationView with listeners when each menu item is clicked. on click --> raise correct fragment class.
      */
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "in onCreate():");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bottomNavigationView = findViewById(R.id.bottomNavigation);
 
         //1.) Find out whether or not need to force ProfileSetupFrag:
         if(getIntent().getBooleanExtra(KEY_PROFILESETUPFRAG, false)){
-            Log.d(DEBUG_TAG, "onCreate(): going to ProfileSetUpFragment");
+            Log.d(TAG, "onCreate(): going to ProfileSetUpFragment");
             restrictUserScreen = true;
             setRestrictScreen(restrictUserScreen);          //hides bottom nav bar and safety toolkit button
             toProfileSetupFragment();
         }
 
-        //else create bottom nav menu and go to HomeFrag
+        //else create bottom nav menu, go to HomeFrag, and begin tracking location:
         else {
+            //1.) Unrestrict the screen --> shows the safety toolkit and bottom nav bar:
             restrictUserScreen = false;
             setRestrictScreen(restrictUserScreen);
-        }
-    }
 
+            //2.) Start tracking current user's location automatically (will ask permission if needed):
+                //2a.) Clear any old location requests:
+                CountDownLatch clearRequests = new CountDownLatch(1);
+                stopAllRequests(clearRequests);
+
+                try {   //tells main thread to wait until all requests are cleared
+                    clearRequests.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                //2b.) Check if we have user's permission to track location, if not, request it
+                if((ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) || (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)){
+                    //request permissions (ACCESS_FINE_LOCATION AND ACCESS_COARSE_LOCATION)
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE_LOCATION_PERMISSION);
+                }
+                //Otherwise --> start tracking location
+                else{
+                    keepTracking= true;
+                    startTracking();           //infinitely runs as long as keepTracking = true;
+                }
+        }
+
+    }
 
     /**
      * Purpose:         called automatically when activity launched --> inflates and displays menu items across the activity using "menu_main_navigation.xml".
@@ -91,8 +142,18 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                 //1.) Log off the user using Parse:
                  ParseUser.logOut();
 
-                //2.) Intent to go to StartActivity, finish() this activity
-                Log.d(DEBUG_TAG, ": logging out");
+                //2.) Intent to go to StartActivity, finish() this activity, stop tracking current user:
+                Log.d(TAG, ": logging out");
+                    //2a.) Clear all requests:
+                CountDownLatch clearRequests = new CountDownLatch(1);
+                stopAllRequests(clearRequests);
+                try {   //tells main thread to wait until all requests are cleared
+                    clearRequests.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                    //2b.) Start intent to StartActivity
                 intent = new Intent(this, StartActivity.class);
                 startActivity(intent);
                 finish();
@@ -113,6 +174,102 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         return false;
     }
 
+    //----------------------------------------------------------All Location stuff------------------------------------------------
+    //TODO: this is for testing purposes, delete later:
+    private void setCounter(int newCounter){
+        counter = newCounter;
+    }
+
+    @Override
+    /**
+     * Purpose:         To ask the user permission for the given String[] of permissions, then handles the result (if permissions are granted, call startTrack())
+     */
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == REQUEST_CODE_LOCATION_PERMISSION && grantResults.length > 1 ){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
+                keepTracking = true;
+                startTracking();
+            }
+            else{
+                Toast.makeText(this, "Permission was denied!", Toast.LENGTH_SHORT).show();
+                //TODO: handle what to do when location permision is denied , i.e ask again or Toast, etc
+            }
+        }
+    }
+
+    /**
+     * Purpose:         Clears all old UpdateLocation requests or stops all new requests by setting keepTracking field = false.
+     */
+    private void stopAllRequests(CountDownLatch latch){
+        keepTracking= false;
+        WorkManager.getInstance(getApplicationContext()).cancelAllWork();       //probably will need to refine by Tags so specific requests get canceled
+        latch.countDown();
+        //textView.setText("All request stopping..");
+    }
+
+    /**
+     * Purpose:     Makes a OneTimeWorkRequest on the UpdateLocationWorker class infinitely as long as keepTracking = true. keepTracking may be turned off through the stopAllRequests()
+     */
+    private void startTracking(){
+
+        //Package data to send the counter
+        Data data = new Data.Builder()
+                .putInt(KEY_SENDCOUNTER, counter)       //send the counter
+                .build();
+
+        //Create the request
+        OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(UpdateLocationWorker.class)
+                .setInputData(data)         //send data
+                .setInitialDelay(5, TimeUnit.SECONDS)      //wait 5 seconds before doing it         //TODO: don't hardcode, make this time frame a constant
+                .build();
+
+        //Queue up the request
+        WorkManager.getInstance(getApplicationContext())
+                .enqueueUniqueWork(
+                        "sendDataWorker request",
+                        ExistingWorkPolicy.REPLACE,         //says, if it does repeat, replace the new request with the old one
+                        (OneTimeWorkRequest) request
+                );
+
+        //Listen to information from the request
+        WorkManager.getInstance(getApplicationContext()).getWorkInfoByIdLiveData(request.getId())      //returns a live data
+                .observe(owner, new Observer<WorkInfo>() {
+
+                    //called every time WorkInfo is changed
+                    public void onChanged(@Nullable WorkInfo workInfo) {
+
+                        //If workInfo is there and it is succeeded --> update the text
+                        if (workInfo != null) {
+                            //Check if finished:
+                            if(workInfo.getState().isFinished()){
+                                if(workInfo.getState() == WorkInfo.State.SUCCEEDED){
+                                    Log.d(TAG, "Request succeeded ");
+                                    //get output:
+                                    Data output = workInfo.getOutputData();
+                                    String result = output.getString(KEY_RESULTSTRING);
+                                    int newCounter = output.getInt(KEY_GETCOUNTER, 0);
+                                    setCounter(newCounter);
+
+                                    //textView.setText(result);
+                                    if(keepTracking) {
+                                        startTracking();               //to infinitely do it!
+                                    }
+                                }
+                                else {
+                                    Log.d(TAG, "Request didn't succeed, status=" + workInfo.getState().name());
+                                    startTracking();
+                                }
+                            }
+                        }
+                    }
+                });
+    }
+
+    //------------------------------------------------------------------------All Location Stuff---------------------------------------------
+
+
+    //----------------------------------------------------------Required methods by MAFragmentsListener-----------------------------------------------------
     /**
      * Purpose:     Needs to be implemented in this activity so Safety Toolkit will execute on any screen
      */
@@ -130,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
      * @param answer
      */
     public void setRestrictScreen(boolean answer){
-        Log.d(DEBUG_TAG, "setRestrictScreen():   profile setup?: " + ParseUser.getCurrentUser().getBoolean(User.KEY_PROFILESETUP));
+        Log.d(TAG, "setRestrictScreen():   profile setup?: " + ParseUser.getCurrentUser().getBoolean(User.KEY_PROFILESETUP));
         //If we need to restrict screen --> hide Bottom Nav Bar
         if(answer){
             bottomNavigationView.setVisibility(View.GONE);

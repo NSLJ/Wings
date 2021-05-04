@@ -27,29 +27,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Wings">
-        <service android:name=".LocationService"
-            android:enabled="true"
-            android:exported="false"/>
 
-        <activity android:name=".TestLocationsActivity">
-
-        </activity>
-        <activity android:name=".TestActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity android:name=".startactivity.StartActivity">
 
-            <!--
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            -->
+
         </activity>
         <activity android:name=".mainactivity.MainActivity" />
 
