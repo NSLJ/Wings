@@ -2,7 +2,7 @@
 With Wings, You Never Walk Alone
 
 ## Progress so far...
-<img src="4-28-walkthrough.gif">
+<img src="5-4-walkthrough.gif">
 
 ## Table of Contents
 1. [Overview](#Overview)
