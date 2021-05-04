@@ -37,23 +37,23 @@ With Wings, You Never Walk Alone.
 - [x] User can log off.
 - [x] User can view their own profiles.
 - [x] User can view other profiles
+
 - [ ] User can search for other users.
-- [ ] User can add friends.
-- [ ] User can view friend list.
-- [ ] User can input their intended destination on a map. 
 - [ ] User is shown all possible buddies.
 - [ ] User can choose to be "able to be a Buddy" when not in need of a Buddy themself. 
-- [ ] User can choose to be a Solo Walker, where they walk to their destination on their own but is still open to being paired with a Buddy. 
 - [ ] User can send, receive, and respond to multiple Buddy Requests.
 - [ ] User can verify their Buddy when meeting in person. 
 - [ ] User can send Emergency Information quickly to Trusted Contacts.
+- [ ] User can confirm when they've safely arrived at their destination. (button to comfirm)
+- [ ] User can choose to be a Solo Walker, where they walk to their destination on their own but is still open to being paired with a Buddy. 
+*Need Google Map features*
+- [ ] User can input their intended destination on a map. 
 - [ ] Buddy Pairs are required to confirm a route on the map to follow. 
 - [ ] Users are tracked while on a Buddy Trip.
-- [ ] User can confirm when they've safely arrived at their destination.
-
-
 
 **Optional Nice-to-have Stories**
+- [ ] User can add friends.
+- [ ] User can view friend list.
 - [ ] Buddies can rate each other after a Buddy Trip. 
 - [ ] Users can chat with their Buddies. 
 - [ ] User can request to chat with other users. 
