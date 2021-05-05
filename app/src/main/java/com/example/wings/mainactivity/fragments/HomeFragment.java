@@ -4,7 +4,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,8 +21,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.wings.DataParser;
 import com.example.wings.R;
 import com.example.wings.mainactivity.MAFragmentsListener;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -40,8 +46,25 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.Buffer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
@@ -59,8 +82,8 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 //@RuntimePermissions     //required by PermissionsDispatcher
 public class HomeFragment extends Fragment implements LocationListener {
     private static final String TAG = "HomeFragment";
-    private static final long UPDATE_INTERVAL = 10000;
-    private static final long FASTEST_INTERVAL = 9000;
+    private static final long UPDATE_INTERVAL = 5000;
+    private static final long FASTEST_INTERVAL = 3000;
 
     private MAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
     private Button chooseBuddyBttn;
@@ -69,6 +92,19 @@ public class HomeFragment extends Fragment implements LocationListener {
     private GoogleMap map;
     private UiSettings mapUI;
     private SupportMapFragment mapFragment;
+
+    //Routing stuff:
+    private LatLng startLocation;
+    private LatLng destination;
+    private Polyline polyline;
+    ArrayList<LatLng> markerPoints;
+    MarkerOptions startMarker;
+    MarkerOptions endMarker;
+
+    //layout views:
+    Button btnSearch;
+    Button btnClear;
+    EditText etSearchBar;
 
 
     public HomeFragment() {
@@ -106,6 +142,7 @@ public class HomeFragment extends Fragment implements LocationListener {
 
         //2.) Initialize map fragment:
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        markerPoints = new ArrayList<>();
 
         //3.) Error check mapFragment
         if (mapFragment != null) {
@@ -146,6 +183,7 @@ public class HomeFragment extends Fragment implements LocationListener {
         startLocationUpdates();
     }
 
+
     protected void startLocationUpdates() {
         Log.d(TAG, "in startLocationUpdates()");
 
@@ -178,18 +216,22 @@ public class HomeFragment extends Fragment implements LocationListener {
                     @Override
                     //When obtains the location update --> updates our Location field, "currentLocation"
                     public void onLocationResult(LocationResult locationResult) {
+
+                        Log.d(TAG, "in onLocationResult()");
                         onLocationChanged(locationResult.getLastLocation());        //our method
+
                     }
                 },
                 Looper.myLooper()
         );
     }
-/*
 
-    @Override
-    /**
-     * Purpose;         Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
-     */
+    /*
+
+        @Override
+        /**
+         * Purpose;         Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
+         */
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -201,21 +243,114 @@ public class HomeFragment extends Fragment implements LocationListener {
                 listener.toChooseBuddyFragment();
             }
         });
+
+        btnSearch = view.findViewById(R.id.btnSearch);
+        btnClear = view.findViewById(R.id.btnClear);
+        etSearchBar = view.findViewById(R.id.etSearchBar);
+
+        //Set on click listener:
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchArea();
+            }
+        });
+
+        btnClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mapFragment.getMapAsync(new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(GoogleMap googleMap) {
+                        //when map is ready --> load it
+                        loadMap(googleMap);
+                    }
+                });
+            }
+        });
+    }
+
+    //Purpose:          Get the text in the Searchbar, use Geocoder to find the LatLng, set a marker at that LatLng
+    private void searchArea() {
+        Log.d(TAG, "in searchArea()");
+        String destinationTxt = etSearchBar.getText().toString();
+        List<Address> addressList = new ArrayList<>();
+        MarkerOptions markerOptions = new MarkerOptions();
+
+        //Check if there is a location text to search for:
+        if(!destinationTxt.equals("")){
+            Geocoder geocoder = new Geocoder(getContext().getApplicationContext());         //May need to be getApplicationContext or getContext
+
+            //1.) Get the address list from the geocoder:
+            try {
+                addressList = geocoder.getFromLocationName(destinationTxt, 5);
+            } catch (IOException e) {
+                Log.d(TAG, "searchArea(): error with geocode to List<Address>, error=" + e.getLocalizedMessage());
+                e.printStackTrace();
+            }
+
+            //2.) Ensure addressList is not null:
+            if(addressList != null){
+                for(int i = 0; i < addressList.size(); i++){
+
+                    //Initialize LatLng of destination field
+                    Address destinAddress = addressList.get(i);
+                    destination = new LatLng(destinAddress.getLatitude(), destinAddress.getLongitude());
+
+                    //Set and add marker to that destination
+                    markerOptions.position(destination);
+                    map.addMarker(markerOptions);
+                    map.animateCamera(CameraUpdateFactory.newLatLng(destination));
+
+                    MarkerOptions mo = new MarkerOptions();
+                    mo.title("Distance");
+                    float[] results = new float[10];
+                    Location.distanceBetween(startLocation.latitude, startLocation.longitude, destination.latitude, destination.longitude, results);
+
+                    String s = String.format("%.1f", results[0]/1000);      //convert distance to km
+
+                    //Set and show startMarker and endMarker:
+                    startMarker = new MarkerOptions().position(startLocation).title("HSR Layout").snippet("startMarker");
+                    endMarker = new MarkerOptions().position(destination).title(destinationTxt).snippet("Distance = " + s + " KM");
+                    map.addMarker(endMarker);
+                    Toast.makeText(getContext(), "Distance = " + s + " KM", Toast.LENGTH_SHORT).show();
+
+                    //Get URL to the Google Directions API:
+                    String url = getDirectionsURL(startMarker.getPosition(), endMarker.getPosition());
+
+                    DownloadTask downloadTask = new DownloadTask();
+                    downloadTask.execute(url);
+                }
+            }
+        }
+
+    }
+
+    private String getDirectionsURL(LatLng start, LatLng end){
+        String startStr = "origin=" + start.latitude + "," + start.longitude;
+        String endStr = "destination=" + end.latitude + "," + end.longitude;
+        String mode = "mode=walking";
+        String parameters = startStr + "&" + endStr + "&" + mode;
+        String output = "json";
+
+        return "https://maps.googleapis.com/maps/api/directions/"+output + "?" + parameters + "&key=AIzaSyC1c3vYFZDb2Ebr1uZbtt-IjGNzARXgVho";
     }
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
         Log.d(TAG, "in onLocationChanged");
-        if(location != null){
+        if (location != null) {
             currentLocation = location;
 
             //Place current location marker
-            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            startLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
             //move map camera
-            map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            map.animateCamera(CameraUpdateFactory.zoomTo(11));
+            //map.moveCamera(CameraUpdateFactory.newLatLng(startLocation));
+            //map.animateCamera(CameraUpdateFactory.zoomTo(17));
         }
+
+
     }
 /*
     @Override
@@ -234,4 +369,114 @@ public class HomeFragment extends Fragment implements LocationListener {
         }
         startLocationUpdates();
     }*/
+
+    private String downloadURL(String urlStr) throws IOException {
+        String data = "";
+        InputStream inStream = null;
+        HttpURLConnection urlConnection = null;
+
+        try {
+            URL url = new URL(urlStr);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.connect();
+            inStream = urlConnection.getInputStream();
+
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inStream));
+            StringBuffer stringBuffer = new StringBuffer();
+            String line = bufferedReader.readLine();
+            while (line != null) {
+                stringBuffer.append(line);
+                line = bufferedReader.readLine();
+            }
+
+            data = stringBuffer.toString();
+            bufferedReader.close();
+        }catch(IOException e){
+            Log.d(TAG, "in downloadURL(): exception=" + e.getLocalizedMessage());
+        }
+        finally {
+            inStream.close();
+            urlConnection.disconnect();
+        }
+
+        Log.d(TAG, "in downloadURL(): data=" + data);
+        return data;
+    }
+    public class DownloadTask extends AsyncTask<String, Void, String>{
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Log.d(TAG, "DownloadTask: in onPostExecute()");
+            ParserTask parserTask = new ParserTask();
+            parserTask.execute(s);
+        }
+
+        @Override
+        protected String doInBackground(String[] url) {
+            String data = "";
+            Log.d(TAG, "DownloadTask: doInBackground(): url[0] = " + url[0]);
+
+            try {
+                data = downloadURL(url[0]);
+            } catch (IOException e) {
+                Log.d(TAG, "DownloadTask: downloadURL exception, error = " + e.getLocalizedMessage());
+                e.printStackTrace();
+            }
+
+            return data;
+        }
+    }
+
+    public class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>>{
+
+        @Override
+        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+            super.onPostExecute(result);
+            Log.d(TAG, "ParserTask: in onPostExecute()");
+
+            ArrayList<LatLng> points = new ArrayList<LatLng>();
+            PolylineOptions lineOptions = new PolylineOptions();
+            for(int i = 0; i < result.size(); i++){
+                List<HashMap<String, String>> path = result.get(i);
+
+                for( int j = 0; j < path.size(); j++){
+                    HashMap<String, String> point = path.get(j);
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lng = Double.parseDouble(point.get("lng"));
+                    LatLng position = new LatLng(lat, lng);
+
+                    points.add(position);
+                }
+
+                lineOptions.addAll(points);
+                lineOptions.width(8);
+                lineOptions.color(Color.BLUE);
+                lineOptions.geodesic(true);
+            }
+            Log.d(TAG, "ParserTask: in onPostExecute(): points=" + points.toString());
+
+            if(points.size() != 0){
+                Log.d(TAG, "ParserTask: in onPostExecute(): adding polyline to map");
+                map.addPolyline(lineOptions);
+            }
+        }
+
+        @Override
+        protected List<List<HashMap<String, String>>> doInBackground(String[] jsonData) {
+            Log.d(TAG, "ParserTask: in doInBackground()");
+            JSONObject jsonObject;
+            List<List<HashMap<String, String>>> routes = null;
+
+            try {
+                jsonObject = new JSONObject(jsonData[0]);
+                DataParser parser = new DataParser();
+                routes = parser.parse(jsonObject);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return routes;
+        }
+    }
 }
