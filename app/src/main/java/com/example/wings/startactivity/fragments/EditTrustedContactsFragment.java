@@ -1,10 +1,13 @@
 package com.example.wings.startactivity.fragments;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 =======
+=======
+>>>>>>> nhi
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +16,9 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+<<<<<<< HEAD
+>>>>>>> nhi
+=======
 >>>>>>> nhi
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +27,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+<<<<<<< HEAD
 <<<<<<< HEAD
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,6 +47,12 @@ public class EditTrustedContactsFragment extends Fragment {
 
     private SAFragmentsListener listener;
 =======
+=======
+
+import com.example.wings.R;
+import com.example.wings.startactivity.SAFragmentsListener;
+
+>>>>>>> nhi
 =======
 
 import com.example.wings.R;
@@ -80,6 +93,7 @@ public class EditTrustedContactsFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_edit_trusted_contacts, container, false);
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> working on Trusted Contacts Fragments
 
     public static final String TAG = "EditTrustedContactsFragment";
@@ -97,6 +111,8 @@ public class EditTrustedContactsFragment extends Fragment {
 
 =======
 =======
+=======
+>>>>>>> nhi
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,6 +120,9 @@ public class EditTrustedContactsFragment extends Fragment {
         setHasOptionsMenu(true);        //let know that there is an options menu to inflate
     }
 
+<<<<<<< HEAD
+>>>>>>> nhi
+=======
 >>>>>>> nhi
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -116,7 +135,10 @@ public class EditTrustedContactsFragment extends Fragment {
      *              Connect the Fragment's listener to the activity!
      */
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> working on Trusted Contacts Fragments
+=======
+>>>>>>> nhi
 =======
 >>>>>>> nhi
     public void onAttach(@NonNull Context context) {
@@ -125,7 +147,11 @@ public class EditTrustedContactsFragment extends Fragment {
             listener = (SAFragmentsListener) context;
         } else {
 <<<<<<< HEAD
+<<<<<<< HEAD
             throw new ClassCastException(context.toString() + " must implement MAFragmentsListener");
+=======
+            throw new ClassCastException(context.toString() + " must implement SAFragmentsListener");
+>>>>>>> nhi
 =======
             throw new ClassCastException(context.toString() + " must implement SAFragmentsListener");
 >>>>>>> nhi
@@ -133,6 +159,7 @@ public class EditTrustedContactsFragment extends Fragment {
     }
 
     @Override
+<<<<<<< HEAD
 <<<<<<< HEAD
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -153,6 +180,8 @@ public class EditTrustedContactsFragment extends Fragment {
         tcRecyclerList.setAdapter(adapter);
         tcRecyclerList.setLayoutManager(new LinearLayoutManager(getContext()));
 =======
+=======
+>>>>>>> nhi
     /**
      * Purpose:     Inflates a specific top navigation bar for this fragment, allowing the user to logout without setting up their profile, to go to SettingsFragments, or go to HelpFragment
      */
@@ -187,6 +216,9 @@ public class EditTrustedContactsFragment extends Fragment {
                 return false;
         }
         return false;
+<<<<<<< HEAD
+>>>>>>> nhi
+=======
 >>>>>>> nhi
     }
 

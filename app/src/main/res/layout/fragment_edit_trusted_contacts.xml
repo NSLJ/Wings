@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< master
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -27,6 +28,8 @@
 
 </LinearLayout>
 =======
+=======
+>>>>>>> nhi
 =======
 >>>>>>> nhi
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -61,8 +64,12 @@
         android:backgroundTint="@color/logo_teal"
         android:text="Save" />
 <<<<<<< HEAD
+<<<<<<< HEAD
 </RelativeLayout>
 >>>>>>> working on Trusted Contacts Fragments
+=======
+</RelativeLayout>
+>>>>>>> nhi
 =======
 </RelativeLayout>
 >>>>>>> nhi
