@@ -19,9 +19,9 @@ public class TrustedContact extends ParseObject {
 
     //Still playing around with
     public TrustedContact(JSONObject object){
-        //ParseObject trustedContact = new ParseObject("TrustedContact");
+        ParseObject trustedContact = new ParseObject("TrustedContact");
 
-        //setUserTrustedBy(object.get)
+        //setUserTrustedBy(object.get);
     }
 
     public ParseUser getUserTrustedBy(){

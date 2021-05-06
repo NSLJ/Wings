@@ -62,6 +62,7 @@ public class ProfileSetupFragment extends Fragment {
     private static final String KEY_RECEIVE_USER = "user";
 
     private MAFragmentsListener listener;
+    private SAFragmentsListener slistener;
 
     public File photoFile;
     private ImageView profileImage;
@@ -103,8 +104,13 @@ public class ProfileSetupFragment extends Fragment {
         if (context instanceof MAFragmentsListener) {
             listener = (MAFragmentsListener) context;
         } else {
-            throw new ClassCastException(context.toString() + " must implement MAFragmentsListener");
+            throw new ClassCastException(context.toString() + " must implement MAFragmentListener");
         }
+//        if (context instanceof SAFragmentsListener) {
+//            slistener = (SAFragmentsListener) context;
+//        } else {
+//            throw new ClassCastException(context.toString() + " must implement SAFragmentListener");
+//        }
     }
     @SuppressLint("ResourceAsColor")
     @Override
@@ -128,10 +134,14 @@ public class ProfileSetupFragment extends Fragment {
             tcstatus.setText("completed");
         }
 
-//        // To create a Trusted Contact List
-//        setupTCBtn.setOnClickListener(new View.OnClickListener() {
-//            listener.toEditTrustedContactsFragment(User object);
-//        });
+        // To create a Trusted Contact List
+        setupTCBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveProfileSetup();
+                slistener.toEditTrustedContacts();
+            }
+        });
 
         // TODO : check if all profile req set up: profile pic, Trusted contacts, and PIN
         completeBtn.setOnClickListener(new View.OnClickListener() {

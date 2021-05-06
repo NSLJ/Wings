@@ -1,0 +1,81 @@
+package com.example.wings;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+
+import com.example.wings.models.TrustedContact;
+
+
+import java.util.List;
+
+public class TrustedContactsAdapter extends RecyclerView.Adapter<TrustedContactsAdapter.ViewHolder> {
+
+    private Context context;
+    private List<TrustedContact> trustedContacts;
+
+    public TrustedContactsAdapter (Context context, List<TrustedContact> trustedContacts) {
+        this.context = context;
+        this.trustedContacts = trustedContacts;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.itemtc, parent, false);
+        return new ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull TrustedContactsAdapter.ViewHolder holder, int position) {
+        TrustedContact trustedContact = trustedContacts.get(position);
+
+        holder.bind(trustedContact);
+    }
+
+    @Override
+    public int getItemCount() {
+        return trustedContacts.size();
+    }
+
+    public void clear(){
+        trustedContacts.clear();
+        notifyDataSetChanged();
+    }
+
+    public void addAll(List<TrustedContact> list){
+        trustedContacts.addAll(list);
+        notifyDataSetChanged();
+    }
+
+    class ViewHolder extends RecyclerView.ViewHolder{
+
+        private EditText tcName;
+        private EditText tcRelationship;
+        private EditText tcEmail;
+        private EditText tcNum;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            tcName = itemView.findViewById(R.id.tcName1);
+            tcRelationship = itemView.findViewById(R.id.tcRelationship1);
+            tcEmail = itemView.findViewById(R.id.tcEmail1);
+            tcNum = itemView.findViewById(R.id.tcNum1);
+        }
+
+        public void bind(TrustedContact tc) {
+            tcName.setText(tc.getFirstName() + " " + tc.getLastName());
+            tcRelationship.setText(tc.getRelationship());
+            tcEmail.setText(tc.getEmail());
+            tcNum.setText(tc.getPhoneNumber());
+        }
+    }
+}
