@@ -6,6 +6,37 @@
     android:orientation="vertical"
     tools:context=".mainactivity.fragments.HomeFragment">
 
+    <RelativeLayout
+        android:id="@+id/rlSearchBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/etSearchBar"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Search for a destination"
+            android:inputType="textPersonName"
+            android:textColorLink="#FFFFFF" />
+
+        <Button
+            android:id="@+id/btnSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="-114dp"
+            android:layout_toEndOf="@+id/etSearchBar"
+            android:text="search" />
+
+        <Button
+            android:id="@+id/btnClear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/btnSearch"
+            android:text="clear" />
+    </RelativeLayout>
+
+
     <fragment
         android:id="@+id/map"
         android:layout_width="match_parent"
