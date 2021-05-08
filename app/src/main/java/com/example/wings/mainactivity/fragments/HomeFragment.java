@@ -107,8 +107,7 @@ public class HomeFragment extends Fragment implements LocationListener {
     EditText etSearchBar;
 
 
-    public HomeFragment() {
-    }    // Required empty public constructor
+    public HomeFragment() {}    // Required empty public constructor
 
     @Override
     /**
