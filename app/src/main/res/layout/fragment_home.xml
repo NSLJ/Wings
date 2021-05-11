@@ -24,16 +24,10 @@
             android:id="@+id/btnSearch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="-114dp"
+            android:layout_marginStart="-35dp"
             android:layout_toEndOf="@+id/etSearchBar"
             android:text="search" />
 
-        <Button
-            android:id="@+id/btnClear"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/btnSearch"
-            android:text="clear" />
     </RelativeLayout>
 
 

@@ -14,10 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.wings.R;
-import com.example.wings.SettingAdapter;
+import com.example.wings.adapters.SettingAdapter;
 import com.example.wings.models.Setting;
-
-import org.json.JSONArray;
 
 import java.util.ArrayList;
 

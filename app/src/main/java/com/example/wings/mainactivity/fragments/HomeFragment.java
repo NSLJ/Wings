@@ -48,8 +48,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,8 +65,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import permissions.dispatcher.NeedsPermission;
-import permissions.dispatcher.RuntimePermissions;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
@@ -79,7 +76,7 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
  * implementing this better!
  *
  */
-//@RuntimePermissions     //required by PermissionsDispatcher
+
 public class HomeFragment extends Fragment implements LocationListener {
     private static final String TAG = "HomeFragment";
     private static final long UPDATE_INTERVAL = 5000;
@@ -101,9 +98,9 @@ public class HomeFragment extends Fragment implements LocationListener {
     MarkerOptions startMarker;
     MarkerOptions endMarker;
 
+    List<LatLng> mapCoordinates;            //after we get the route, stores all intermediate coordinates (LatLngs) needed to get from startLocation to destination
     //layout views:
     Button btnSearch;
-    Button btnClear;
     EditText etSearchBar;
 
 
@@ -132,13 +129,6 @@ public class HomeFragment extends Fragment implements LocationListener {
         //1.) Initialize view:
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-       /* if (savedInstanceState != null && savedInstanceState.keySet().contains(KEY_LOCATION)) {
-            // Since KEY_LOCATION was found in the Bundle, we can be sure that currentLocation
-            // is not null.
-            //Get the current location
-            currentLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-        }*/
-
         //2.) Initialize map fragment:
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         markerPoints = new ArrayList<>();
@@ -165,9 +155,9 @@ public class HomeFragment extends Fragment implements LocationListener {
         Log.d(TAG, "in loadMap():");
         map = googleMap;
 
-        //SHOULD never have to worry about permissions as MainActivity does it for us
+        //SHOULD never have to worry about permissions as MainActivity does it for us, TODO:would be best to create method to call the MainActivity to ask for permissons again instead of assumming
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "Permissions are not granted to do the map");
+            Log.d(TAG, "loadMap(): Permissions are not granted to do the map");
             return;
         }
 
@@ -179,10 +169,11 @@ public class HomeFragment extends Fragment implements LocationListener {
         mapUI.setZoomControlsEnabled(true);
         mapUI.setZoomGesturesEnabled(true);
 
-        startLocationUpdates();
+        startLocationUpdates();             //To constantly get current location and display update on the map
     }
 
 
+    //Purpose:          Obtains the current location of the user to display on the map constantly, DOES NOT do anything with the Parse database. This is simply to display on the Fragment ONLY!
     protected void startLocationUpdates() {
         Log.d(TAG, "in startLocationUpdates()");
 
@@ -243,35 +234,23 @@ public class HomeFragment extends Fragment implements LocationListener {
             }
         });
 
+
         btnSearch = view.findViewById(R.id.btnSearch);
-        btnClear = view.findViewById(R.id.btnClear);
         etSearchBar = view.findViewById(R.id.etSearchBar);
 
-        //Set on click listener:
+        //set listener: onClick() --> search for and route to a location
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 searchArea();
             }
         });
-
-        btnClear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mapFragment.getMapAsync(new OnMapReadyCallback() {
-                    @Override
-                    public void onMapReady(GoogleMap googleMap) {
-                        //when map is ready --> load it
-                        loadMap(googleMap);
-                    }
-                });
-            }
-        });
     }
 
-    //Purpose:          Get the text in the Searchbar, use Geocoder to find the LatLng, set a marker at that LatLng
+    //Purpose:          Get the text in the Searchbar, use Geocoder to find the LatLng, set a marker at that LatLng, attempt to make a Network request to the Google Directions API
     private void searchArea() {
         Log.d(TAG, "in searchArea()");
+
         String destinationTxt = etSearchBar.getText().toString();
         List<Address> addressList = new ArrayList<>();
         MarkerOptions markerOptions = new MarkerOptions();
@@ -315,14 +294,19 @@ public class HomeFragment extends Fragment implements LocationListener {
                     Toast.makeText(getContext(), "Distance = " + s + " KM", Toast.LENGTH_SHORT).show();
 
                     //Get URL to the Google Directions API:
-                    String url = getDirectionsURL(startMarker.getPosition(), endMarker.getPosition());
-
-                    DownloadTask downloadTask = new DownloadTask();
-                    downloadTask.execute(url);
+                    route(startMarker.getPosition(), endMarker.getPosition());
                 }
             }
         }
 
+    }
+
+    //Purpose:      routes from the given start position to the end position
+    private void route(LatLng start, LatLng end){
+        String url = getDirectionsURL(start, end);
+
+        DownloadTask downloadTask = new DownloadTask();
+        downloadTask.execute(url);
     }
 
     private String getDirectionsURL(LatLng start, LatLng end){
@@ -351,6 +335,11 @@ public class HomeFragment extends Fragment implements LocationListener {
 
 
     }
+
+    private void setMappingCoordinates(List<LatLng> newMapCoordinates){
+        Log.d(TAG, "setMappingCoordinates(): newMapCoordinates= " + newMapCoordinates.toString());
+        mapCoordinates = newMapCoordinates;
+    }
 /*
     @Override
     public void onResume() {
@@ -369,6 +358,7 @@ public class HomeFragment extends Fragment implements LocationListener {
         startLocationUpdates();
     }*/
 
+    //Purpose:          Makes the network request to the Google Directions API given the correct URL, returns the entire JSONObject as a string
     private String downloadURL(String urlStr) throws IOException {
         String data = "";
         InputStream inStream = null;
@@ -401,8 +391,12 @@ public class HomeFragment extends Fragment implements LocationListener {
         Log.d(TAG, "in downloadURL(): data=" + data);
         return data;
     }
+
+    //Purpose:          To make network request in an async task (in the background), finds the JSONObject that has the routes --> gives to ParserTask to parse the JSONObject
+    //                  and get the LatLngs needed while going on the trip. ParseTask --> initializes mapCoordinates (List<LatLng>)
     public class DownloadTask extends AsyncTask<String, Void, String>{
         @Override
+        //s = the entire JSONObject result from the api call, but it's a string --> Parser task will
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             Log.d(TAG, "DownloadTask: in onPostExecute()");
@@ -411,6 +405,7 @@ public class HomeFragment extends Fragment implements LocationListener {
         }
 
         @Override
+        //Purpose:          called when you use "execute()", calls downloadURL to make the actual request to the Google Directions API, data = the entire JSON Object result
         protected String doInBackground(String[] url) {
             String data = "";
             Log.d(TAG, "DownloadTask: doInBackground(): url[0] = " + url[0]);
@@ -429,24 +424,30 @@ public class HomeFragment extends Fragment implements LocationListener {
     public class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>>{
 
         @Override
+        //Purpose:      Given all possible routes from a trip, basically draws the last one, but this assumes there's only one route anyway I think
         protected void onPostExecute(List<List<HashMap<String, String>>> result) {
             super.onPostExecute(result);
             Log.d(TAG, "ParserTask: in onPostExecute()");
 
             ArrayList<LatLng> points = new ArrayList<LatLng>();
             PolylineOptions lineOptions = new PolylineOptions();
+            //For every route in the List:
             for(int i = 0; i < result.size(); i++){
                 List<HashMap<String, String>> path = result.get(i);
 
+                //Go through every LatLng stored in that route/every LatLng need to pass to get to destination
                 for( int j = 0; j < path.size(); j++){
                     HashMap<String, String> point = path.get(j);
                     double lat = Double.parseDouble(point.get("lat"));
                     double lng = Double.parseDouble(point.get("lng"));
                     LatLng position = new LatLng(lat, lng);
 
+                    //Add the LatLng to a List of LatLng
                     points.add(position);
                 }
 
+                //After you save all the LatLngs of a route into a List --> set the display of the route
+                //TODO: technically this logic is flawed as it assumes there is only 1 route, I think
                 lineOptions.addAll(points);
                 lineOptions.width(8);
                 lineOptions.color(Color.BLUE);
@@ -454,6 +455,9 @@ public class HomeFragment extends Fragment implements LocationListener {
             }
             Log.d(TAG, "ParserTask: in onPostExecute(): points=" + points.toString());
 
+            setMappingCoordinates(points);          //save our List of LatLngs into a field so we have access to it
+
+            //Displays the route through the seeetings of the lineOptions, this technically being here means it would only display the last route listed in the given List of routes
             if(points.size() != 0){
                 Log.d(TAG, "ParserTask: in onPostExecute(): adding polyline to map");
                 map.addPolyline(lineOptions);
@@ -467,9 +471,9 @@ public class HomeFragment extends Fragment implements LocationListener {
             List<List<HashMap<String, String>>> routes = null;
 
             try {
-                jsonObject = new JSONObject(jsonData[0]);
-                DataParser parser = new DataParser();
-                routes = parser.parse(jsonObject);
+                jsonObject = new JSONObject(jsonData[0]);        //Makes the String representing a JSONObject into an actual JSONObject
+                DataParser parser = new DataParser();           //DataParser does the actual parsing of the JSONObject
+                routes = parser.parse(jsonObject);              //returns all possible routes from the JSONObject
 
             } catch (JSONException e) {
                 e.printStackTrace();

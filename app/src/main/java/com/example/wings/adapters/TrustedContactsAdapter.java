@@ -1,4 +1,4 @@
-package com.example.wings;
+package com.example.wings.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.example.wings.R;
 import com.example.wings.models.TrustedContact;
 
 

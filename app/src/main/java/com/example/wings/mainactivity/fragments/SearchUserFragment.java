@@ -18,14 +18,12 @@ import android.widget.TextView;
 
 import com.example.wings.R;
 
-import com.example.wings.UserAdapter;
+import com.example.wings.adapters.UserAdapter;
 import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.User;
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
