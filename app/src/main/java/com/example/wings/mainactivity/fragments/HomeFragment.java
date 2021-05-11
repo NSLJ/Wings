@@ -27,6 +27,8 @@ import android.widget.Toast;
 import com.example.wings.DataParser;
 import com.example.wings.R;
 import com.example.wings.mainactivity.MAFragmentsListener;
+import com.example.wings.models.User;
+import com.example.wings.models.WingsGeoPoint;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
@@ -48,6 +50,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseUser;
 
 
 import org.json.JSONException;
@@ -98,7 +103,7 @@ public class HomeFragment extends Fragment implements LocationListener {
     MarkerOptions startMarker;
     MarkerOptions endMarker;
 
-    List<LatLng> mapCoordinates;            //after we get the route, stores all intermediate coordinates (LatLngs) needed to get from startLocation to destination
+    List<LatLng> mapCoordinates;            //after we get the route, stores all intermediate coordinates (LatLngs) needed to get from startLocation to destination (froom decoding the polyline)
     //layout views:
     Button btnSearch;
     EditText etSearchBar;
@@ -150,6 +155,37 @@ public class HomeFragment extends Fragment implements LocationListener {
         return view;
     }
 
+    /*
+
+        @Override
+        /**
+         * Purpose;         Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
+         */
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        //Changes the Fragment to the ChooseBuddyFragment via the MainActivity!
+        chooseBuddyBttn = view.findViewById(R.id.registerBttn);
+        chooseBuddyBttn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.toChooseBuddyFragment();
+            }
+        });
+
+
+        btnSearch = view.findViewById(R.id.btnSearch);
+        etSearchBar = view.findViewById(R.id.etSearchBar);
+
+        //set listener: onClick() --> search for and route to a location
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchArea();
+            }
+        });
+    }
+
     //Purpose:          Initializes our "map" field, starts continuously checking for location updates
     protected void loadMap(GoogleMap googleMap) {
         Log.d(TAG, "in loadMap():");
@@ -162,6 +198,25 @@ public class HomeFragment extends Fragment implements LocationListener {
         }
 
         map.setMyLocationEnabled(true);                 //enables the "my-location-layer"
+
+        //Get the saved current location from database, move map to it
+        ParseUser currUser = ParseUser.getCurrentUser();
+        WingsGeoPoint initalLoc = (WingsGeoPoint) currUser.getParseObject(User.KEY_CURRENTLOCATION);
+        try {
+            initalLoc.fetchIfNeeded();
+        } catch (ParseException e) {
+            Log.d(TAG, "loadmap(): could not fetch the current user's currentLocation field");
+            e.printStackTrace();
+        }
+
+        if (initalLoc != null) {
+            //Place current location marker
+            startLocation = new LatLng(initalLoc.getLatitude(), initalLoc.getLongitude());
+
+            //move map camera
+            map.moveCamera(CameraUpdateFactory.newLatLng(startLocation));
+            map.animateCamera(CameraUpdateFactory.zoomTo(15));      //12 = how much to zoom to, can make constant
+        }
 
         //Set UI of google map:
         mapUI = map.getUiSettings();
@@ -215,39 +270,16 @@ public class HomeFragment extends Fragment implements LocationListener {
                 Looper.myLooper()
         );
     }
-
-    /*
-
-        @Override
-        /**
-         * Purpose;         Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
-         */
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        //Changes the Fragment to the ChooseBuddyFragment via the MainActivity!
-        chooseBuddyBttn = view.findViewById(R.id.registerBttn);
-        chooseBuddyBttn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.toChooseBuddyFragment();
-            }
-        });
-
-
-        btnSearch = view.findViewById(R.id.btnSearch);
-        etSearchBar = view.findViewById(R.id.etSearchBar);
-
-        //set listener: onClick() --> search for and route to a location
-        btnSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchArea();
-            }
-        });
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+        Log.d(TAG, "in onLocationChanged");
+        if (location != null) {
+            currentLocation = location;
+            startLocation = new LatLng(location.getLatitude(), location.getLongitude());        //to change map display automatically
+        }
     }
 
-    //Purpose:          Get the text in the Searchbar, use Geocoder to find the LatLng, set a marker at that LatLng, attempt to make a Network request to the Google Directions API
+    //Purpose:          Called when user clicks on the search button, Get the text in the Searchbar, use Geocoder to find the LatLng, set a marker at that LatLng, attempt to make a Network request to the Google Directions API
     private void searchArea() {
         Log.d(TAG, "in searchArea()");
 
@@ -293,47 +325,30 @@ public class HomeFragment extends Fragment implements LocationListener {
                     map.addMarker(endMarker);
                     Toast.makeText(getContext(), "Distance = " + s + " KM", Toast.LENGTH_SHORT).show();
 
-                    //Get URL to the Google Directions API:
-                    route(startMarker.getPosition(), endMarker.getPosition());
+                    //route - will use the class fields startLocstion an destination as endpoints
+                    route();
                 }
             }
         }
 
     }
 
-    //Purpose:      routes from the given start position to the end position
-    private void route(LatLng start, LatLng end){
-        String url = getDirectionsURL(start, end);
+    //Purpose:      Finds API URL needed, makes API call through DownloadTask, draws Polyline (and all decoding needewd) in ParserTask
+    private void route(){
+        String url = getDirectionsURL();
 
-        DownloadTask downloadTask = new DownloadTask();
+        DownloadTask downloadTask = new DownloadTask();         //postexecute() will call ParserTask automatically
         downloadTask.execute(url);
     }
 
-    private String getDirectionsURL(LatLng start, LatLng end){
-        String startStr = "origin=" + start.latitude + "," + start.longitude;
-        String endStr = "destination=" + end.latitude + "," + end.longitude;
+    private String getDirectionsURL(){
+        String startStr = "origin=" + startLocation.latitude + "," + startLocation.longitude;
+        String endStr = "destination=" + destination.latitude + "," + destination.longitude;
         String mode = "mode=walking";
         String parameters = startStr + "&" + endStr + "&" + mode;
         String output = "json";
 
         return "https://maps.googleapis.com/maps/api/directions/"+output + "?" + parameters + "&key=AIzaSyC1c3vYFZDb2Ebr1uZbtt-IjGNzARXgVho";
-    }
-
-    @Override
-    public void onLocationChanged(@NonNull Location location) {
-        Log.d(TAG, "in onLocationChanged");
-        if (location != null) {
-            currentLocation = location;
-
-            //Place current location marker
-            startLocation = new LatLng(location.getLatitude(), location.getLongitude());
-
-            //move map camera
-            //map.moveCamera(CameraUpdateFactory.newLatLng(startLocation));
-            //map.animateCamera(CameraUpdateFactory.zoomTo(17));
-        }
-
-
     }
 
     private void setMappingCoordinates(List<LatLng> newMapCoordinates){
