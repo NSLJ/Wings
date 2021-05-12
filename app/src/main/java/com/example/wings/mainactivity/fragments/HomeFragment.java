@@ -2,6 +2,7 @@ package com.example.wings.mainactivity.fragments;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -17,6 +18,7 @@ import androidx.fragment.app.Fragment;
 
 import android.os.Looper;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +52,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
@@ -87,8 +90,10 @@ public class HomeFragment extends Fragment implements LocationListener {
     private static final long UPDATE_INTERVAL = 5000;
     private static final long FASTEST_INTERVAL = 3000;
 
+    ParseUser currUser = ParseUser.getCurrentUser();
+
     private MAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
-    private Button chooseBuddyBttn;
+    private FloatingActionButton fabEndRoute;
 
     Location currentLocation;
     private GoogleMap map;
@@ -165,25 +170,55 @@ public class HomeFragment extends Fragment implements LocationListener {
         super.onViewCreated(view, savedInstanceState);
 
         //Changes the Fragment to the ChooseBuddyFragment via the MainActivity!
-        chooseBuddyBttn = view.findViewById(R.id.registerBttn);
+        /*chooseBuddyBttn = view.findViewById(R.id.registerBttn);
         chooseBuddyBttn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 listener.toChooseBuddyFragment();
             }
-        });
-
+        });*/
 
         btnSearch = view.findViewById(R.id.btnSearch);
         etSearchBar = view.findViewById(R.id.etSearchBar);
+        fabEndRoute = (FloatingActionButton) view.findViewById(R.id.fabEndRoute);
+
+        //To delete/cancel a route
+        fabEndRoute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //reset destination to 0:
+                WingsGeoPoint currDestination = (WingsGeoPoint) currUser.getParseObject(User.KEY_MAPDESTINATION);
+                currDestination.setLatitude(0);
+                currDestination.setLongitude(0);
+                currDestination.setLocation(0,0);
+                currUser.put(User.KEY_MAPDESTINATION, currDestination);
+                currDestination.saveInBackground();
+                fabEndRoute.setVisibility(View.INVISIBLE);
+            }
+        });
 
         //set listener: onClick() --> search for and route to a location
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 searchArea();
+                fabEndRoute.setVisibility(View.VISIBLE);    //TODO: only do this when user is for sure on a route and not just clicking the button many times
+                //Testing creation of dialog:
+                /*final Dialog dialog = new Dialog(getContext());
+                dialog.setContentView(R.layout.cancel_route_dialog);
+                Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
+                dialogButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        Toast.makeText(getContext(),"Dismissed..!!",Toast.LENGTH_SHORT).show();
+                    }
+                });
+                dialog.getWindow().setGravity(Gravity.BOTTOM);
+                dialog.show();*/
             }
         });
+
     }
 
     //Purpose:          Initializes our "map" field, starts continuously checking for location updates
@@ -202,21 +237,48 @@ public class HomeFragment extends Fragment implements LocationListener {
         //Get the saved current location from database, move map to it
         ParseUser currUser = ParseUser.getCurrentUser();
         WingsGeoPoint initalLoc = (WingsGeoPoint) currUser.getParseObject(User.KEY_CURRENTLOCATION);
-        try {
-            initalLoc.fetchIfNeeded();
-        } catch (ParseException e) {
-            Log.d(TAG, "loadmap(): could not fetch the current user's currentLocation field");
-            e.printStackTrace();
+        WingsGeoPoint initalDestination = (WingsGeoPoint) currUser.getParseObject(User.KEY_MAPDESTINATION);
+
+        //If the user's "mapDestination" field is not yet declared:
+        if(initalDestination == null) {
+            initalDestination = new WingsGeoPoint(currUser, 0, 0);
+            currUser.put(User.KEY_MAPDESTINATION, initalDestination);
+            currUser.saveInBackground();
         }
 
-        if (initalLoc != null) {
-            //Place current location marker
-            startLocation = new LatLng(initalLoc.getLatitude(), initalLoc.getLongitude());
+            try {
+                //Actually fetch the data:
+                initalLoc.fetchIfNeeded();
+                initalDestination.fetchIfNeeded();
 
-            //move map camera
-            map.moveCamera(CameraUpdateFactory.newLatLng(startLocation));
-            map.animateCamera(CameraUpdateFactory.zoomTo(15));      //12 = how much to zoom to, can make constant
-        }
+                //Check if there is already a destination we should be routing to:
+                if (initalDestination.getLatitude() != 0) {
+                    Log.d(TAG, "loadMap(): an inital destination exists! Routing to it...");
+                    startLocation = new LatLng(initalLoc.getLatitude(), initalLoc.getLongitude());
+                    destination = new LatLng(initalDestination.getLatitude(), initalDestination.getLongitude());
+                    route();
+
+                    //move map camera to current location for now
+                    map.moveCamera(CameraUpdateFactory.newLatLng(startLocation));
+                    map.animateCamera(CameraUpdateFactory.zoomTo(11));      //12 = how much to zoom to, can make constant
+                }
+                //Otherwise --> there is no destination to map to yet
+                else{
+                    fabEndRoute.setVisibility(View.INVISIBLE);
+
+                    Log.d(TAG, "loadMap(): no inital destination yet, just show current location!");
+                    //Place current location marker
+                    startLocation = new LatLng(initalLoc.getLatitude(), initalLoc.getLongitude());
+                    Log.d(TAG, "loadMap(): location from parse: " + initalLoc.getLatitude() + " , " + initalLoc.getLongitude());
+
+                    //move map camera
+                    map.moveCamera(CameraUpdateFactory.newLatLng(startLocation));
+                    map.animateCamera(CameraUpdateFactory.zoomTo(15));      //12 = how much to zoom to, can make constant
+                }
+            } catch (ParseException e) {
+                Log.d(TAG, "loadmap(): could not fetch the current user's currentLocation field or mapDestination field");
+                e.printStackTrace();
+            }
 
         //Set UI of google map:
         mapUI = map.getUiSettings();
@@ -305,7 +367,9 @@ public class HomeFragment extends Fragment implements LocationListener {
 
                     //Initialize LatLng of destination field
                     Address destinAddress = addressList.get(i);
+
                     destination = new LatLng(destinAddress.getLatitude(), destinAddress.getLongitude());
+                    setUserDestination();           //uses the destination class field, may need to change this
 
                     //Set and add marker to that destination
                     markerOptions.position(destination);
@@ -330,7 +394,6 @@ public class HomeFragment extends Fragment implements LocationListener {
                 }
             }
         }
-
     }
 
     //Purpose:      Finds API URL needed, makes API call through DownloadTask, draws Polyline (and all decoding needewd) in ParserTask
@@ -354,6 +417,14 @@ public class HomeFragment extends Fragment implements LocationListener {
     private void setMappingCoordinates(List<LatLng> newMapCoordinates){
         Log.d(TAG, "setMappingCoordinates(): newMapCoordinates= " + newMapCoordinates.toString());
         mapCoordinates = newMapCoordinates;
+    }
+
+    //Save the destination in Parse Database, technically should be doing this here
+    private void setUserDestination(){
+        Log.d(TAG, "setUserDestination()");
+        ParseUser currUser = ParseUser.getCurrentUser();
+        currUser.put(User.KEY_MAPDESTINATION, new WingsGeoPoint(currUser, destination.latitude, destination.longitude));
+        currUser.saveInBackground();
     }
 /*
     @Override

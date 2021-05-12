@@ -44,10 +44,10 @@ public class WingsGeoPoint extends ParseObject {
         return getParseGeoPoint(KEY_LOCATION);
     }
     public double getLatitude(){
-        return (double) getNumber(KEY_LATITUDE);
+        return getNumber(KEY_LATITUDE).doubleValue();
     }
     public double getLongitude(){
-        return (double) getNumber(KEY_LONGITUDE);
+        return getNumber(KEY_LONGITUDE).doubleValue();
     }
     public ParseUser getUser(){
         return getParseUser(KEY_USER);
