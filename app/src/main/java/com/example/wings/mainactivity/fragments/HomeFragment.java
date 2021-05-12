@@ -1,9 +1,10 @@
 package com.example.wings.mainactivity.fragments;
 
 import android.Manifest;
-import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
@@ -24,14 +25,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.wings.ConfirmDestinationDialog;
 import com.example.wings.DataParser;
 import com.example.wings.R;
 import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.User;
 import com.example.wings.models.WingsGeoPoint;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -39,22 +42,17 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.ParseException;
-import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 
 
@@ -66,12 +64,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
@@ -85,7 +82,7 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
  *
  */
 
-public class HomeFragment extends Fragment implements LocationListener {
+public class HomeFragment extends Fragment implements LocationListener, ConfirmDestinationDialog.ResultListener {
     private static final String TAG = "HomeFragment";
     private static final long UPDATE_INTERVAL = 5000;
     private static final long FASTEST_INTERVAL = 3000;
@@ -113,6 +110,23 @@ public class HomeFragment extends Fragment implements LocationListener {
     Button btnSearch;
     EditText etSearchBar;
 
+
+    @Override
+    public void onAccept() {
+        listener.toChooseBuddyFragment();
+    }
+
+    @Override
+    //Clear the destination
+    public void onReject() {
+        WingsGeoPoint currDestination = (WingsGeoPoint) currUser.getParseObject(User.KEY_MAPDESTINATION);
+        currDestination.setLatitude(0);
+        currDestination.setLongitude(0);
+        currDestination.setLocation(0,0);
+        currUser.put(User.KEY_MAPDESTINATION, currDestination);
+        currDestination.saveInBackground();
+        fabEndRoute.setVisibility(View.INVISIBLE);
+    }
 
     public HomeFragment() {}    // Required empty public constructor
 
@@ -182,6 +196,7 @@ public class HomeFragment extends Fragment implements LocationListener {
         etSearchBar = view.findViewById(R.id.etSearchBar);
         fabEndRoute = (FloatingActionButton) view.findViewById(R.id.fabEndRoute);
 
+        fabEndRoute.setVisibility(View.INVISIBLE);        //TODO: Just for now bc there is no reason for it
         //To delete/cancel a route
         fabEndRoute.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -202,10 +217,12 @@ public class HomeFragment extends Fragment implements LocationListener {
             @Override
             public void onClick(View v) {
                 searchArea();
-                fabEndRoute.setVisibility(View.VISIBLE);    //TODO: only do this when user is for sure on a route and not just clicking the button many times
+                //fabEndRoute.setVisibility(View.VISIBLE);    //TODO: only do this when user is for sure on a route and not just clicking the button many times
+
+
                 //Testing creation of dialog:
                 /*final Dialog dialog = new Dialog(getContext());
-                dialog.setContentView(R.layout.cancel_route_dialog);
+                dialog.setContentView(R.layout.confirm_destination_dialog);
                 Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
                 dialogButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -216,9 +233,16 @@ public class HomeFragment extends Fragment implements LocationListener {
                 });
                 dialog.getWindow().setGravity(Gravity.BOTTOM);
                 dialog.show();*/
+                /*try {
+                    latch.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }*/
+                ConfirmDestinationDialog confirmDestDialog = ConfirmDestinationDialog.newInstance(etSearchBar.getText().toString());
+                confirmDestDialog.setTargetFragment(HomeFragment.this, 1);
+                confirmDestDialog.show(getFragmentManager(), "ConfirmDestinationDialogTag");
             }
         });
-
     }
 
     //Purpose:          Initializes our "map" field, starts continuously checking for location updates
@@ -264,7 +288,7 @@ public class HomeFragment extends Fragment implements LocationListener {
                 }
                 //Otherwise --> there is no destination to map to yet
                 else{
-                    fabEndRoute.setVisibility(View.INVISIBLE);
+                    //fabEndRoute.setVisibility(View.INVISIBLE);
 
                     Log.d(TAG, "loadMap(): no inital destination yet, just show current location!");
                     //Place current location marker
@@ -273,7 +297,7 @@ public class HomeFragment extends Fragment implements LocationListener {
 
                     //move map camera
                     map.moveCamera(CameraUpdateFactory.newLatLng(startLocation));
-                    map.animateCamera(CameraUpdateFactory.zoomTo(15));      //12 = how much to zoom to, can make constant
+                    map.animateCamera(CameraUpdateFactory.zoomTo(11));      //12 = how much to zoom to, can make constant
                 }
             } catch (ParseException e) {
                 Log.d(TAG, "loadmap(): could not fetch the current user's currentLocation field or mapDestination field");
@@ -426,23 +450,6 @@ public class HomeFragment extends Fragment implements LocationListener {
         currUser.put(User.KEY_MAPDESTINATION, new WingsGeoPoint(currUser, destination.latitude, destination.longitude));
         currUser.saveInBackground();
     }
-/*
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // Display the connection status
-
-        if (currentLocation != null) {
-            Toast.makeText(getContext(), "GPS location was found!", Toast.LENGTH_SHORT).show();
-            LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17);
-            map.animateCamera(cameraUpdate);            //animates the movement of the camera to the position in this Camera Update
-        } else {
-            Toast.makeText(getContext(), "Current location was null, enable GPS on emulator!", Toast.LENGTH_SHORT).show();
-        }
-        startLocationUpdates();
-    }*/
 
     //Purpose:          Makes the network request to the Google Directions API given the correct URL, returns the entire JSONObject as a string
     private String downloadURL(String urlStr) throws IOException {
@@ -477,6 +484,8 @@ public class HomeFragment extends Fragment implements LocationListener {
         Log.d(TAG, "in downloadURL(): data=" + data);
         return data;
     }
+
+
 
     //Purpose:          To make network request in an async task (in the background), finds the JSONObject that has the routes --> gives to ParserTask to parse the JSONObject
     //                  and get the LatLngs needed while going on the trip. ParseTask --> initializes mapCoordinates (List<LatLng>)
