@@ -19,6 +19,7 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.example.wings.models.User;
+import com.example.wings.models.WingsGeoPoint;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -28,6 +29,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.concurrent.CountDownLatch;
@@ -262,12 +264,26 @@ public class UpdateLocationWorker extends Worker {
     private void updateUserLocation(double latitude, double longitude){
         Log.d(TAG, "in updateUserLocation(): latitude = " + latitude + "        longitude = " + longitude);
 
-        ParseGeoPoint currLocation = new ParseGeoPoint(latitude, longitude);
+        //Get the user's WingsGeoPoint and update it:
         ParseUser currentUser = ParseUser.getCurrentUser();
         if(currentUser != null){
             Log.d(TAG, "updateUserLocation(): currentUser = " + currentUser.getString(User.KEY_FIRSTNAME));
-            currentUser.put(User.KEY_CURRENTLOCATION, currLocation);
-            currentUser.saveInBackground();
+            WingsGeoPoint currLocation = (WingsGeoPoint) currentUser.getParseObject(User.KEY_CURRENTLOCATION);
+
+            //if its never been initialized:
+            if(currLocation == null){
+                Log.d(TAG, "updateUserLocation(): currLocation == null");
+                currLocation = new WingsGeoPoint(currentUser, latitude, longitude);
+                currentUser.put(User.KEY_CURRENTLOCATION, currLocation);
+                currentUser.saveInBackground();
+            }
+            else {  //otherwise don't instantiate a new object and just update!
+                Log.d(TAG, "updateUserLocation(): currLocation is NOT null");
+                currLocation.put(WingsGeoPoint.KEY_LOCATION, new ParseGeoPoint(latitude, longitude));
+                currLocation.put(WingsGeoPoint.KEY_LATITUDE, latitude);
+                currLocation.put(WingsGeoPoint.KEY_LONGITUDE, longitude);
+                currLocation.saveInBackground();
+            }
         }
         else{
             Log.d(TAG, "updateUserLocation():   currentUser = null, return failure!");;

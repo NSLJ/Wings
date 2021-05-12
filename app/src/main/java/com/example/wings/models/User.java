@@ -31,6 +31,7 @@ public class User extends ParseUser {
     public static final String KEY_CURRENTLOCATION = "currentLocation";
     public static final String KEY_PROFILESETUP  = "ProfileSetUp";
     public static final String KEY_RATING = "rating";
+    public static final String KEY_MAPDESTINATION = "mapDestination";
     //not sure if we will need this
     public static final String KEY_OBJECTID = "objectId";
 
@@ -77,6 +78,12 @@ public class User extends ParseUser {
     }
     public void setLastName(String lastName){ put(KEY_LASTNAME, lastName); }
 
+    public void setCurrentLocation(WingsGeoPoint location){
+        put(KEY_CURRENTLOCATION, location);
+    }
+    public void setMapDestination(WingsGeoPoint location){
+        put(KEY_MAPDESTINATION, location);
+    }
     public int getPin(){
         return getInt(KEY_PIN);
     }
@@ -116,8 +123,6 @@ public class User extends ParseUser {
         }
     }
 
-    public ParseGeoPoint getLocation(){return getParseGeoPoint(KEY_CURRENTLOCATION); }
-    public void setLocation(ParseGeoPoint location){put(KEY_CURRENTLOCATION, location); }
 
     public Boolean getProfileSetUp(){ return getBoolean(KEY_PROFILESETUP); }
     public void setProfileSetUp(Boolean setup){ put(KEY_PROFILESETUP, setup); }

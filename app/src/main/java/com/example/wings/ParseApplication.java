@@ -7,7 +7,9 @@ import com.example.wings.models.BuddyRequest;
 import com.example.wings.models.BuddyTrip;
 import com.example.wings.models.TrustedContact;
 import com.example.wings.models.User;
+import com.example.wings.models.WingsGeoPoint;
 import com.parse.Parse;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -28,6 +30,7 @@ public class ParseApplication extends Application {
         ParseObject.registerSubclass(BuddyRequest.class);
         ParseObject.registerSubclass(BuddyTrip.class);
         ParseObject.registerSubclass(TrustedContact.class);
+        ParseObject.registerSubclass(WingsGeoPoint.class);
 
         // Initializes Parse SDK as soon as the application is created
         Parse.initialize(new Parse.Configuration.Builder(this)

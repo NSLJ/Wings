@@ -1,4 +1,4 @@
-package com.example.wings;
+package com.example.wings.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,9 +8,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.wings.R;
 import com.example.wings.models.Setting;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class SettingAdapter extends RecyclerView.Adapter<SettingAdapter.ViewHolder> {
