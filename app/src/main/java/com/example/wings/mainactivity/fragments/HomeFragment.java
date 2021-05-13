@@ -20,6 +20,7 @@ import com.example.wings.mainactivity.fragments.dialogs.ConfirmDestinationDialog
 import com.example.wings.R;
 import com.example.wings.WingsMap;
 import com.example.wings.mainactivity.MAFragmentsListener;
+import com.example.wings.models.Buddy;
 import com.example.wings.models.User;
 import com.example.wings.models.WingsGeoPoint;
 import com.google.android.gms.maps.GoogleMap;
@@ -27,9 +28,11 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 
 import java.util.ArrayList;
@@ -53,10 +56,9 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
     private static final long FASTEST_INTERVAL = 3000;
 
     ParseUser currUser = ParseUser.getCurrentUser();
-    User userModel;
 
     private MAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
-    private FloatingActionButton fabShowMyBuddyRequests;
+    private ExtendedFloatingActionButton fabChooseBuddy;
 
     Location currentLocation;
     private WingsMap wingsMap;
@@ -81,33 +83,28 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
     //Purpose:      on confirmation --> current user accepts to be a buddy --> set User's isBuddy field to true, and instantiate being a Buddy
     public void onAccept() {
         Log.d(TAG, "confirmationDialogBox onAccept(): creating Buddy instance");
-
-        //Create a new Buddy instance and link it to this user:
-       /* Buddy buddy = new Buddy();
-        buddy.setUser(currUser);
-        buddy.setDestination(new WingsGeoPoint(currUser, destination.latitude, destination.longitude));
-        buddy.setHasBuddy(false);
+        //1.) Create a new Buddy instance and link it to this user:
+        Buddy buddy = new Buddy(currUser, new WingsGeoPoint(currUser, destination.latitude, destination.longitude));
         buddy.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    Log.d(TAG, "no Error creating Buddy instance!");
-                    listener.toChooseBuddyFragment();
+                    Log.d(TAG, "onAccept(): no Error saving Buddy!");
                 }
                 else{
-                    Log.d(TAG, "Error saving Buddy instance! error=" + e.getMessage());
+                    Log.d(TAG, "onAccept(): no Error saving Buddy!");
                 }
             }
         });
+        currUser.put(User.KEY_ISBUDDY, true);       //update isBuddy = true and link the buddy object!
+        currUser.put(User.KEY_BUDDY, buddy);
 
-        currUser.put(User.KEY_ISBUDDY, true);
-        currUser.put(User.KEY_BUDDY, buddy);*/
-        userModel = new User(currUser);
-        userModel.createBuddy();
+        //2.) Show the BuddyRequest FloatingActionButton in MainActivity, and the fabChooseBuddy button on HomeFrag!
+        fabChooseBuddy.setVisibility(View.VISIBLE);         //navigates to ChooseBuddyFrag from HomeFrag
+        listener.setBuddyRequestBttn(true);                 //navigates to PotentialBuddyFragment from any frag
 
-        //Show the BuddyRequest FloatingActionButton
-        //fabShowMyBuddyRequests.setVisibility(View.VISIBLE);
-        listener.setBuddyRequestBttn(true);
+        //3.) automatically go to the ChooseBuddyFrag!
+        listener.toChooseBuddyFragment();
     }
 
     @Override
@@ -179,31 +176,45 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
 
         btnSearch = view.findViewById(R.id.btnSearch);
         etSearchBar = view.findViewById(R.id.etSearchBar);
-       /* fabShowMyBuddyRequests = (FloatingActionButton) view.findViewById(R.id.fabEndRoute);
+        fabChooseBuddy = (ExtendedFloatingActionButton) view.findViewById(R.id.fabChooseBuddy);
 
-        fabShowMyBuddyRequests.setVisibility(View.INVISIBLE);        //TODO: Just for now bc there is no reason for it
+        //1.) Check if the user currently needs a buddy --> check their isBuddy field --> if is a buddy do they hasBuddy?
+        if(currUser.getBoolean(User.KEY_ISBUDDY)) {   //if they are a buddy
+            Log.d(TAG, "onViewCreated(): current user IS a Buddy!");
+            Buddy buddyInstance = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
+            try {
+                buddyInstance.fetchIfNeeded();
 
-        //To go to UserBuddyRequestsFragment
-        fabShowMyBuddyRequests.setOnClickListener(new View.OnClickListener() {
+                if (!buddyInstance.getHasBuddy()) {      //if they don't have a buddy but they want one, we need to show th button
+                    Log.d(TAG, "onViewCreated(): This buddy is still looking for a buddy!");
+                    fabChooseBuddy.setVisibility(View.VISIBLE);
+                } else {
+                    fabChooseBuddy.setVisibility(View.INVISIBLE);
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            fabChooseBuddy.setVisibility(View.INVISIBLE);     //automatically invisible until the user wants to be a Buddy
+        }
+
+
+        //2.) Set on click listeners:
+        // 2a.) fabChooseBuddy --> To go to choose buddy frag from homefrag!
+        fabChooseBuddy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //reset destination to 0:
-                WingsGeoPoint currDestination = (WingsGeoPoint) currUser.getParseObject(User.KEY_QUERIEDDESTINATION);
-                currDestination.setLatitude(0);
-                currDestination.setLongitude(0);
-                currDestination.setLocation(0,0);
-                currUser.put(User.KEY_QUERIEDDESTINATION, currDestination);
-                currDestination.saveInBackground();
-                fabShowMyBuddyRequests.setVisibility(View.INVISIBLE);
+                listener.toChooseBuddyFragment();
             }
-        });*/
+        });
 
-        //set listener: onClick() --> search for and route to a location
+        //2b.) btnSearch --> search for and route to a location
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //1.) Maps and draws route to the destination in the etSearchBar:
                 searchArea();
-                //fabEndRoute.setVisibility(View.VISIBLE);    //TODO: only do this when user is for sure on a route and not just clicking the button many times
 
                 try {   //just for now bc DialogBox below will halt the thread, and we need to make sure seachArea() executes all the way first
                     Thread.sleep(1500);
@@ -211,7 +222,8 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
                     e.printStackTrace();
                 }
 
-                //show dialog ONLY if the address inputted in the bar was valid"
+                //2.) Show dialog ONLY if the address inputted in the bar was valid
+                //Dialog asks to confirm the destination inputted to start becoming a buddy!
                 List<Address> possibleAddresses = wingsMap.getPossibleAddresses(etSearchBar.getText().toString());
                 Log.d(TAG, "btnSearch.onClick(): possibleAddressses = " + possibleAddresses.toString());
                 if(possibleAddresses != null) {
@@ -255,8 +267,7 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
                 boolean isBuddy = currUser.getBoolean(User.KEY_ISBUDDY);
                 if(!isBuddy){
                     //See if there is a destinationString we can display in the Display, if not, just use the LatLng
-                    userModel = new User(currUser);
-                    String checkDestinationStr = userModel.getDestinationString();
+                    String checkDestinationStr = currUser.getString(User.KEY_DESTINATIONSTR);
                     Log.d(TAG, "loadMap(): checkDestinationStr=" +checkDestinationStr);
                     if(!checkDestinationStr.equals("default")){
                         makeConfirmDestinationDialog(checkDestinationStr);
@@ -265,8 +276,6 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
                         makeConfirmDestinationDialog(Double.toString(initalDestination.getLatitude()) + ", " + Double.toString(initalDestination.getLongitude()));
                     }
                 }
-
-
             }
 
         } catch (ParseException e) {

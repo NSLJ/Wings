@@ -2,21 +2,25 @@ package com.example.wings.models;
 
 import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.parse.ParseClassName;
+import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 //Needed because apparently Parse server will not allow multiple geopoints, so we'll save points to this class instead
 @ParseClassName("WingsGeoPoint")
 public class WingsGeoPoint extends ParseObject {
-    private static final String DEBUG_TAG = "WingsGeoPoint";
+    private static final String TAG = "WingsGeoPoint";
     public static final String KEY_USER = "user";
     public static final String KEY_LOCATION = "location";
     public static final String KEY_LATITUDE = "latitude";
     public static final String KEY_LONGITUDE = "longitude";
 
+    private WingsGeoPoint wingsGeoPointInstance;
+
+    //Purpose:      Set everything up here, include default values:
     public WingsGeoPoint(ParseUser user, double latitude, double longitude){
         setUser(user);
         setLatitude(latitude);
@@ -26,31 +30,35 @@ public class WingsGeoPoint extends ParseObject {
 
     public WingsGeoPoint(){}            //required
 
+    public ParseUser getUser(){
+        return getParseUser(KEY_USER);
+    }
     public void setUser(ParseUser user){
         put(KEY_USER, user);
-    }
-    public void setLocation(double latitude, double longitude){
-        put(KEY_LOCATION, new ParseGeoPoint(latitude, longitude));
-    }
-    public void setLatitude(double latitude){
-        Log.d(DEBUG_TAG, "setLatitude()");
-        put(KEY_LATITUDE, latitude);
-    }
-    public void setLongitude(double longitude){
-        put(KEY_LONGITUDE, longitude);
     }
 
     public ParseGeoPoint getLocation(){
         return getParseGeoPoint(KEY_LOCATION);
     }
+    public void setLocation(double latitude, double longitude){
+        put(KEY_LOCATION, new ParseGeoPoint(latitude, longitude));
+    }
+
     public double getLatitude(){
         return getNumber(KEY_LATITUDE).doubleValue();
+    }
+    public void setLatitude(double latitude){
+        Log.d(TAG, "setLatitude()");
+        put(KEY_LATITUDE, latitude);
+    }
+
+    public void setLongitude(double longitude){
+        put(KEY_LONGITUDE, longitude);
     }
     public double getLongitude(){
         return getNumber(KEY_LONGITUDE).doubleValue();
     }
-    public ParseUser getUser(){
-        return getParseUser(KEY_USER);
-    }
+
+
 
 }

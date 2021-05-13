@@ -89,14 +89,20 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         //Set up buddy request button (meant to display the UserBuddyRequestFragment when appl.)
         //Check if the user is currently looking for a buddy (e.g hasBuddy == false)
         ParseUser currentUser = ParseUser.getCurrentUser();
-        User userModel = new User(currentUser);
 
-        if(userModel.getIsBuddy()) {   //if they are a buddy
-            Buddy buddyInstance = userModel.getBuddy();
-            if (!buddyInstance.getHasBuddy()) {      //if they don't have a buddy but they want one, we need to show th button
-                fabBuddyRequests.setVisibility(View.VISIBLE);
-            } else {
-                fabBuddyRequests.setVisibility(View.INVISIBLE);
+        if(currentUser.getBoolean(User.KEY_ISBUDDY)) {   //if they are a buddy
+            Buddy buddyInstance = (Buddy) currentUser.getParseObject(User.KEY_BUDDY);
+            try {
+                buddyInstance.fetchIfNeeded();
+
+                if (!buddyInstance.getHasBuddy()) {      //if they don't have a buddy but they want one, we need to show th button
+                    fabBuddyRequests.setVisibility(View.VISIBLE);
+                } else {
+                    fabBuddyRequests.setVisibility(View.INVISIBLE);
+                }
+
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
         }
         else {

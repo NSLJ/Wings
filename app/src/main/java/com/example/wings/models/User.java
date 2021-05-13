@@ -23,7 +23,7 @@ public class User extends ParseUser {
     public static final String KEY_EMAIL = "email";
     public static final String KEY_FIRSTNAME = "FirstName";
     public static final String KEY_LASTNAME = "LastName";
-    public static final String KEY_PIN = "Pin";
+    public static final String KEY_PIN = "pin";
     public static final String KEY_PROFILEPICTURE = "ProfilePicture";
     public static final String KEY_TRUSTEDCONTACTS = "trustedContacts";
     public static final String KEY_FRIENDS = "friends";
@@ -39,11 +39,34 @@ public class User extends ParseUser {
     public static final String KEY_OBJECTID = "objectId";
 
     private ParseUser user;
-    public User(){}
+
+    //Ensure everything is declared
+    public User(){
+      /*  setUsername("");
+        setPassword("");
+        setEmail("");
+        setFirstName("");
+        setLastName("");
+        setProfileSetUp(false);
+        setRating(2.5);
+       // setProfilePic(new ParseFile());
+        setPin("0000");
+        setCurrentLocation(new WingsGeoPoint(this, 0, 0));
+        setQueriedDestination(new WingsGeoPoint(this, 0, 0));
+        setDestinationString("default");
+        setIsBuddy(false);
+
+        List<TrustedContact> trustedContacts = new ArrayList<>();
+        setTrustedContacts(trustedContacts);
+
+        List<ParseUser> friends = new ArrayList<>();
+        setFriends(friends);*/
+    }
 
     public User(ParseUser user){
         this.user = user;
     }
+
     //returns the username part of the cpp email (Example: billybronco@cpp.edu would return billybronco)
     public String getUsername(){
         String username = "";
@@ -54,7 +77,6 @@ public class User extends ParseUser {
         username = getEmail().substring(0, atIndex);
         return username;
     }
-    //not sure if we will need this, might just call it in getUsername...
     public void setUsername(String username){
         put(KEY_USERNAME, username);
     }
@@ -94,7 +116,19 @@ public class User extends ParseUser {
         put(KEY_QUERIEDDESTINATION, location);
     }
     public WingsGeoPoint getQueriedDestination(){
-        return (WingsGeoPoint) user.getParseObject(KEY_QUERIEDDESTINATION);
+        WingsGeoPoint queriedDestination = (WingsGeoPoint) user.getParseObject(KEY_QUERIEDDESTINATION);
+        if(queriedDestination == null){
+            queriedDestination = new WingsGeoPoint(ParseUser.getCurrentUser(), 0, 0);
+            saveUserData("queriedDestination");
+        }
+
+        //Ensure to get the data inside the object
+        try {
+            queriedDestination.fetchIfNeeded();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return queriedDestination;
     }
 
     public void setIsBuddy(boolean answer){
@@ -132,18 +166,11 @@ public class User extends ParseUser {
         return destinationStr;
     }
 
-    public int getPin(){
-        return getInt(KEY_PIN);
+    public String getPin(){
+        return getString(KEY_PIN);
     }
-    //can do more error handling in execution
-    //returns true if pin was set and false if not. Can be used for error handaling
-    public boolean setPin(int pin){
-        if((pin > 999) && (pin < 10000)){
-            put(KEY_PIN, pin);
-            return true;
-        } else{
-            return false;
-        }
+    public void setPin(String pin){
+        put(KEY_PIN, pin);
     }
 
     public ParseFile getProfilePic(){
@@ -155,37 +182,40 @@ public class User extends ParseUser {
     }
 
     //seems like we need a specific way to do this...
-    public List getTrustedContacts() throws JSONException {
+  /*  public List getTrustedContacts() throws JSONException {
         JSONArray jsonArray = getJSONArray(KEY_TRUSTEDCONTACTS);
         Log.d(TAG, jsonArray.toString());
        List<TrustedContact> trustedContacts = new ArrayList<TrustedContact>();
        /* for(int i = 0; i < jsonArray.length(); i++){
            trustedContacts.add(new TrustedContact(jsonArray.getJSONObject(i)));
-        }*/
-        return trustedContacts;
-    }
-
-    public void setTrustedContacts(List contacts){
-        while(!contacts.isEmpty()){
-
         }
+        return trustedContacts;
+    }*/
+
+    public List<TrustedContact> getTrustedContacts(){
+        return getList(KEY_TRUSTEDCONTACTS);
+    }
+    public void setTrustedContacts(List<TrustedContact> contacts){
+        put(KEY_TRUSTEDCONTACTS, contacts);
     }
 
+    public List<ParseUser> getFriends(){
+        return getList(KEY_FRIENDS);
+    }
+    public void setFriends(List<ParseUser> friends){
+        put(KEY_FRIENDS, friends);
+    }
 
     public Boolean getProfileSetUp(){ return getBoolean(KEY_PROFILESETUP); }
     public void setProfileSetUp(Boolean setup){ put(KEY_PROFILESETUP, setup); }
 
-    public int getRating(){ return getInt(KEY_RATING);}
-
-    //TODO: Set error handling so rating must <= 5
-    //returns true if rating was set and false if not
-    public boolean setRating(int rating){
-        if((rating < 6) && (rating > 0)) {
+    public double getRating(){ return getDouble(KEY_RATING);}
+    public boolean setRating(double rating){
+        if((rating <= 5) && (rating > 0)) {
             put(KEY_RATING, rating);
             return true;
         } else{
             return false;
-
         }
     }
 
@@ -217,8 +247,8 @@ public class User extends ParseUser {
         Buddy buddy = new Buddy();
         buddy.setUser(user);
 
-        WingsGeoPoint destination = getQueriedDestination();
-        buddy.setDestination(new WingsGeoPoint(user, destination.getLatitude(), destination.getLongitude()));
+        WingsGeoPoint queriedDestination = getQueriedDestination();
+        //buddy.setDestination(new WingsGeoPoint(user, WingsGeoPoint.getLatitude(queriedDestination), queriedDestination.getLongitude()));
         buddy.setHasBuddy(false);
         saveUserData("buddyInstance");
 
