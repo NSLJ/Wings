@@ -253,21 +253,27 @@ public class UpdateLocationWorker extends Worker {
         ParseUser currentUser = ParseUser.getCurrentUser();
         if(currentUser != null){
             Log.d(TAG, "updateUserLocation(): currentUser = " + currentUser.getString(User.KEY_FIRSTNAME));
-            WingsGeoPoint currLocation = (WingsGeoPoint) currentUser.getParseObject(User.KEY_CURRENTLOCATION);
+            WingsGeoPoint initialLocation = (WingsGeoPoint) currentUser.getParseObject(User.KEY_CURRENTLOCATION);
 
-            //if its never been initialized:
-            if(currLocation == null){
-                Log.d(TAG, "updateUserLocation(): currLocation == null");
-                currLocation = new WingsGeoPoint(currentUser, latitude, longitude);
-                currentUser.put(User.KEY_CURRENTLOCATION, currLocation);
-                currentUser.saveInBackground();
-            }
-            else {  //otherwise don't instantiate a new object and just update!
-                Log.d(TAG, "updateUserLocation(): currLocation is NOT null");
-                currLocation.put(WingsGeoPoint.KEY_LOCATION, new ParseGeoPoint(latitude, longitude));
-                currLocation.put(WingsGeoPoint.KEY_LATITUDE, latitude);
-                currLocation.put(WingsGeoPoint.KEY_LONGITUDE, longitude);
-                currLocation.saveInBackground();
+            try {
+                initialLocation.fetchIfNeeded();
+
+                //if its still the default value of (0,0):
+                if(initialLocation.getLatitude() == 0 && initialLocation.getLongitude() == 0){
+                    Log.d(TAG, "updateUserLocation(): currLocation == null");
+                    WingsGeoPoint currLocation = new WingsGeoPoint(currentUser, latitude, longitude);
+                    currentUser.put(User.KEY_CURRENTLOCATION, currLocation);
+                    currentUser.saveInBackground();
+                }
+                else {  //otherwise don't instantiate a new object and just update!
+                    Log.d(TAG, "updateUserLocation(): currLocation is NOT null");
+                    initialLocation.put(WingsGeoPoint.KEY_LOCATION, new ParseGeoPoint(latitude, longitude));
+                    initialLocation.put(WingsGeoPoint.KEY_LATITUDE, latitude);
+                    initialLocation.put(WingsGeoPoint.KEY_LONGITUDE, longitude);
+                    initialLocation.saveInBackground();
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
         }
         else{
