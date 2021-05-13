@@ -245,11 +245,11 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
         WingsGeoPoint initalDestination = (WingsGeoPoint) currUser.getParseObject(User.KEY_QUERIEDDESTINATION);
 
         //If the user's "queriedDestination" field is not yet declared:
-        if (initalDestination == null) {
+        /*if (initalDestination == null) {
             initalDestination = new WingsGeoPoint(currUser, 0, 0);
             currUser.put(User.KEY_QUERIEDDESTINATION, initalDestination);
             currUser.saveInBackground();
-        }
+        }*/
         try {
             //Actually fetch the data:
             initalDestination.fetchIfNeeded();

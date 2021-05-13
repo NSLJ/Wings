@@ -46,6 +46,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 
 import org.json.JSONObject;
@@ -360,8 +361,30 @@ public class WingsMap {
     //Save the destination in Parse Database, technically should be doing this here
     private void setUserQueriedDestination(LatLng destination){
         Log.d(TAG, "setUserQueriedDestination()");
-        currentUser.put(User.KEY_QUERIEDDESTINATION, new WingsGeoPoint(currentUser, destination.latitude, destination.longitude));
-        currentUser.saveInBackground();
+
+        WingsGeoPoint initialDestination = (WingsGeoPoint) currentUser.getParseObject(User.KEY_QUERIEDDESTINATION);
+        //if the queriedDestination field is still the default value of (0, 0) --> create new object:
+        //if its still the default value of (0,0):
+        try {
+            initialDestination.fetchIfNeeded();
+
+            if(initialDestination.getLatitude() == 0 && initialDestination.getLongitude() == 0){
+                Log.d(TAG, "updateUserLocation(): default destination");
+                WingsGeoPoint currDestination = new WingsGeoPoint(currentUser, destination.latitude, destination.longitude);
+                currentUser.put(User.KEY_QUERIEDDESTINATION, currDestination);
+                currentUser.saveInBackground();
+            }
+            else {  //otherwise don't instantiate a new object and just update!
+                Log.d(TAG, "setQueriedDestionation(): destination was not default value!");
+                initialDestination.put(WingsGeoPoint.KEY_LOCATION, new ParseGeoPoint(destination.latitude, destination.longitude));
+                initialDestination.put(WingsGeoPoint.KEY_LATITUDE, destination.latitude);
+                initialDestination.put(WingsGeoPoint.KEY_LONGITUDE, destination.longitude);
+                initialDestination.saveInBackground();
+            }
+        } catch (ParseException e) {
+            Log.d(TAG, "setUserQueriedDestination(): error fetching initialDestination = " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     //Save the destination in Parse Database, technically should be doing this here
