@@ -35,10 +35,15 @@ import com.example.wings.mainactivity.fragments.OtherProfileFragment;
 import com.example.wings.mainactivity.fragments.ProfileSetupFragment;
 import com.example.wings.mainactivity.fragments.SearchUserFragment;
 import com.example.wings.commonFragments.SettingsFragment;
+import com.example.wings.mainactivity.fragments.UserBuddyRequestsFragment;
 import com.example.wings.mainactivity.fragments.UserProfileFragment;
+import com.example.wings.models.Buddy;
 import com.example.wings.models.User;
+import com.example.wings.models.WingsGeoPoint;
 import com.example.wings.startactivity.StartActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import java.util.concurrent.CountDownLatch;
@@ -62,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
     final FragmentManager fragmentManager = getSupportFragmentManager();
     private BottomNavigationView bottomNavigationView;
+    private FloatingActionButton fabBuddyRequests;            //used to display the BuddyRequest control button above all fragments when applicable!
     private boolean restrictUserScreen = false;
 
     //fields for getting current location:
@@ -78,6 +84,31 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bottomNavigationView = findViewById(R.id.bottomNavigation);
+        fabBuddyRequests = (FloatingActionButton) findViewById(R.id.fabBuddyRequests);
+
+        //Set up buddy request button (meant to display the UserBuddyRequestFragment when appl.)
+        //Check if the user is currently looking for a buddy (e.g hasBuddy == false)
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        User userModel = new User(currentUser);
+
+        if(userModel.getIsBuddy()) {   //if they are a buddy
+            Buddy buddyInstance = userModel.getBuddy();
+            if (!buddyInstance.getHasBuddy()) {      //if they don't have a buddy but they want one, we need to show th button
+                fabBuddyRequests.setVisibility(View.VISIBLE);
+            } else {
+                fabBuddyRequests.setVisibility(View.INVISIBLE);
+            }
+        }
+        else {
+            fabBuddyRequests.setVisibility(View.INVISIBLE);     //automatically invisible until the user wants to be a Buddy
+        }
+
+        fabBuddyRequests.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toUserBuddyRequestFragment();       //the only way to get to this fragment is through this button!
+            }
+        });
 
         //1.) Find out whether or not need to force ProfileSetupFrag:
         if(getIntent().getBooleanExtra(KEY_PROFILESETUPFRAG, false)){
@@ -92,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
             //1.) Unrestrict the screen --> shows the safety toolkit and bottom nav bar:
             restrictUserScreen = false;
             setRestrictScreen(restrictUserScreen);
-
+        }
             //2.) Start tracking current user's location automatically (will ask permission if needed):
                 //2a.) Clear any old location requests:
                 CountDownLatch clearRequests = new CountDownLatch(1);
@@ -114,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                     keepTracking= true;
                     startTracking();           //infinitely runs as long as keepTracking = true;
                 }
-        }
+
 
     }
 
@@ -376,5 +407,20 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     @Override
     public void toHelpFragment() {
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new HelpFragment()).commit();
+    }
+
+    @Override
+    public void setBuddyRequestBttn(boolean answer) {
+        if(answer){
+            fabBuddyRequests.setVisibility(View.VISIBLE);
+        }
+        else{
+            fabBuddyRequests.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    public void toUserBuddyRequestFragment() {
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new UserBuddyRequestsFragment()).commit();
     }
 }

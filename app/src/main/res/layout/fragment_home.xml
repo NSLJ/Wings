@@ -36,10 +36,6 @@
     </RelativeLayout>
 
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
         <fragment
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -47,23 +43,5 @@
             android:layout_width="match_parent"
             android:layout_height="510dp"></fragment>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabEndRoute"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="false"
-            android:layout_marginLeft="15dp"
-            android:layout_marginTop="430dp"
-            android:backgroundTint="@color/red"
-            android:baselineAlignBottom="false"
-            android:clickable="true"
-            android:keepScreenOn="false"
-            android:src="@android:drawable/ic_delete"
-            android:text="End Route"
-            app:elevation="5dp"
-            app:layout_anchorGravity="bottom|right" />
-    </RelativeLayout>
-
-    <!-- here is where we input the map -->
 
 </LinearLayout>

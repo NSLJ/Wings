@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +14,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.wings.R;
+import com.example.wings.adapters.PotentialBuddyAdapter;
 import com.example.wings.mainactivity.MAFragmentsListener;
+import com.example.wings.models.Buddy;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ChooseBuddyFragment.java
@@ -25,7 +32,9 @@ import com.example.wings.mainactivity.MAFragmentsListener;
 public class ChooseBuddyFragment extends Fragment {
 
     private MAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
-    private Button homeBttn;
+    private RecyclerView recyclerView;
+    private List<Buddy> potentialBuddies;
+    private PotentialBuddyAdapter buddyAdapter;
 
     public ChooseBuddyFragment() {}    // Required empty public constructor
 
@@ -58,14 +67,20 @@ public class ChooseBuddyFragment extends Fragment {
      * Purpose;         Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
      */
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        
+        //1.) Connect views:
+        potentialBuddies = new ArrayList<>();
+        recyclerView = view.findViewById(R.id.rvBuddies);
+        buddyAdapter = new PotentialBuddyAdapter(getContext(), potentialBuddies);
 
-        //Changes the Fragment to the ChooseBuddyFragment via the MainActivity!
-        homeBttn = view.findViewById(R.id.homeBttn);
-        homeBttn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.toHomeFragment();
-            }
-        });
+        //2.) Set up recycler view:
+        recyclerView.setAdapter(buddyAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        
+        //3.) Populate with buddies:
+        queryPotentialBuddies();
+    }
+
+    private void queryPotentialBuddies() {
     }
 }

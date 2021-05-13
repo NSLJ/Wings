@@ -1,4 +1,4 @@
-package com.example.wings;
+package com.example.wings.mainactivity.fragments.dialogs;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -6,7 +6,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.Gravity;
@@ -17,6 +16,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import com.example.wings.R;
 
 public class ConfirmDestinationDialog extends DialogFragment {
     private static final String TAG = "ConfirmDestinationDialog";

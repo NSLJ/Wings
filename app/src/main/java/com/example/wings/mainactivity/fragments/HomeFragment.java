@@ -1,20 +1,13 @@
 package com.example.wings.mainactivity.fragments;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,48 +16,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.wings.ConfirmDestinationDialog;
-import com.example.wings.DataParser;
+import com.example.wings.mainactivity.fragments.dialogs.ConfirmDestinationDialog;
 import com.example.wings.R;
 import com.example.wings.WingsMap;
 import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.User;
 import com.example.wings.models.WingsGeoPoint;
-import com.example.wings.models.WingsRoute;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
@@ -84,8 +53,10 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
     private static final long FASTEST_INTERVAL = 3000;
 
     ParseUser currUser = ParseUser.getCurrentUser();
+    User userModel;
+
     private MAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
-    private FloatingActionButton fabEndRoute;
+    private FloatingActionButton fabShowMyBuddyRequests;
 
     Location currentLocation;
     private WingsMap wingsMap;
@@ -107,20 +78,48 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
 
 
     @Override
+    //Purpose:      on confirmation --> current user accepts to be a buddy --> set User's isBuddy field to true, and instantiate being a Buddy
     public void onAccept() {
-        listener.toChooseBuddyFragment();
+        Log.d(TAG, "confirmationDialogBox onAccept(): creating Buddy instance");
+
+        //Create a new Buddy instance and link it to this user:
+       /* Buddy buddy = new Buddy();
+        buddy.setUser(currUser);
+        buddy.setDestination(new WingsGeoPoint(currUser, destination.latitude, destination.longitude));
+        buddy.setHasBuddy(false);
+        buddy.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Log.d(TAG, "no Error creating Buddy instance!");
+                    listener.toChooseBuddyFragment();
+                }
+                else{
+                    Log.d(TAG, "Error saving Buddy instance! error=" + e.getMessage());
+                }
+            }
+        });
+
+        currUser.put(User.KEY_ISBUDDY, true);
+        currUser.put(User.KEY_BUDDY, buddy);*/
+        userModel = new User(currUser);
+        userModel.createBuddy();
+
+        //Show the BuddyRequest FloatingActionButton
+        //fabShowMyBuddyRequests.setVisibility(View.VISIBLE);
+        listener.setBuddyRequestBttn(true);
     }
 
     @Override
     //Clear the destination
     public void onReject() {
+        Log.d(TAG, "confirmationDialogBox onReject(): erasing the queriedDestination");
         WingsGeoPoint currDestination = (WingsGeoPoint) currUser.getParseObject(User.KEY_QUERIEDDESTINATION);
         currDestination.setLatitude(0);
         currDestination.setLongitude(0);
         currDestination.setLocation(0,0);
         currUser.put(User.KEY_QUERIEDDESTINATION, currDestination);
         currDestination.saveInBackground();
-        fabEndRoute.setVisibility(View.INVISIBLE);
     }
 
     public HomeFragment() {}    // Required empty public constructor
@@ -180,12 +179,12 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
 
         btnSearch = view.findViewById(R.id.btnSearch);
         etSearchBar = view.findViewById(R.id.etSearchBar);
-        fabEndRoute = (FloatingActionButton) view.findViewById(R.id.fabEndRoute);
+       /* fabShowMyBuddyRequests = (FloatingActionButton) view.findViewById(R.id.fabEndRoute);
 
-        fabEndRoute.setVisibility(View.INVISIBLE);        //TODO: Just for now bc there is no reason for it
+        fabShowMyBuddyRequests.setVisibility(View.INVISIBLE);        //TODO: Just for now bc there is no reason for it
 
-        //To delete/cancel a route
-        fabEndRoute.setOnClickListener(new View.OnClickListener() {
+        //To go to UserBuddyRequestsFragment
+        fabShowMyBuddyRequests.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //reset destination to 0:
@@ -195,9 +194,9 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
                 currDestination.setLocation(0,0);
                 currUser.put(User.KEY_QUERIEDDESTINATION, currDestination);
                 currDestination.saveInBackground();
-                fabEndRoute.setVisibility(View.INVISIBLE);
+                fabShowMyBuddyRequests.setVisibility(View.INVISIBLE);
             }
-        });
+        });*/
 
         //set listener: onClick() --> search for and route to a location
         btnSearch.setOnClickListener(new View.OnClickListener() {
@@ -206,31 +205,19 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
                 searchArea();
                 //fabEndRoute.setVisibility(View.VISIBLE);    //TODO: only do this when user is for sure on a route and not just clicking the button many times
 
-
-                //Testing creation of dialog:
-                /*final Dialog dialog = new Dialog(getContext());
-                dialog.setContentView(R.layout.confirm_destination_dialog);
-                Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
-                dialogButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                        Toast.makeText(getContext(),"Dismissed..!!",Toast.LENGTH_SHORT).show();
-                    }
-                });
-                dialog.getWindow().setGravity(Gravity.BOTTOM);
-                dialog.show();*/
-                /*try {
-                    latch.await();
+                try {   //just for now bc DialogBox below will halt the thread, and we need to make sure seachArea() executes all the way first
+                    Thread.sleep(1500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                }*/
-                //This code below will not call until the latch counts down all the way:
+                }
 
-                //TODO: Technically this dialog should come up every time the current user's "queriedDestination" is full --> bc means they looked up some destination but just navigated to another fragment.
-                ConfirmDestinationDialog confirmDestDialog = ConfirmDestinationDialog.newInstance(etSearchBar.getText().toString());
-                confirmDestDialog.setTargetFragment(HomeFragment.this, 1);
-                confirmDestDialog.show(getFragmentManager(), "ConfirmDestinationDialogTag");
+                //show dialog ONLY if the address inputted in the bar was valid"
+                List<Address> possibleAddresses = wingsMap.getPossibleAddresses(etSearchBar.getText().toString());
+                Log.d(TAG, "btnSearch.onClick(): possibleAddressses = " + possibleAddresses.toString());
+                if(possibleAddresses != null) {
+                    makeConfirmDestinationDialog(etSearchBar.getText().toString());
+                }
+
             }
         });
     }
@@ -254,12 +241,32 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
         try {
             //Actually fetch the data:
             initalDestination.fetchIfNeeded();
+            Log.d(TAG, "loadMap(): initialDestination.latitide = " + initalDestination.getLatitude());
 
-            //Check if there is already a destination we should be routing to:
+            //Check if there is already a destination we should be routing to + asking for destination confirmation  with Dialog
             if (initalDestination.getLatitude() != 0) {
                 Log.d(TAG, "loadMap(): an inital destination exists! Routing to it...");
                 destination = new LatLng(initalDestination.getLatitude(), initalDestination.getLongitude());
                 wingsMap.routeFromCurrentLocation(destination);
+
+
+                //if we are already a buddy --> no need to display a Dialog
+                //else we are not a buddy, yet we are querying a location --> show dialog to ask if they want to confirm being a buddy:
+                boolean isBuddy = currUser.getBoolean(User.KEY_ISBUDDY);
+                if(!isBuddy){
+                    //See if there is a destinationString we can display in the Display, if not, just use the LatLng
+                    userModel = new User(currUser);
+                    String checkDestinationStr = userModel.getDestinationString();
+                    Log.d(TAG, "loadMap(): checkDestinationStr=" +checkDestinationStr);
+                    if(!checkDestinationStr.equals("default")){
+                        makeConfirmDestinationDialog(checkDestinationStr);
+                    }
+                    else{
+                        makeConfirmDestinationDialog(Double.toString(initalDestination.getLatitude()) + ", " + Double.toString(initalDestination.getLongitude()));
+                    }
+                }
+
+
             }
 
         } catch (ParseException e) {
@@ -275,8 +282,16 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
         String destinationTxt = etSearchBar.getText().toString();
         if(destinationTxt.equals("")){
             Toast.makeText(getContext(), "You didn't enter anything!", Toast.LENGTH_SHORT).show();
-            return;
         }
-        wingsMap.routeFromCurrentLocation(destinationTxt);
+        else {
+            wingsMap.routeFromCurrentLocation(destinationTxt);
+        }
+    }
+
+    //Purpose:      Creates a ConfirmDestinationDialog with the given destination string to display
+    public void makeConfirmDestinationDialog(String destinationTxt){
+        ConfirmDestinationDialog confirmDestDialog = ConfirmDestinationDialog.newInstance(destinationTxt);
+        confirmDestDialog.setTargetFragment(HomeFragment.this, 1);
+        confirmDestDialog.show(getFragmentManager(), "ConfirmDestinationDialogTag");
     }
 }

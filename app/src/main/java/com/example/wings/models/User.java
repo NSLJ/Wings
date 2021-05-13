@@ -3,8 +3,10 @@ package com.example.wings.models;
 import android.util.Log;
 
 import com.parse.ParseClassName;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,7 +16,7 @@ import java.util.List;
 
 @ParseClassName("User")
 public class User extends ParseUser {
-    private static final String DEBUG_TAG = "User";
+    private static final String TAG = "User";
 
     public static final String KEY_USERNAME = "username";
     public static final String KEY_PASSWORD = "password";
@@ -28,12 +30,20 @@ public class User extends ParseUser {
     public static final String KEY_CURRENTLOCATION = "currentLocation";
     public static final String KEY_PROFILESETUP  = "ProfileSetUp";
     public static final String KEY_RATING = "rating";
-    public static final String KEY_QUERIEDDESTINATION = "mapDestination";
+    public static final String KEY_QUERIEDDESTINATION = "queriedDestination";
+    public static final String KEY_ISBUDDY = "isBuddy";
+    public static final String KEY_DESTINATIONSTR = "destinationString";
+    public static final String KEY_BUDDY = "buddyInstance";
+
     //not sure if we will need this
     public static final String KEY_OBJECTID = "objectId";
 
+    private ParseUser user;
     public User(){}
 
+    public User(ParseUser user){
+        this.user = user;
+    }
     //returns the username part of the cpp email (Example: billybronco@cpp.edu would return billybronco)
     public String getUsername(){
         String username = "";
@@ -78,8 +88,48 @@ public class User extends ParseUser {
     public void setCurrentLocation(WingsGeoPoint location){
         put(KEY_CURRENTLOCATION, location);
     }
+
+
     public void setQueriedDestination(WingsGeoPoint location){
         put(KEY_QUERIEDDESTINATION, location);
+    }
+    public WingsGeoPoint getQueriedDestination(){
+        return (WingsGeoPoint) user.getParseObject(KEY_QUERIEDDESTINATION);
+    }
+
+    public void setIsBuddy(boolean answer){
+        put(KEY_ISBUDDY, answer);
+    }
+    public boolean getIsBuddy(){
+        Boolean isBuddy = user.getBoolean(KEY_ISBUDDY);
+
+        if(isBuddy == null){
+            isBuddy = false;
+            user.put(KEY_ISBUDDY, false);
+            saveUserData("isBuddy");
+        }
+
+        return isBuddy;
+    }
+
+
+    public void setDestinationString(String destinationString){
+        put(KEY_DESTINATIONSTR, destinationString);
+    }
+
+    //Purpose:      Every getter method will get the data from Parse, IF the data has never been declared, an object is declared and updated and then returns the updated data
+    public String getDestinationString(){
+        ParseUser user = ParseUser.getCurrentUser();
+        String destinationStr = user.getString(KEY_DESTINATIONSTR);
+
+        //Set it to the default value if doesn't exist:
+        if(destinationStr == null){
+            destinationStr = "default";
+            user.put(KEY_DESTINATIONSTR, false);
+            saveUserData("destinationString");
+        }
+
+        return destinationStr;
     }
 
     public int getPin(){
@@ -107,7 +157,7 @@ public class User extends ParseUser {
     //seems like we need a specific way to do this...
     public List getTrustedContacts() throws JSONException {
         JSONArray jsonArray = getJSONArray(KEY_TRUSTEDCONTACTS);
-        Log.d(DEBUG_TAG, jsonArray.toString());
+        Log.d(TAG, jsonArray.toString());
        List<TrustedContact> trustedContacts = new ArrayList<TrustedContact>();
        /* for(int i = 0; i < jsonArray.length(); i++){
            trustedContacts.add(new TrustedContact(jsonArray.getJSONObject(i)));
@@ -140,4 +190,56 @@ public class User extends ParseUser {
     }
 
     public String getObjectID(){ return getString(KEY_OBJECTID); }
+
+
+
+    public Buddy getBuddy() {
+        Buddy buddyInstance = (Buddy) user.getParseObject(KEY_BUDDY);
+        //If the user's "buddyInstance" field is not yet declared for some reason:
+        if (buddyInstance == null) {
+            buddyInstance = createBuddy();     //creates corresponding buddy instance for currentUser field
+        }
+
+        //Actually fetch the data:
+        try {
+            buddyInstance.fetchIfNeeded();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return buddyInstance;
+    }
+
+
+    //Creates buddy object using user field
+    public Buddy createBuddy(){
+        Log.d(TAG, "createBuddy()");
+        //Create a new Buddy instance and link it to this user:
+        Buddy buddy = new Buddy();
+        buddy.setUser(user);
+
+        WingsGeoPoint destination = getQueriedDestination();
+        buddy.setDestination(new WingsGeoPoint(user, destination.getLatitude(), destination.getLongitude()));
+        buddy.setHasBuddy(false);
+        saveUserData("buddyInstance");
+
+        user.put(KEY_ISBUDDY, true);
+        user.put(KEY_BUDDY, buddy);
+        return buddy;
+    }
+
+    //Helper method:
+    private void saveUserData(String text){
+        ParseUser user = ParseUser.getCurrentUser();
+        user.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Log.d(TAG, "no Error saving " + text);
+                }
+                else{
+                    Log.d(TAG, "Error saving " + text + " error=" + e.getMessage());
+                }
+            }
+        });
+    }
 }
