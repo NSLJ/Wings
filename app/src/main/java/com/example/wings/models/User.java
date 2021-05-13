@@ -4,13 +4,10 @@ import android.util.Log;
 
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
-import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +28,7 @@ public class User extends ParseUser {
     public static final String KEY_CURRENTLOCATION = "currentLocation";
     public static final String KEY_PROFILESETUP  = "ProfileSetUp";
     public static final String KEY_RATING = "rating";
-    public static final String KEY_MAPDESTINATION = "mapDestination";
+    public static final String KEY_QUERIEDDESTINATION = "mapDestination";
     //not sure if we will need this
     public static final String KEY_OBJECTID = "objectId";
 
@@ -81,9 +78,10 @@ public class User extends ParseUser {
     public void setCurrentLocation(WingsGeoPoint location){
         put(KEY_CURRENTLOCATION, location);
     }
-    public void setMapDestination(WingsGeoPoint location){
-        put(KEY_MAPDESTINATION, location);
+    public void setQueriedDestination(WingsGeoPoint location){
+        put(KEY_QUERIEDDESTINATION, location);
     }
+
     public int getPin(){
         return getInt(KEY_PIN);
     }

@@ -123,23 +123,8 @@ public class UpdateLocationWorker extends Worker {
         return Result.success(output);
     }
 
-    public void sendData() throws ParseException {
-        /*ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.whereEqualTo(User.KEY_FIRSTNAME, "Josephine");
-        List<ParseUser> users = query.find();
-        ParseUser user = users.get(0);
-        Log.d(TAG, "sendData():  user=" + user.getString(User.KEY_FIRSTNAME));
 
-        user.logIn(user.getUsername(), "Jo123456");
-        int pin = user.getInt(User.KEY_PIN);
-        Log.d(TAG, "sendData():  pin=" + pin);
-
-        int newPin = pin+1;
-        user.put(User.KEY_PIN, newPin);
-        user.save();*/
-        Log.d(TAG, "in sendData()");
-    }
-
+    //I'm keeping this so I can do Notifications later in the app since ik it works already!
     static void makeStatusNotification(String message, Context context) {
 
         // Make a channel if necessary
