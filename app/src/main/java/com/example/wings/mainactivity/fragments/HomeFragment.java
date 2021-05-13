@@ -224,11 +224,13 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
                     latch.await();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                }
+                }*/
                 //This code below will not call until the latch counts down all the way:
+
+                //TODO: Technically this dialog should come up every time the current user's "queriedDestination" is full --> bc means they looked up some destination but just navigated to another fragment.
                 ConfirmDestinationDialog confirmDestDialog = ConfirmDestinationDialog.newInstance(etSearchBar.getText().toString());
                 confirmDestDialog.setTargetFragment(HomeFragment.this, 1);
-                confirmDestDialog.show(getFragmentManager(), "ConfirmDestinationDialogTag");*/
+                confirmDestDialog.show(getFragmentManager(), "ConfirmDestinationDialogTag");
             }
         });
     }
