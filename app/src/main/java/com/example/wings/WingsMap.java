@@ -114,11 +114,19 @@ public class WingsMap {
     public void openAppSetUp(){
         // Get the saved current location from database, move map to it
         WingsGeoPoint initalLoc = (WingsGeoPoint) currentUser.getParseObject(User.KEY_CURRENTLOCATION);
+
+        //If this is a new user --> there is no WingsGeoPoint listed
+        if(initalLoc == null){
+            initalLoc = new WingsGeoPoint(currentUser, 0, 0);
+            currentUser.put(User.KEY_QUERIEDDESTINATION, initalLoc);
+            currentUser.saveInBackground();
+        }
         try {
             //Actually fetch the data:
             initalLoc.fetchIfNeeded();
 
             //initialize currentLocation:
+            Log.d(TAG, "openAppSetUp(): initialLoc.latitide = " + initalLoc.getLatitude());
             currentLocation = new LatLng(initalLoc.getLatitude(), initalLoc.getLongitude());
             Log.d(TAG, "openAppSetUp(): location from parse: " + initalLoc.getLatitude() + " , " + initalLoc.getLongitude());
 
@@ -150,13 +158,19 @@ public class WingsMap {
     public void routeFromCurrentLocation(String destinationTxt){
         //Get possible addresses and choose the first one for now:
         List<Address> possibleAddresses = getPossibleAddresses(destinationTxt);
-        LatLng foundDestination = new LatLng(possibleAddresses.get(0).getLatitude(), possibleAddresses.get(0).getLongitude());
+        if(possibleAddresses == null){
+            Toast.makeText(context, "No addresses exist!", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            LatLng foundDestination = new LatLng(possibleAddresses.get(0).getLatitude(), possibleAddresses.get(0).getLongitude());
 
-        //Because this is a new destination for the user --> save it into parse
-        setUserQueriedDestination(foundDestination);
+            //Because this is a new destination for the user --> save it into parse, and the text of destination to display in later fragments
+            setUserQueriedDestination(foundDestination);
+            setUserDestinationString(destinationTxt);
 
-        //2.) Find all routes from current location to destination, choose first route to draw
-        routeFromCurrentLocation(foundDestination);
+            //2.) Find all routes from current location to destination, choose first route to draw
+            routeFromCurrentLocation(foundDestination);
+        }
     }
 
     //Purpose:      To use Geocoder to get the List<Address> that correlate to the given destination string
@@ -244,8 +258,9 @@ public class WingsMap {
         mapUI.setZoomGesturesEnabled(true);
 
         //3.) move map camera to current location --> may need to change later
-        map.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
-        map.animateCamera(CameraUpdateFactory.zoomTo(12));      //12 = how much to zoom to, can make constant
+        //map.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
+       // map.animateCamera(CameraUpdateFactory.zoomTo(12));      //12 = how much to zoom to, can make constant
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
 
         //4.) Start constantly getting + displaying current location:
         startLocationUpdates();             //To constantly get current location and display update on the map
@@ -315,8 +330,9 @@ public class WingsMap {
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(destination);
         map.addMarker(markerOptions);
-        map.animateCamera(CameraUpdateFactory.newLatLng(destination));
-        map.animateCamera(CameraUpdateFactory.zoomTo(9));
+       // map.animateCamera(CameraUpdateFactory.newLatLng(destination));
+      //  map.animateCamera(CameraUpdateFactory.zoomTo(9));
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(destination, 12));
     }
 
     //All setters and getters
@@ -343,10 +359,16 @@ public class WingsMap {
 
     //Save the destination in Parse Database, technically should be doing this here
     private void setUserQueriedDestination(LatLng destination){
-        Log.d(TAG, "setUserDestination()");
-        ParseUser currUser = ParseUser.getCurrentUser();
-        currUser.put(User.KEY_QUERIEDDESTINATION, new WingsGeoPoint(currUser, destination.latitude, destination.longitude));
-        currUser.saveInBackground();
+        Log.d(TAG, "setUserQueriedDestination()");
+        currentUser.put(User.KEY_QUERIEDDESTINATION, new WingsGeoPoint(currentUser, destination.latitude, destination.longitude));
+        currentUser.saveInBackground();
+    }
+
+    //Save the destination in Parse Database, technically should be doing this here
+    private void setUserDestinationString(String destinationTxt){
+        Log.d(TAG, "setUserDestinationString()");
+        currentUser.put(User.KEY_DESTINATIONSTR, destinationTxt);
+        currentUser.saveInBackground();
     }
 
     public LatLng getCurrentLocation(){

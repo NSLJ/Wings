@@ -4,15 +4,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".mainactivity.MainActivity"
-
-    >
+    tools:context=".mainactivity.MainActivity">
 
     <FrameLayout
         android:id="@+id/flFragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     </FrameLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabBuddyRequests"
+        android:layout_width="67dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="false"
+        android:layout_marginLeft="7dp"
+        android:layout_marginTop="480dp"
+        android:backgroundTint="@color/gray_100"
+        android:baselineAlignBottom="false"
+        android:clickable="true"
+        android:keepScreenOn="false"
+        android:src="@drawable/wings_logo"
+        android:text="End Route"
+        app:elevation="5dp"
+        app:layout_anchorGravity="bottom|right" />
+
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:background="#121212"

@@ -246,7 +246,7 @@ public class RegisterTwoFragment extends Fragment {
 
                 //On failure:
                 else{
-                    Log.e(TAG, "createAccount():  User sign up failure:  error=", e);
+                    Log.d(TAG, "createAccount():  User sign up failure:  error=" + e.getMessage());
                     showShortTopToast("Sorry, we couldn't sign you up!");
                 }
             }

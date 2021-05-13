@@ -80,7 +80,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         public void bind(User user) {
 
             tvusernmae.setText(user.getFirstName() + " " + user.getLastName());
-            rbuserrating.setRating(user.getRating());
+            rbuserrating.setRating((float)user.getRating());
 
             ParseFile image = user.getProfilePic();
 //            if(image != null) {

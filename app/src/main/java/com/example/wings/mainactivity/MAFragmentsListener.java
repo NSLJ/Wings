@@ -18,4 +18,6 @@ public interface MAFragmentsListener {
     public void toSettingsFragment();
     public void toEditTrustedContactsFragment();
     public void toHelpFragment();
+    public void setBuddyRequestBttn(boolean answer);
+    public void toUserBuddyRequestFragment();
 }
