@@ -251,7 +251,6 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                                     int newCounter = output.getInt(KEY_GETCOUNTER, 0);
                                     setCounter(newCounter);
 
-                                    //textView.setText(result);
                                     if(keepTracking) {
                                         startTracking();               //to infinitely do it!
                                     }
