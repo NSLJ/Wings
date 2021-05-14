@@ -50,7 +50,14 @@ public class Buddy extends ParseObject {
 
     //Getters and setters
     public ParseUser getUser(){
-        return getParseUser(KEY_USER);
+        ParseUser user = getParseUser(KEY_USER);
+        try {
+            user.fetchIfNeeded();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return user;
     }
     public void setUser(ParseUser sender){
         put(KEY_USER, sender);

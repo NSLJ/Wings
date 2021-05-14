@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 //Purpose:      To display a selected other user's information when looking for a buddy --> displays map, routes, locations, ialogbox, etc
+//              will display different Dialogs depending on who is calling this Fragment. This Fragment is only accessed in special occasions essentially
+
 public class PotentialBuddyFragment extends Fragment implements ConfirmBuddyRequestDialog.ResultListener {
     private static final String TAG = "PotentialBuddyFragment";
     public static final String KEY_USERID = "potentialBuddyId";

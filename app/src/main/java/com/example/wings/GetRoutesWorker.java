@@ -50,7 +50,6 @@ public class GetRoutesWorker extends Worker {
         LatLng startLocation = new LatLng(locations[0], locations[1]);     //should probably error check the received locations
         LatLng destination = new LatLng(locations[2], locations[4]);
 
-
         //1.) Make the api call --> get back the JSONObject as a String for some reason:
         String jsonResult = getJsonResult(startLocation, destination);
 

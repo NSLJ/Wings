@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.wings.HandleBuddyRequestsWorker;
 import com.example.wings.R;
 import com.example.wings.UpdateLocationWorker;
 import com.example.wings.mainactivity.fragments.ChooseBuddyFragment;
@@ -64,6 +65,12 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     public static final String KEY_PROFILESETUPFRAG = "ProfileSetupFrag?";          //to get whether or not the current user's profile is set up from the StartActivity
     public static final String KEY_USERID = "potentialBuddyId";
 
+    private static final String KEY_APPROVED_REQUEST = "whichSentRequest?"; //these two are for responses with sentrequests
+    private static final String KEY_ISAPPROVED = "anyRequestsApproved?";
+    private static final String KEY_INITIAL_COUNT = "initialSizeReceivedRequests";  //this is to
+    private static final String KEY_NUM_RECEIVED = "responseTotalReceived";
+    private static final String KEY_CHANGED = "receivedRequestsChanged?";
+
     //UpdateLocationWorker keys:
     private static final int REQUEST_CODE_LOCATION_PERMISSION = 1;              //request code for permissions result
     public static final String KEY_SENDCOUNTER = "activity_counter";
@@ -78,7 +85,9 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
     //fields for getting current location:
     private boolean keepTracking;                    //whether or not we should continue tracking user's current location
-    private int counter = 0;               //TODO: this is for testing purposes, delete later:
+    private boolean runRequestHandling = false;
+    private int receivedRequestCount;
+    private int counter = 0;
     LifecycleOwner owner = this;                    //used in the startTracking() to listen to WorkInfo responses from the UpdateLocationWorker
 
     @Override
@@ -103,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
                 if (!buddyInstance.getHasBuddy()) {      //if they don't have a buddy but they want one, we need to show th button
                     fabBuddyRequests.setVisibility(View.VISIBLE);
+                    //setWatchRequests(true);
                 } else {
                     fabBuddyRequests.setVisibility(View.INVISIBLE);
                 }
@@ -121,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                 toUserBuddyRequestFragment();       //the only way to get to this fragment is through this button!
             }
         });
+
 
         //1.) Find out whether or not need to force ProfileSetupFrag:
         if(getIntent().getBooleanExtra(KEY_PROFILESETUPFRAG, false)){
@@ -156,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                 else{
                     keepTracking= true;
                     startTracking();           //infinitely runs as long as keepTracking = true;
+                    setWatchRequests(true);
                 }
 
 
@@ -444,5 +456,95 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         frag.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
 
+    }
+
+    //Purpose:      called by other Fragments when current User is a Buddy looking to keep track of their requests
+    public void setWatchRequests(boolean answer){
+        if(answer){
+            receivedRequestCount = 10;
+            setRunRequestHandling(true);
+            watchRequests();
+        }
+    }
+
+    private void setReceivedRequestCount(int newCount){
+        receivedRequestCount = newCount;
+    }
+    private void setRunRequestHandling(boolean answer){
+        runRequestHandling = answer;
+    }
+
+    private void watchRequests(){
+        Log.d(TAG, "in watchRequests() receivedRequestCount = " + receivedRequestCount);
+        //Package data to send the counter
+        Data data = new Data.Builder()
+                .putInt(KEY_INITIAL_COUNT, receivedRequestCount)       //send the counter
+                .build();
+
+        //Create the request
+        OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(HandleBuddyRequestsWorker.class)
+                .setInputData(data)         //send data
+                .setInitialDelay(8, TimeUnit.SECONDS)      //wait 5 seconds before doing it         //TODO: don't hardcode, make this time frame a constant
+                .build();
+
+        //Queue up the request
+        WorkManager.getInstance(getApplicationContext())
+                .enqueueUniqueWork(
+                        "HandleBuddyRequests request",
+                        ExistingWorkPolicy.REPLACE,         //says, if it does repeat, replace the new request with the old one
+                        (OneTimeWorkRequest) request
+                );
+
+        //Listen to information from the request
+        WorkManager.getInstance(getApplicationContext()).getWorkInfoByIdLiveData(request.getId())      //returns a live data
+                .observe(owner, new Observer<WorkInfo>() {
+
+                    //called every time WorkInfo is changed
+                    public void onChanged(@Nullable WorkInfo workInfo) {
+                        Log.d(TAG, "watchRequests(): onChanged()");
+                        //If workInfo is there and it is succeeded --> update the text
+                        if (workInfo != null) {
+                            //Check if finished:
+                            if(workInfo.getState().isFinished()){
+                                if(workInfo.getState() == WorkInfo.State.SUCCEEDED){
+                                    Log.d(TAG, "watchRequest(): Request succeeded ");
+
+                                    Data output = workInfo.getOutputData();
+
+                                    boolean anyApproved = output.getBoolean(KEY_ISAPPROVED, false);
+                                    Log.d(TAG, "watchRequests(): anyApproved=" + anyApproved);
+                                    if(anyApproved){
+                                        int sentRequestIndex = output.getInt(KEY_APPROVED_REQUEST, -1);
+                                        Log.d(TAG, "watchRequests(): sentRequestindex=" + sentRequestIndex);
+                                        //break out of the loop bc there's an approved request now
+                                        setRunRequestHandling(false);
+                                        Toast.makeText(getApplicationContext(), "One of your sent requests was approved!", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else {
+                                        int numOfReceived = output.getInt(KEY_NUM_RECEIVED, 0);
+                                        Log.d(TAG, "watchRequests(): numOfreceived=" + numOfReceived);
+                                        setReceivedRequestCount(numOfReceived);
+
+                                        boolean receivedRequestsChanged = output.getBoolean(KEY_CHANGED, false);
+                                        Log.d(TAG, "watchRequests(): receivedRequestsChanged=" + receivedRequestsChanged);
+                                        if (receivedRequestsChanged) {        //hopefully should mean the # of received requests got bigger --> show it
+                                            Toast.makeText(getApplicationContext(), "You got a new BuddyRequest!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    Log.d(TAG, "watchRequests(): runRequestHanding=" + runRequestHandling);
+                                    if(runRequestHandling) {
+                                        Log.d(TAG, "watchRequests():  recursive call it!");
+                                        watchRequests();         //to infinitely do it!
+                                    }
+                                }
+                                else {
+                                    Log.d(TAG, "Request didn't succeed, status=" + workInfo.getState().name());
+                                    watchRequests();
+                                }
+                            }
+                        }
+                    }
+                });
     }
 }
