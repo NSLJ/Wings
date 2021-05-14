@@ -6,9 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.ImageDecoder;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,9 +18,6 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.provider.MediaStore;
 import android.view.ViewGroup;
@@ -34,16 +29,11 @@ import android.widget.Toast;
 
 import com.example.wings.R;
 import com.example.wings.mainactivity.MAFragmentsListener;
-import com.example.wings.mainactivity.MainActivity;
 import com.example.wings.models.User;
 import com.example.wings.startactivity.SAFragmentsListener;
-import com.example.wings.startactivity.StartActivity;
 import com.parse.ParseUser;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -61,8 +51,8 @@ public class ProfileSetupFragment extends Fragment {
     private static final String PHOTO_FILE_NAME = "photo.jpg";         //arbitrary file name to store Post photo in
     private static final String KEY_RECEIVE_USER = "user";
 
-    private MAFragmentsListener listener;
     private SAFragmentsListener slistener;
+    private MAFragmentsListener mlistener;
 
     public File photoFile;
     private ImageView profileImage;
@@ -102,15 +92,15 @@ public class ProfileSetupFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof MAFragmentsListener) {
-            listener = (MAFragmentsListener) context;
+            mlistener = (MAFragmentsListener) context;
         } else {
             throw new ClassCastException(context.toString() + " must implement MAFragmentListener");
         }
 //        if (context instanceof SAFragmentsListener) {
-//            slistener = (SAFragmentsListener) context;
-//        } else {
-//            throw new ClassCastException(context.toString() + " must implement SAFragmentListener");
-//        }
+ //           slistener = (SAFragmentsListener) context;
+ //       } else {
+ //           throw new ClassCastException(context.toString() + " must implement SAFragmentListener");
+ //       }
     }
     @SuppressLint("ResourceAsColor")
     @Override
@@ -139,7 +129,7 @@ public class ProfileSetupFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 saveProfileSetup();
-                slistener.toEditTrustedContacts();
+                mlistener.toEditTrustedContactsFragment();
             }
         });
 
@@ -161,8 +151,8 @@ public class ProfileSetupFragment extends Fragment {
                 */
                 //Delete this once fragment is fully done!
                 saveProfileSetup();         //makes profileSetup = true and saves it!
-                listener.setRestrictScreen(false);
-                listener.toHomeFragment();
+                mlistener.setRestrictScreen(false);
+                mlistener.toHomeFragment();
             }
         });
 
@@ -282,6 +272,7 @@ public class ProfileSetupFragment extends Fragment {
             }
         });
     }
+
     private void showLongTopToast(String message){
         Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_LONG);
         toast.setGravity(Gravity.TOP, 0, 0);
