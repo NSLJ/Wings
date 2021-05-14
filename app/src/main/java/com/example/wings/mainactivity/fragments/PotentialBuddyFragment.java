@@ -16,6 +16,8 @@ import android.widget.Toast;
 import com.example.wings.R;
 import com.example.wings.WingsMap;
 import com.example.wings.mainactivity.MAFragmentsListener;
+import com.example.wings.mainactivity.fragments.dialogs.ConfirmBuddyRequestDialog;
+import com.example.wings.mainactivity.fragments.dialogs.ConfirmDestinationDialog;
 import com.example.wings.models.Buddy;
 import com.example.wings.models.User;
 import com.example.wings.models.WingsGeoPoint;
@@ -35,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 //Purpose:      To display a selected other user's information when looking for a buddy --> displays map, routes, locations, ialogbox, etc
-public class PotentialBuddyFragment extends Fragment {
+public class PotentialBuddyFragment extends Fragment implements ConfirmBuddyRequestDialog.ResultListener {
     private static final String TAG = "PotentialBuddyFragment";
     public static final String KEY_USERID = "potentialBuddyId";
 
@@ -52,6 +54,18 @@ public class PotentialBuddyFragment extends Fragment {
     private LatLng potentialBuddyDestination;
 
     public PotentialBuddyFragment() {}
+
+
+    //Methods to override from ConfirmBuddyRequestDialog resultlistener:
+    @Override
+    public void onAccept() {
+        Toast.makeText(getContext(), "accept button pressed", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onReject() {
+        Toast.makeText(getContext(), "reject button pressed", Toast.LENGTH_SHORT).show();
+    }
 
 
     @Override
@@ -166,6 +180,8 @@ public class PotentialBuddyFragment extends Fragment {
                 wingsMap.setMarker(potentialBuddyLocation, BitmapDescriptorFactory.HUE_BLUE);
                 wingsMap.route(potentialBuddyLocation, potentialBuddyDestination);
 
+                //Show dialog:
+                makeConfirmBuddyRequestDialog();
 
             } catch (ParseException e) {
                 Log.d(TAG, "onViewCreated(): error fetching buddy instance");
@@ -182,4 +198,14 @@ public class PotentialBuddyFragment extends Fragment {
         wingsMap = new WingsMap(map, getContext(), getViewLifecycleOwner());   //automatically constantly shows current location
 
     }
+
+    //Purpose:      Creates a ConfirmDestinationDialog with the given destination string to display
+    public void makeConfirmBuddyRequestDialog(){
+        Log.d(TAG, "makeConfirmBuddyRequestDialog(): potentialBuddyId=" + potentialBuddyId);
+        ConfirmBuddyRequestDialog dialog = ConfirmBuddyRequestDialog.newInstance(potentialBuddyId);
+        dialog.setTargetFragment(PotentialBuddyFragment.this, 1);
+        dialog.show(getFragmentManager(), "ConfirmBuddyRequestDialogTag");
+    }
+
+
 }

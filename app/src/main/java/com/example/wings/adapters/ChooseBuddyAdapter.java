@@ -119,7 +119,8 @@ public class ChooseBuddyAdapter extends RecyclerView.Adapter<ChooseBuddyAdapter.
                 tvName.setText(fName);
                 ratingBar.setRating(rating);
 
-                tvDistance.setText(Double.toString(distanceBetween) + " m");
+                double roundedDistance = Math.round(distanceBetween*100.0)/100.0;
+                tvDistance.setText(Double.toString(roundedDistance) + " m away");
             } catch (ParseException e) {
                 e.printStackTrace();
             }

@@ -242,7 +242,8 @@ public class ChooseBuddyFragment extends Fragment {
             public void done(List<Buddy> response, ParseException e) {
                 if(e == null){
                     Log.d(TAG, "queryPotentialBuddies(): success!:  response=" + response.toString());
-                    parseModel(response);       //to extract all "intendedDestination" fields and all User model objects from the List<Buddy>
+                    //parseModel(response);       //to extract all "intendedDestination" fields and all User model objects from the List<Buddy>
+                    parse(response);
                 }
                 else{
                     Log.d(TAG, "queryPotentialBuddies(): failed to query for buddies, error=" + e.getMessage());
@@ -281,6 +282,7 @@ public class ChooseBuddyFragment extends Fragment {
                 ParseGeoPoint otherDestination = (ParseGeoPoint) destinationGeoPoint.getLocation();
 
                 //Get distance between destination field and otherDestination + add it to the list:
+             //----This was wrong, was supposed to be distance from current distance
                 double distance = destination.distanceInKilometersTo(otherDestination)*1000;    //* by 1000 to convert to m
                 distancesList.add(distance);
 
@@ -295,6 +297,32 @@ public class ChooseBuddyFragment extends Fragment {
         }
         Log.d(TAG, "parseModel is done: usersToDisplay = " + usersToDisplay.toString());
         Log.d(TAG, "parseModel is done: distances = " + distancesList.toString());
+        buddyAdapter.notifyDataSetChanged();
+    }
+
+    private void parse(List<Buddy> buddiesToShow){
+        for(int i = 0; i < buddiesToShow.size(); i++){
+            Buddy currBuddy = buddiesToShow.get(i);
+            ParseUser otherUser = currBuddy.getUser();
+            try {
+                otherUser.fetchIfNeeded();
+                usersToDisplay.add(otherUser);
+
+                //Get the otherUser's currentLocation:
+                WingsGeoPoint otherCurrentGeoPoint = (WingsGeoPoint) otherUser.getParseObject(User.KEY_CURRENTLOCATION);
+
+                otherCurrentGeoPoint.fetchIfNeeded();
+
+                ParseGeoPoint otherCurrentLocation = otherCurrentGeoPoint.getLocation();
+                double distance = currentLocation.distanceInKilometersTo(otherCurrentLocation)*1000;      //* by 1000 to convert to m
+                distancesList.add(distance);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Log.d(TAG, "parse() is done: usersToDisplay = " + usersToDisplay.toString());
+        Log.d(TAG, "parse() is done: distances = " + distancesList.toString());
         buddyAdapter.notifyDataSetChanged();
     }
 
