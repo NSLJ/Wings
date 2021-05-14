@@ -17,26 +17,26 @@ import com.example.wings.models.Buddy;
 
 import java.util.List;
 
-public class PotentialBuddyAdapter extends RecyclerView.Adapter<PotentialBuddyAdapter.ViewHolder> {
+public class ChooseBuddyAdapter extends RecyclerView.Adapter<ChooseBuddyAdapter.ViewHolder> {
 
     private Context context;
     private List<Buddy> buddiesToShow;
 
-    public PotentialBuddyAdapter(Context context, List<Buddy> buddiesToShow){
+    public ChooseBuddyAdapter(Context context, List<Buddy> buddiesToShow){
         this.context = context;
         this.buddiesToShow = buddiesToShow;
     }
     @NonNull
     @Override
-    public PotentialBuddyAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d("PotentialBuddyAdapter", "onCreateViewHolder");
+    public ChooseBuddyAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Log.d("ChooseBuddyAdapter", "onCreateViewHolder");
         View buddyView = LayoutInflater.from(context).inflate(R.layout.item_potential_buddy, parent, false);
         return new ViewHolder(buddyView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PotentialBuddyAdapter.ViewHolder holder, int position) {
-        Log.d("PotentialBuddyAdapter", "onBindViewHolder: position = " + position);
+    public void onBindViewHolder(@NonNull ChooseBuddyAdapter.ViewHolder holder, int position) {
+        Log.d("ChooseBuddyAdapter", "onBindViewHolder: position = " + position);
         Buddy currentBuddy = buddiesToShow.get(position);
         holder.bind(currentBuddy);
     }
@@ -46,6 +46,15 @@ public class PotentialBuddyAdapter extends RecyclerView.Adapter<PotentialBuddyAd
         return buddiesToShow.size();
     }
 
+    public void clear() {
+        buddiesToShow.clear();
+        notifyDataSetChanged();
+    }
+
+    public void addAll(List<Buddy> list){
+        buddiesToShow.addAll(list);
+        notifyDataSetChanged();
+    }
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         //All Views in item_potential_buddy layout
