@@ -13,6 +13,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.wings.R;
@@ -50,6 +51,7 @@ public class ChooseBuddyFragment extends Fragment {
     private MAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
     private RecyclerView recyclerView;
     private ChooseBuddyAdapter buddyAdapter;
+    private Button btnBack;
 
     private  List<ParseUser> usersToDisplay;        //our models
     private List<Double> distancesList;
@@ -90,11 +92,33 @@ public class ChooseBuddyFragment extends Fragment {
         usersToDisplay = new ArrayList<>();
         distancesList = new ArrayList<>();
         recyclerView = view.findViewById(R.id.rvBuddies);
-        buddyAdapter = new ChooseBuddyAdapter(getContext(), usersToDisplay, distancesList);
+        btnBack = view.findViewById(R.id.btnBack);
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.toHomeFragment();
+            }
+        });
+
+        //2.) Create an ChooseBuddyAdapter.OnClickListener to create a ChooseBuddyAdapter:
+        ChooseBuddyAdapter.OnClickListener onClickListener = new ChooseBuddyAdapter.OnClickListener() {
+            @Override
+            public void onClick(int position) {
+                //I think position = corresponds to the indexes in the List<> models but may be backwards or something:
+                ParseUser userClicked = usersToDisplay.get(position);
+                String objectId = userClicked.getObjectId();
+                Log.d(TAG, "onClick(): position = " + position + "   objectId to send = " + objectId);
+                listener.toPotentialBuddyFragment(objectId);
+            }
+        };
+
+        buddyAdapter = new ChooseBuddyAdapter(getContext(), usersToDisplay, distancesList, onClickListener);
 
         //2.) Set up recycler view:
         recyclerView.setAdapter(buddyAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
 
         //3.) Initialize user, and buddyInstance fields, obtain our user's currentLocation and intendedDestination in ParseGeoPoint type
         user = ParseUser.getCurrentUser();

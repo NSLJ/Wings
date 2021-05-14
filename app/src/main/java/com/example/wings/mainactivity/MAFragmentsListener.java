@@ -1,4 +1,7 @@
 package com.example.wings.mainactivity;
+
+import com.parse.ParseUser;
+
 /**
  * MAFragmentsListener.java
  * Purpose:         Allows a medium for Fragments to communicate with MainActivity in order to display the correct Fragments at the right time. Essentially shows all Fragments NOT in the Bottom Navigation
@@ -20,4 +23,5 @@ public interface MAFragmentsListener {
     public void toHelpFragment();
     public void setBuddyRequestBttn(boolean answer);
     public void toUserBuddyRequestFragment();
+    public void toPotentialBuddyFragment(String potentialBuddyId);
 }

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import com.bumptech.glide.Glide;
 import com.example.wings.R;
 import com.example.wings.models.User;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseUser;
 
 import java.util.List;
@@ -26,18 +28,26 @@ public class ChooseBuddyAdapter extends RecyclerView.Adapter<ChooseBuddyAdapter.
     private Context context;
     private List<ParseUser> buddiesToShow;
     private List<Double> distancesList;
+    private OnClickListener clickListener;
 
-    public ChooseBuddyAdapter(Context context, List<ParseUser> buddiesToShow, List<Double> distancesList){
+    //To pass in the position of row clicked on:
+    public interface OnClickListener{
+        void onClick(int position);
+    }
+
+    //Pass in the models and an onClickListener:
+    public ChooseBuddyAdapter(Context context, List<ParseUser> buddiesToShow, List<Double> distancesList, OnClickListener clickListener){
         this.context = context;
         this.buddiesToShow = buddiesToShow;
         this.distancesList = distancesList;
+        this.clickListener = clickListener;
     }
 
     @NonNull
     @Override
     public ChooseBuddyAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Log.d("ChooseBuddyAdapter", "onCreateViewHolder");
-        View buddyView = LayoutInflater.from(context).inflate(R.layout.item_potential_buddy, parent, false);
+        View buddyView = LayoutInflater.from(context).inflate(R.layout.item_choose_buddy, parent, false);
         return new ViewHolder(buddyView);
     }
 
@@ -69,6 +79,7 @@ public class ChooseBuddyAdapter extends RecyclerView.Adapter<ChooseBuddyAdapter.
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         //All Views in item_potential_buddy layout
+        RelativeLayout rlContainer;
         ImageView ivProfilePic;
         TextView tvName;
         TextView tvDistance;
@@ -76,6 +87,7 @@ public class ChooseBuddyAdapter extends RecyclerView.Adapter<ChooseBuddyAdapter.
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            rlContainer = (RelativeLayout) itemView.findViewById(R.id.rlContainer);
             ivProfilePic = (ImageView) itemView.findViewById(R.id.ivOtherProfile);
             tvName = (TextView) itemView.findViewById(R.id.tvOtherName);
             tvDistance = (TextView) itemView.findViewById(R.id.tvDistance);
@@ -85,11 +97,20 @@ public class ChooseBuddyAdapter extends RecyclerView.Adapter<ChooseBuddyAdapter.
         //Do all binding to a specific buddy here:
         public void bind(ParseUser user, double distanceBetween){
             Log.d(TAG, "in bind()");
+
+            //Listen to the recyclerView, when its clicked on --> invoke the onClick() given to us in constructor
+            rlContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    clickListener.onClick(getAdapterPosition());
+                }
+            });
             try {
                 user.fetchIfNeeded();
 
-                if(user.getParseFile(User.KEY_PROFILEPICTURE) != null) {
-                    Glide.with(context).load(user.getParseFile(User.KEY_PROFILEPICTURE)).into(ivProfilePic);
+                ParseFile imageFile = user.getParseFile(User.KEY_PROFILEPICTURE);
+                if( imageFile != null) {
+                    Glide.with(context).load(imageFile.getFile()).into(ivProfilePic);
                 }
                 String fName = user.getString(User.KEY_FIRSTNAME);
 
@@ -98,7 +119,7 @@ public class ChooseBuddyAdapter extends RecyclerView.Adapter<ChooseBuddyAdapter.
                 tvName.setText(fName);
                 ratingBar.setRating(rating);
 
-                tvDistance.setText(Double.toString(distanceBetween));
+                tvDistance.setText(Double.toString(distanceBetween) + " m");
             } catch (ParseException e) {
                 e.printStackTrace();
             }

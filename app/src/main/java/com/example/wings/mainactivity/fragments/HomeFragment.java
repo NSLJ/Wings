@@ -59,6 +59,7 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
 
     private MAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
     private ExtendedFloatingActionButton fabChooseBuddy;
+    private ExtendedFloatingActionButton fabCancelBuddy;
 
     Location currentLocation;
     private WingsMap wingsMap;
@@ -215,6 +216,7 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
         btnSearch = view.findViewById(R.id.btnSearch);
         etSearchBar = view.findViewById(R.id.etSearchBar);
         fabChooseBuddy = (ExtendedFloatingActionButton) view.findViewById(R.id.fabChooseBuddy);
+        fabCancelBuddy = view.findViewById(R.id.fabCancelBuddy);
 
         //1.) Check if the user currently needs a buddy --> check their isBuddy field --> if is a buddy do they hasBuddy?
         if(currUser.getBoolean(User.KEY_ISBUDDY)) {   //if they are a buddy
@@ -226,8 +228,10 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
                 if (!buddyInstance.getHasBuddy()) {      //if they don't have a buddy but they want one, we need to show th button
                     Log.d(TAG, "onViewCreated(): This buddy is still looking for a buddy!");
                     fabChooseBuddy.setVisibility(View.VISIBLE);
+                    fabCancelBuddy.setVisibility(View.VISIBLE);
                 } else {
                     fabChooseBuddy.setVisibility(View.INVISIBLE);
+                    fabCancelBuddy.setVisibility(View.INVISIBLE);
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -235,6 +239,7 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
         }
         else {
             fabChooseBuddy.setVisibility(View.INVISIBLE);     //automatically invisible until the user wants to be a Buddy
+            fabCancelBuddy.setVisibility(View.INVISIBLE);
         }
 
 
@@ -247,7 +252,27 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
             }
         });
 
-        //2b.) btnSearch --> search for and route to a location
+        //2b.) fabCancelBuddy --> get rid of all Buddy stuff
+        fabCancelBuddy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Make all buttons stuff invisible again:
+                fabCancelBuddy.setVisibility(View.INVISIBLE);
+                fabChooseBuddy.setVisibility(View.INVISIBLE);
+                listener.setBuddyRequestBttn(false);
+
+                //Make Buddy field in user null again:
+                currUser.put(User.KEY_BUDDY, new Buddy());      //im sure there's a better way to erase it but not enough time rn
+
+                //set isBuddy field = false again
+                currUser.put(User.KEY_ISBUDDY, false);
+
+
+            }
+        });
+
+
+        //2c.) btnSearch --> search for and route to a location
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

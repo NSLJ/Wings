@@ -41,6 +41,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -323,16 +324,17 @@ public class WingsMap {
         lineOptions.color(Color.BLUE);
         lineOptions.geodesic(true);
 
-        setMarker(destination);
+        setMarker(destination, BitmapDescriptorFactory.HUE_RED);
         routeDrawn = true;
         polylineDrawn = map.addPolyline(lineOptions);
 
     }
 
-    private void setMarker(LatLng destination){
+    public void setMarker(LatLng destination, float color){
         Log.d(TAG, "setMaker()");
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(destination);
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(color));
         map.addMarker(markerOptions);
        // map.animateCamera(CameraUpdateFactory.newLatLng(destination));
       //  map.animateCamera(CameraUpdateFactory.zoomTo(9));

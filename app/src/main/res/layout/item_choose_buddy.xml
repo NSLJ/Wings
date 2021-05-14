@@ -2,18 +2,20 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rlContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/gray_background">
+    android:background="@color/gray_background"
+    android:clickable="false">
 
     <ImageView
         android:id="@+id/ivOtherProfile"
         android:layout_width="99dp"
-        android:layout_height="113dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
+        android:layout_height="120dp"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentTop="false"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         tools:srcCompat="@tools:sample/avatars" />
 
@@ -29,7 +31,7 @@
         android:fontFamily="@font/lato"
         android:text="Annie"
         android:textColor="#B5B5B5"
-        android:textSize="25sp" />
+        android:textSize="23sp" />
 
     <RatingBar
         android:id="@+id/rbOtherRatings"
@@ -38,9 +40,9 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/tvOtherName"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="18dp"
-        android:layout_toEndOf="@+id/tvOtherName"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="17dp"
+        android:layout_marginEnd="14dp"
         android:isIndicator="true"
         android:numStars="5"
         android:progressTint="@color/logo_teal"
@@ -57,5 +59,5 @@
         android:fontFamily="@font/lato"
         android:text="0.3 miles away"
         android:textColor="#B5B5B5"
-        android:textSize="20sp" />
+        android:textSize="17sp" />
 </RelativeLayout>

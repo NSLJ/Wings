@@ -32,19 +32,24 @@ import com.example.wings.commonFragments.EditTrustedContactsFragment;
 import com.example.wings.commonFragments.HelpFragment;
 import com.example.wings.mainactivity.fragments.HomeFragment;
 import com.example.wings.mainactivity.fragments.OtherProfileFragment;
+import com.example.wings.mainactivity.fragments.PotentialBuddyFragment;
 import com.example.wings.mainactivity.fragments.ProfileSetupFragment;
 import com.example.wings.mainactivity.fragments.SearchUserFragment;
 import com.example.wings.commonFragments.SettingsFragment;
 import com.example.wings.mainactivity.fragments.UserBuddyRequestsFragment;
 import com.example.wings.mainactivity.fragments.UserProfileFragment;
 import com.example.wings.models.Buddy;
+import com.example.wings.models.ParcelUser;
 import com.example.wings.models.User;
 import com.example.wings.models.WingsGeoPoint;
 import com.example.wings.startactivity.StartActivity;
+import com.example.wings.startactivity.fragments.RegisterTwoFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+
+import org.parceler.Parcels;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -57,6 +62,7 @@ import java.util.concurrent.TimeUnit;
 public class MainActivity extends AppCompatActivity implements MAFragmentsListener{
     private static final String TAG = "MainActivity";
     public static final String KEY_PROFILESETUPFRAG = "ProfileSetupFrag?";          //to get whether or not the current user's profile is set up from the StartActivity
+    public static final String KEY_USERID = "potentialBuddyId";
 
     //UpdateLocationWorker keys:
     private static final int REQUEST_CODE_LOCATION_PERMISSION = 1;              //request code for permissions result
@@ -428,5 +434,15 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     @Override
     public void toUserBuddyRequestFragment() {
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new UserBuddyRequestsFragment()).commit();
+    }
+
+    @Override
+    public void toPotentialBuddyFragment(String userId) {
+        Bundle bundle = new Bundle();;
+        bundle.putString(KEY_USERID, userId);
+        Fragment frag = new PotentialBuddyFragment();
+        frag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
+
     }
 }
