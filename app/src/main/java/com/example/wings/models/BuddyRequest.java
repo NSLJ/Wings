@@ -2,41 +2,49 @@ package com.example.wings.models;
 
 import com.parse.Parse;
 import com.parse.ParseClassName;
+import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
-
+//lJoWkyVJ55
 @ParseClassName("BuddyRequest")
 public class BuddyRequest extends ParseObject {
-
-    public static final String KEY_OBJECTID = "objectId";
-    public static final String KEY_SENDER = "sender";
     public static final String KEY_RECEIVER = "receiver";
-    public static final String KEY_TARGETDEST = "targetDestination";
+    public static final String KEY_SENDER = "sender";
     public static final String KEY_ISCONFIRMED = "isConfirmed";
-    public static final String KEY_MEETINGMETHOD = "meetingMethod";
 
     public BuddyRequest() {}
 
-    public ParseUser getSender(){
-        return getParseUser(KEY_SENDER);
-    }
-    public void setSender(ParseUser user){
-        put(KEY_SENDER, user);
-    }
-
-    public ParseUser getReceiver(){
-        return getParseUser(KEY_RECEIVER);
-    }
-    public void setReceiver(ParseUser user){
-        put(KEY_RECEIVER, user);
+    public BuddyRequest(Buddy sender, Buddy receiver){
+        setSender(sender);
+        setReceiver(receiver);
+        setIsConfirmed(false);
     }
 
-    public ParseGeoPoint getTargetDestination(){
-        return getParseGeoPoint(KEY_TARGETDEST);
+    public Buddy getSender(){
+        Buddy buddy = (Buddy) getParseObject(KEY_SENDER);
+        try {
+            buddy.fetchIfNeeded();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return buddy;
     }
-    public void setTargetDestination(ParseGeoPoint dest){
-        put(KEY_TARGETDEST, dest);
+    public void setSender(Buddy buddy){
+        put(KEY_SENDER, buddy);
+    }
+
+    public Buddy getReceiver(){
+        Buddy buddy = (Buddy) getParseObject(KEY_RECEIVER);
+        try {
+            buddy.fetchIfNeeded();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return buddy;
+    }
+    public void setReceiver(Buddy buddy){
+        put(KEY_RECEIVER, buddy);
     }
 
     public Boolean getIsConfirmed(){
@@ -46,14 +54,5 @@ public class BuddyRequest extends ParseObject {
         put(KEY_ISCONFIRMED, confirm);
     }
 
-    public String getMeetingMethod(){
-        return getString(KEY_MEETINGMETHOD);
-    }
-    public void setMeetingMethod(String method){
-        put(KEY_MEETINGMETHOD, method);
-    }
 
-    public String getObjectID() {
-        return getString(KEY_OBJECTID);
-    }
 }

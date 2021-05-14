@@ -41,6 +41,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -155,15 +156,17 @@ public class WingsMap {
         route(currentLocation, destination);
     }
 
-    //Purpose:          Finds and chooses the first Address found from the given destination text. Routes from currentLocation
-    public void routeFromCurrentLocation(String destinationTxt){
+    //Purpose:          Finds and chooses the first Address found from the given destination text. Routes from currentLocation, return the destination so HomeFragment can use it!
+    public LatLng routeFromCurrentLocation(String destinationTxt){
         //Get possible addresses and choose the first one for now:
+        LatLng foundDestination = null;
+
         List<Address> possibleAddresses = getPossibleAddresses(destinationTxt);
         if(possibleAddresses == null){
             Toast.makeText(context, "No addresses exist!", Toast.LENGTH_SHORT).show();
         }
         else {
-            LatLng foundDestination = new LatLng(possibleAddresses.get(0).getLatitude(), possibleAddresses.get(0).getLongitude());
+            foundDestination = new LatLng(possibleAddresses.get(0).getLatitude(), possibleAddresses.get(0).getLongitude());
 
             //Because this is a new destination for the user --> save it into parse, and the text of destination to display in later fragments
             setUserQueriedDestination(foundDestination);
@@ -172,6 +175,7 @@ public class WingsMap {
             //2.) Find all routes from current location to destination, choose first route to draw
             routeFromCurrentLocation(foundDestination);
         }
+        return foundDestination;
     }
 
     //Purpose:      To use Geocoder to get the List<Address> that correlate to the given destination string
@@ -320,16 +324,17 @@ public class WingsMap {
         lineOptions.color(Color.BLUE);
         lineOptions.geodesic(true);
 
-        setMarker(destination);
+        setMarker(destination, BitmapDescriptorFactory.HUE_RED);
         routeDrawn = true;
         polylineDrawn = map.addPolyline(lineOptions);
 
     }
 
-    private void setMarker(LatLng destination){
+    public void setMarker(LatLng destination, float color){
         Log.d(TAG, "setMaker()");
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(destination);
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(color));
         map.addMarker(markerOptions);
        // map.animateCamera(CameraUpdateFactory.newLatLng(destination));
       //  map.animateCamera(CameraUpdateFactory.zoomTo(9));

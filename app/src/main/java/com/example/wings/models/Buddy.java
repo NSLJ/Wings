@@ -43,7 +43,7 @@ public class Buddy extends ParseObject {
         setReceivedRequests(receivedRequests);
 
         List<BuddyRequest> sentRequests = new ArrayList<>();
-        setReceivedRequests(sentRequests);
+        setSentRequests(sentRequests);
 
         setHasBuddy(false);
     }
