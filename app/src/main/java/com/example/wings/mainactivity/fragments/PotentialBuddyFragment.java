@@ -19,6 +19,7 @@ import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.mainactivity.fragments.dialogs.ConfirmBuddyRequestDialog;
 import com.example.wings.mainactivity.fragments.dialogs.ConfirmDestinationDialog;
 import com.example.wings.models.Buddy;
+import com.example.wings.models.BuddyRequest;
 import com.example.wings.models.User;
 import com.example.wings.models.WingsGeoPoint;
 import com.google.android.gms.maps.GoogleMap;
@@ -58,13 +59,49 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmBuddyRequ
 
     //Methods to override from ConfirmBuddyRequestDialog resultlistener:
     @Override
-    public void onAccept() {
+    //Purpose:      Create a BuddyRequest where current user is the sender, other user is the receiver, go back to ChooseBuddyFragment, increment the BuddyRequest in UserBuddyRequestsFragment
+    public void onAccept(Buddy potentialBuddy) {
+        Log.d(TAG, "onAccept()");
         Toast.makeText(getContext(), "accept button pressed", Toast.LENGTH_SHORT).show();
+
+        //TODO: Should technically check if we've already sent a request to this Buddy
+        //1.) Get current user's buddy instance:
+        ParseUser user = ParseUser.getCurrentUser();
+        Buddy buddyInstance = (Buddy) user.getParseObject(User.KEY_BUDDY);
+        try {
+            buddyInstance.fetchIfNeeded();
+
+            //2.) Create and save BuddyRequest:
+            BuddyRequest request = new BuddyRequest(buddyInstance, potentialBuddy);
+            request.saveInBackground();
+
+            //3.) Get buddyInstance's list of sentBuddyRequests:
+            List<BuddyRequest> sentRequests = buddyInstance.getSentRequests();
+            sentRequests.add(request);
+            buddyInstance.setSentRequests(sentRequests);
+            buddyInstance.saveInBackground();
+
+            //4.) Save the receivedRequest in the potentialBuddy now --> later this is how its received:
+            List<BuddyRequest> othersReceivedRequests = potentialBuddy.getReceivedRequests();
+            othersReceivedRequests.add(request);
+            potentialBuddy.setReceivedRequests(othersReceivedRequests);
+            potentialBuddy.saveInBackground();
+
+
+            //5.) Go back to ChooseBuddyFrag
+            listener.toChooseBuddyFragment();
+        } catch (ParseException e) {
+            Log.d(TAG, "onAccept: error getting buddy request I think, error=" + e.getMessage());
+            e.printStackTrace();
+        }
+
     }
 
     @Override
+    //Purpose:      Just go back to the ChooseBuddyFragment
     public void onReject() {
         Toast.makeText(getContext(), "reject button pressed", Toast.LENGTH_SHORT).show();
+        listener.toChooseBuddyFragment();
     }
 
 

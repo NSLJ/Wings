@@ -7,6 +7,16 @@
     android:orientation="vertical"
     tools:context=".mainactivity.fragments.ChooseBuddyFragment">
 
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/satisfy"
+        android:text="Potential Buddies"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="35sp" />
+
     <Button
         android:id="@+id/btnBack"
         android:layout_width="match_parent"

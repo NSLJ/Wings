@@ -55,7 +55,7 @@ public class ConfirmBuddyRequestDialog extends DialogFragment {
 
     //Purpose:      so the PotentialBuddyFragment will be able to handle info from the Dialog!
     public interface ResultListener{
-        public void onAccept();
+        public void onAccept(Buddy buddy);
         public void onReject();
     }
 
@@ -180,7 +180,13 @@ public class ConfirmBuddyRequestDialog extends DialogFragment {
                     @Override
                     public void onClick(View v) {
                         Log.d(TAG, "bttnAccept - onClick():");
-                        listener.onAccept();
+                        Buddy buddyInstance = (Buddy) potentialBuddy.getParseObject(User.KEY_BUDDY);
+                        try {
+                            buddyInstance.fetchIfNeeded();
+                            listener.onAccept(buddyInstance);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                         getDialog().dismiss();
                     }
                 });

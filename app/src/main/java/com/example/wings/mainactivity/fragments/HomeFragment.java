@@ -266,8 +266,10 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
 
                 //set isBuddy field = false again
                 currUser.put(User.KEY_ISBUDDY, false);
+                currUser.saveInBackground();
 
-
+                //reset map:
+                wingsMap.removeRoute();     //sets the map back to normal
             }
         });
 
