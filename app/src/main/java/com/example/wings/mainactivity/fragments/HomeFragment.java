@@ -92,12 +92,23 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
                     Log.d(TAG, "onAccept(): no Error saving Buddy!");
                 }
                 else{
-                    Log.d(TAG, "onAccept(): no Error saving Buddy!");
+                    Log.d(TAG, "onAccept(): Error saving Buddy!");
                 }
             }
         });
         currUser.put(User.KEY_ISBUDDY, true);       //update isBuddy = true and link the buddy object!
         currUser.put(User.KEY_BUDDY, buddy);
+        currUser.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Log.d(TAG, "onAccept() the dialog box: succesfully saved user's isBuddy and Buddy!");
+                }
+                else{
+                    Log.d(TAG, "onAccept() the dialog box: succesfully saved user's isBuddy and Buddy!");
+                }
+            }
+        });
 
         //2.) Show the BuddyRequest FloatingActionButton in MainActivity, and the fabChooseBuddy button on HomeFrag!
         fabChooseBuddy.setVisibility(View.VISIBLE);         //navigates to ChooseBuddyFrag from HomeFrag
@@ -108,7 +119,7 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
     }
 
     @Override
-    //Clear the destination
+    //Clear the destination + destinationStr
     public void onReject() {
         Log.d(TAG, "confirmationDialogBox onReject(): erasing the queriedDestination");
         WingsGeoPoint currDestination = (WingsGeoPoint) currUser.getParseObject(User.KEY_QUERIEDDESTINATION);
@@ -116,7 +127,34 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
         currDestination.setLongitude(0);
         currDestination.setLocation(0,0);
         currUser.put(User.KEY_QUERIEDDESTINATION, currDestination);
+        currUser.put(User.KEY_DESTINATIONSTR, "default");
         currDestination.saveInBackground();
+
+
+        //1.) if isBuddy --> route back to intendedDestination
+        boolean isBuddy = currUser.getBoolean(User.KEY_ISBUDDY);
+        if(isBuddy){
+            //1a.) Get the Buddy object --> get the intendedDestination
+            Buddy currBuddy = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
+            try {
+                currBuddy.fetchIfNeeded();
+
+                //2.) Obtain the intendedDestination:
+                WingsGeoPoint intendedDestination = currBuddy.getDestination();
+                intendedDestination.fetchIfNeeded();
+
+                //3.) Save "destination" field to intendedDestination + route to it
+                destination = new LatLng(intendedDestination.getLatitude(), intendedDestination.getLongitude());
+                wingsMap.routeFromCurrentLocation(destination);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //if not a Buddy --> go back to complete normal w/ no route:
+        else{
+            wingsMap.removeRoute();     //sets the map back to normal
+        }
     }
 
     public HomeFragment() {}    // Required empty public constructor
@@ -237,49 +275,65 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
     //Purpose:          Initializes our "map" field, starts continuously checking for location updates
     protected void loadMap(GoogleMap map) {
         Log.d(TAG, "in loadMap():");
-
         wingsMap = new WingsMap(map, getContext(), getViewLifecycleOwner());   //automatically constantly shows current location
 
-        //Check if there is a stored queriedDestination to map to:
-        ParseUser currUser = ParseUser.getCurrentUser();
-        WingsGeoPoint initalDestination = (WingsGeoPoint) currUser.getParseObject(User.KEY_QUERIEDDESTINATION);
+        //Check who we are: should we check queriedDestination or intendedDestination?
+        //1.) Are we a Buddy? --> map the intendedDestination
+        boolean isBuddy = currUser.getBoolean(User.KEY_ISBUDDY);
+        if(isBuddy){
+            //Map the intendedDestination:
 
-        //If the user's "queriedDestination" field is not yet declared:
-        /*if (initalDestination == null) {
-            initalDestination = new WingsGeoPoint(currUser, 0, 0);
-            currUser.put(User.KEY_QUERIEDDESTINATION, initalDestination);
-            currUser.saveInBackground();
-        }*/
-        try {
-            //Actually fetch the data:
-            initalDestination.fetchIfNeeded();
-            Log.d(TAG, "loadMap(): initialDestination.latitide = " + initalDestination.getLatitude());
+            //1) Obtain the Buddy object:
+                Buddy currBuddy = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
+                try {
+                    currBuddy.fetchIfNeeded();
 
-            //Check if there is already a destination we should be routing to + asking for destination confirmation  with Dialog
-            if (initalDestination.getLatitude() != 0) {
-                Log.d(TAG, "loadMap(): an inital destination exists! Routing to it...");
-                destination = new LatLng(initalDestination.getLatitude(), initalDestination.getLongitude());
-                wingsMap.routeFromCurrentLocation(destination);
+                    //2.) Obtain the intendedDestination:
+                    WingsGeoPoint intendedDestination = currBuddy.getDestination();
+                    intendedDestination.fetchIfNeeded();
 
-
-                //if we are already a buddy --> no need to display a Dialog
-                //else we are not a buddy, yet we are querying a location --> show dialog to ask if they want to confirm being a buddy:
-                boolean isBuddy = currUser.getBoolean(User.KEY_ISBUDDY);
-                if(!isBuddy){
-                    //See if there is a destinationString we can display in the Display, if not, just use the LatLng
-                    String checkDestinationStr = currUser.getString(User.KEY_DESTINATIONSTR);
-                    Log.d(TAG, "loadMap(): checkDestinationStr=" +checkDestinationStr);
-                    if(!checkDestinationStr.equals("default")){
-                        makeConfirmDestinationDialog(checkDestinationStr);
-                    }
-                    else{
-                        makeConfirmDestinationDialog(Double.toString(initalDestination.getLatitude()) + ", " + Double.toString(initalDestination.getLongitude()));
-                    }
+                    //3.) Save "destination" field to intendedDestination + route to it
+                    destination = new LatLng(intendedDestination.getLatitude(), intendedDestination.getLongitude());
+                    wingsMap.routeFromCurrentLocation(destination);
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
-            }
 
-        } catch (ParseException e) {
-            e.printStackTrace();
+        }
+        //2.) Else we are just a normal User --> map the queriedDestination if applicable!
+        else{
+            //Map the queriedDestination:
+
+            //1.) Obtain the queriedDestination
+                WingsGeoPoint queriedDestination = (WingsGeoPoint) currUser.getParseObject(User.KEY_QUERIEDDESTINATION);
+                try {
+                    queriedDestination.fetchIfNeeded();
+
+                    //2.) Check if we even have a queriedDestination (e.g. is NOT at default value (0,0)):
+                    if(queriedDestination.getLatitude() != 0 && queriedDestination.getLongitude() != 0){
+                        //2a.) if its filled --> save the "destination" field to queriedDestination + route to it + display Dialog to ask if they want to confirm that destination:
+                        //1.) destination = ...
+                            destination = new LatLng(queriedDestination.getLatitude(), queriedDestination.getLongitude());
+
+                        //2.) route....
+                            wingsMap.routeFromCurrentLocation(destination);
+
+                        //3.) What kind of Dialog? With the destinationText or not?
+                            String destinationTxt = currUser.getString(User.KEY_DESTINATIONSTR);
+
+                        //3a.) if destinationTxt is still default value (= "default") --> just display the destination field (LatLng)
+                            if(destinationTxt.equals("default")){
+                                makeConfirmDestinationDialog(destination.latitude + ", " + destination.longitude);
+                            }
+                        //3b.) else --> show the destinationTxt
+                            else{
+                                makeConfirmDestinationDialog(destinationTxt);
+                            }
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            //2b.) else --> its not filled, do nothin
         }
     }
 
@@ -293,7 +347,7 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
             Toast.makeText(getContext(), "You didn't enter anything!", Toast.LENGTH_SHORT).show();
         }
         else {
-            wingsMap.routeFromCurrentLocation(destinationTxt);
+            destination = wingsMap.routeFromCurrentLocation(destinationTxt);
         }
     }
 

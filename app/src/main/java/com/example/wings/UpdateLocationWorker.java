@@ -70,7 +70,7 @@ public class UpdateLocationWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Log.i(TAG, "in doWork(): Sending data to Server started!");
+       // Log.i(TAG, "in doWork(): Sending data to Server started!");
 /*
         Data data = getInputData();
         int counter = data.getInt(KEY, 0);
@@ -90,7 +90,7 @@ public class UpdateLocationWorker extends Worker {
         //1.) Get the counter passed in
         Data data = getInputData();
         int counter = data.getInt(KEY_GETCOUNTER, 0);
-        Log.d(TAG, "in doWork(): counter received = " + counter);
+      //  Log.d(TAG, "in doWork(): counter received = " + counter);
 
 
         //  getCurrentLocation();               //will update the "result" field
@@ -98,7 +98,7 @@ public class UpdateLocationWorker extends Worker {
         doTask();
 
         try {
-            Log.d(TAG, "doWork() is waiting for doTask()");
+         //   Log.d(TAG, "doWork() is waiting for doTask()");
             latch.await();
         } catch (InterruptedException e) {
             Log.e(TAG, "doWork encountered error while trying latch.await(): e=" + e.getLocalizedMessage());
@@ -114,7 +114,7 @@ public class UpdateLocationWorker extends Worker {
         counter++;
         result += "\n Output #" + counter;
 
-        Log.d(TAG, "in doWork(): After doTask() result= " + result);
+       // Log.d(TAG, "in doWork(): After doTask() result= " + result);
         //set output:
         Data output = new Data.Builder()
                 .putString(KEY_RESULTSTRING, result)
@@ -167,7 +167,7 @@ public class UpdateLocationWorker extends Worker {
 
 
     public void doTask() {
-        Log.d(TAG, "in doTask()");
+       // Log.d(TAG, "in doTask()");
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "permission check failed!");
             return;
@@ -180,14 +180,14 @@ public class UpdateLocationWorker extends Worker {
                 if (currLocation != null) {
                     double latitude = currLocation.getLatitude();
                     double longitude = currLocation.getLongitude();
-                    Log.d(TAG, "doTask(): latitude = " + latitude + "  longitude = " + longitude);
-                    Log.d(TAG, "doTask(): calling updateUserLocation now...");
+                 //   Log.d(TAG, "doTask(): latitude = " + latitude + "  longitude = " + longitude);
+                  ////  Log.d(TAG, "doTask(): calling updateUserLocation now...");
                     updateUserLocation(latitude, longitude);
 
                     //This section will not execute until waitForParse counts down (counts down when updateUserLocation is done)
                     try {
                         waitForParse.await();
-                        Log.d(TAG, "doTask() is waiting until updateUserLocation() is done...");
+                    //    Log.d(TAG, "doTask() is waiting until updateUserLocation() is done...");
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -203,7 +203,7 @@ public class UpdateLocationWorker extends Worker {
 
     //-----------All location stuff:
     public void getCurrentLocation() {
-        Log.d(TAG, "in getCurrentLocation()");
+   //     Log.d(TAG, "in getCurrentLocation()");
         LocationRequest locationRequest = new LocationRequest();
 
         //1.) Fill the request --> set high accuracy location, set update and fastest interval (from class constants)
@@ -235,7 +235,7 @@ public class UpdateLocationWorker extends Worker {
     }
 
     public void setResultMessage(String newMessage){
-        Log.d(TAG, "in setResultMessage(): newMessage = " + newMessage);
+        //Log.d(TAG, "in setResultMessage(): newMessage = " + newMessage);
         result = newMessage;
         latch.countDown();
     }
@@ -252,7 +252,7 @@ public class UpdateLocationWorker extends Worker {
         //Get the user's WingsGeoPoint and update it:
         ParseUser currentUser = ParseUser.getCurrentUser();
         if(currentUser != null){
-            Log.d(TAG, "updateUserLocation(): currentUser = " + currentUser.getString(User.KEY_FIRSTNAME));
+          //  Log.d(TAG, "updateUserLocation(): currentUser = " + currentUser.getString(User.KEY_FIRSTNAME));
             WingsGeoPoint initialLocation = (WingsGeoPoint) currentUser.getParseObject(User.KEY_CURRENTLOCATION);
 
             try {
@@ -260,13 +260,13 @@ public class UpdateLocationWorker extends Worker {
 
                 //if its still the default value of (0,0):
                 if(initialLocation.getLatitude() == 0 && initialLocation.getLongitude() == 0){
-                    Log.d(TAG, "updateUserLocation(): currLocation == null");
+                 //   Log.d(TAG, "updateUserLocation(): currLocation == null");
                     WingsGeoPoint currLocation = new WingsGeoPoint(currentUser, latitude, longitude);
                     currentUser.put(User.KEY_CURRENTLOCATION, currLocation);
                     currentUser.saveInBackground();
                 }
                 else {  //otherwise don't instantiate a new object and just update!
-                    Log.d(TAG, "updateUserLocation(): currLocation is NOT null");
+                 //   Log.d(TAG, "updateUserLocation(): currLocation is NOT null");
                     initialLocation.put(WingsGeoPoint.KEY_LOCATION, new ParseGeoPoint(latitude, longitude));
                     initialLocation.put(WingsGeoPoint.KEY_LATITUDE, latitude);
                     initialLocation.put(WingsGeoPoint.KEY_LONGITUDE, longitude);

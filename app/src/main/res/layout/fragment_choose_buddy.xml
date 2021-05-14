@@ -5,16 +5,10 @@
     android:layout_height="match_parent"
     tools:context=".mainactivity.fragments.ChooseBuddyFragment">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="This is the Choose Buddy Fragment! It's not implemented yet, but the adapter and adapter layout is set up already!" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvBuddies"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent">
 
     </androidx.recyclerview.widget.RecyclerView>
 
