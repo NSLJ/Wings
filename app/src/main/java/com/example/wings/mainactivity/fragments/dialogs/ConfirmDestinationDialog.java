@@ -1,6 +1,10 @@
 package com.example.wings.mainactivity.fragments.dialogs;
 
+import android.app.ActionBar;
+import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -25,6 +30,7 @@ public class ConfirmDestinationDialog extends DialogFragment {
     private ImageButton ibttnAccept;
     private ImageButton ibttnReject;
     private TextView tvDestination;
+    private Button btnConfirmDestination;
 
     private ResultListener listener;
 
@@ -58,7 +64,8 @@ public class ConfirmDestinationDialog extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Window window = getDialog().getWindow();
+       /* Window window = getDialog().getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 140);
 
         // set "origin" to top left corner, so to speak
         window.setGravity(Gravity.TOP| Gravity.LEFT);
@@ -68,8 +75,31 @@ public class ConfirmDestinationDialog extends DialogFragment {
         params.x = 110;
         params.y = 1190;
         window.setAttributes(params);
+*/
+        //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        /*getDialog().getWindow()
+                .setLayout(
+                        ViewGroup.LayoutParams.FILL_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                );*/
+        Dialog dialog = getDialog();
+        dialog.getWindow().setGravity(Gravity.TOP| Gravity.LEFT);
+        WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+        params.x = 110;
+        params.y = 1190;
+        dialog.getWindow().setAttributes(params);
+        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+// layout to display
+        dialog.setContentView(R.layout.fragment_confirm_destination_dialog);
 
-        return inflater.inflate(R.layout.fragment_confirm_destination_dialog, container, false);
+// set color transpartent
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
+
+        View view = inflater.inflate(R.layout.fragment_confirm_destination_dialog, container, false);
+        return view;
+
     }
 
     @Override
@@ -78,6 +108,16 @@ public class ConfirmDestinationDialog extends DialogFragment {
         String destination = getArguments().getString(KEY_DESTINATION, "defaultVal");
         tvDestination = (TextView) view.findViewById(R.id.tvDestination);
         tvDestination.setText("Destination: " + destination);
+       /* btnConfirmDestination = view.findViewById(R.id.btnConfirmDestination);
+
+        btnConfirmDestination.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "ibttnAccept - onClick():");
+                listener.onAccept();
+                getDialog().dismiss();
+            }
+        });*/
 
         // Get field from view
         ibttnAccept = (ImageButton) view.findViewById(R.id.ibttnAccept);

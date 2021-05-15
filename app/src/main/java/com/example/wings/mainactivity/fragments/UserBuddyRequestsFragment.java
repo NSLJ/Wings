@@ -116,7 +116,7 @@ public class UserBuddyRequestsFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 //just go to homeFragment bc why not:
-                listener.toHomeFragment();
+                listener.toHomeFragment(HomeFragment.KEY_BASIC);
             }
         });
         peopleSentTo = new ArrayList<>();

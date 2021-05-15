@@ -53,12 +53,14 @@ public class UpdateLocationWorker extends Worker {
             }
         }
     };
+
     double longitude, latitude;
     String result;
     CountDownLatch latch = new CountDownLatch(1);               //to for all tasks to finish
     CountDownLatch waitForParse = new CountDownLatch(1);        // used for getCurrentLocation to wait for updateCur
     FusedLocationProviderClient flpClient;
     Context context;
+
 
     public UpdateLocationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -71,27 +73,12 @@ public class UpdateLocationWorker extends Worker {
     @Override
     public Result doWork() {
        // Log.i(TAG, "in doWork(): Sending data to Server started!");
-/*
-        Data data = getInputData();
-        int counter = data.getInt(KEY, 0);
-        counter++;
-        String message = "counter = " + counter;
-        makeStatusNotification(message, getApplicationContext());
-
-        //set output:
-        Data output = new Data.Builder()
-                .putString(OUTPUT_KEY, message)
-                .putInt(COUNTER, counter)
-                .build();
-        return Result.success(output);*/
-
         result = "";
 
         //1.) Get the counter passed in
         Data data = getInputData();
         int counter = data.getInt(KEY_GETCOUNTER, 0);
       //  Log.d(TAG, "in doWork(): counter received = " + counter);
-
 
         //  getCurrentLocation();               //will update the "result" field
         //2.) Get the current location using the flpClient:

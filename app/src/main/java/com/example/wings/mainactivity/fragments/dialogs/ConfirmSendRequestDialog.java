@@ -1,6 +1,9 @@
 package com.example.wings.mainactivity.fragments.dialogs;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -8,9 +11,12 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -86,12 +92,27 @@ public class ConfirmSendRequestDialog extends DialogFragment {
             potentialBuddyId = getArguments().getString(KEY_USERID, "defaultVal");
             Log.d(TAG, "onCreate():  potentialBuddyId =" + potentialBuddyId);
         }
+       // this.setCanceledOnTouchOutside(false);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Dialog dialog = getDialog();
+        dialog.getWindow().setGravity(Gravity.TOP| Gravity.LEFT);
+        WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+        params.x = 110;
+        params.y = 1190;
+        dialog.getWindow().setAttributes(params);
+        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+// layout to display
+        dialog.setContentView(R.layout.fragment_confirm_send_request_dialog);
+
+// set color transpartent
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
         return inflater.inflate(R.layout.fragment_confirm_send_request_dialog, container, false);
     }
 

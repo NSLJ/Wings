@@ -2,7 +2,6 @@ package com.example.wings.mainactivity.fragments;
 
 import android.content.Context;
 import android.location.Address;
-import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,20 +16,22 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.wings.mainactivity.fragments.dialogs.ConfirmBuddyDialog;
 import com.example.wings.mainactivity.fragments.dialogs.ConfirmDestinationDialog;
 import com.example.wings.R;
 import com.example.wings.WingsMap;
 import com.example.wings.mainactivity.MAFragmentsListener;
+import com.example.wings.mainactivity.fragments.dialogs.ConfirmSafeArrivalDialog;
 import com.example.wings.models.Buddy;
+import com.example.wings.models.BuddyMeetUp;
+import com.example.wings.models.BuddyTrip;
 import com.example.wings.models.User;
 import com.example.wings.models.WingsGeoPoint;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -50,115 +51,40 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
  * implementing this better!
  *
  */
-//TODO: Make Titles for this fragment bc looking at a ton of maps really gets confusing for screen to screen, only when is buddy obviously
-public class HomeFragment extends Fragment implements ConfirmDestinationDialog.ResultListener {
+
+public class HomeFragment extends Fragment implements ConfirmDestinationDialog.ResultListener, ConfirmSafeArrivalDialog.ResultListener, ConfirmBuddyDialog.ResultListener{
     private static final String TAG = "HomeFragment";
-    private static final long UPDATE_INTERVAL = 5000;
-    private static final long FASTEST_INTERVAL = 3000;
+    private static final String KEY_MODE = "whatMode?";
+    public static final String KEY_BASIC = "basicMode";         //not on a trip
+    public static final String KEY_ONTRIP = "tripMode";
+
 
     ParseUser currUser = ParseUser.getCurrentUser();
+
+    private String mode;
 
     private MAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
     private ExtendedFloatingActionButton fabChooseBuddy;
     private ExtendedFloatingActionButton fabCancelBuddy;
 
-    Location currentLocation;
     private WingsMap wingsMap;
-
     private SupportMapFragment mapFragment;
 
     //Routing stuff:
-    private LatLng startLocation;
     private LatLng destination;
 
     ArrayList<LatLng> markerPoints;
-    MarkerOptions startMarker;
-    MarkerOptions endMarker;
 
-    List<LatLng> mapCoordinates;            //after we get the route, stores all intermediate coordinates (LatLngs) needed to get from startLocation to destination (froom decoding the polyline)
-    //layout views:
     Button btnSearch;
     EditText etSearchBar;
     TextView tvTitle;
 
-
-    @Override
-    //Purpose:      on confirmation --> current user accepts to be a buddy --> set User's isBuddy field to true, and instantiate being a Buddy
-    public void onAccept() {
-        Log.d(TAG, "confirmationDialogBox onAccept(): creating Buddy instance");
-        //1.) Create a new Buddy instance and link it to this user:
-        Buddy buddy = new Buddy(currUser, new WingsGeoPoint(currUser, destination.latitude, destination.longitude));
-        buddy.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if(e == null){
-                    Log.d(TAG, "onAccept(): no Error saving Buddy!");
-                }
-                else{
-                    Log.d(TAG, "onAccept(): Error saving Buddy!");
-                }
-            }
-        });
-        currUser.put(User.KEY_ISBUDDY, true);       //update isBuddy = true and link the buddy object!
-        currUser.put(User.KEY_BUDDY, buddy);
-        currUser.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if(e == null){
-                    Log.d(TAG, "onAccept() the dialog box: succesfully saved user's isBuddy and Buddy!");
-                }
-                else{
-                    Log.d(TAG, "onAccept() the dialog box: succesfully saved user's isBuddy and Buddy!");
-                }
-            }
-        });
-
-        //2.) Show the BuddyRequest FloatingActionButton in MainActivity, and the fabChooseBuddy button on HomeFrag!
-        fabChooseBuddy.setVisibility(View.VISIBLE);         //navigates to ChooseBuddyFrag from HomeFrag
-        listener.setBuddyRequestBttn(true);                 //navigates to PotentialBuddyFragment from any frag
-
-        //3.) automatically go to the ChooseBuddyFrag!
-        listener.toChooseBuddyFragment();
-    }
-
-    @Override
-    //Clear the destination + destinationStr
-    public void onReject() {
-        Log.d(TAG, "confirmationDialogBox onReject(): erasing the queriedDestination");
-        WingsGeoPoint currDestination = (WingsGeoPoint) currUser.getParseObject(User.KEY_QUERIEDDESTINATION);
-        currDestination.setLatitude(0);
-        currDestination.setLongitude(0);
-        currDestination.setLocation(0,0);
-        currUser.put(User.KEY_QUERIEDDESTINATION, currDestination);
-        currUser.put(User.KEY_DESTINATIONSTR, "default");
-        currDestination.saveInBackground();
+    Buddy userBuddyInstance;
+    BuddyMeetUp meetUpInstance;
+    BuddyTrip buddyTrip;
+    ParseUser otherUser;
 
 
-        //1.) if isBuddy --> route back to intendedDestination
-        boolean isBuddy = currUser.getBoolean(User.KEY_ISBUDDY);
-        if(isBuddy){
-            //1a.) Get the Buddy object --> get the intendedDestination
-            Buddy currBuddy = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
-            try {
-                currBuddy.fetchIfNeeded();
-
-                //2.) Obtain the intendedDestination:
-                WingsGeoPoint intendedDestination = currBuddy.getDestination();
-                intendedDestination.fetchIfNeeded();
-
-                //3.) Save "destination" field to intendedDestination + route to it
-                destination = new LatLng(intendedDestination.getLatitude(), intendedDestination.getLongitude());
-                wingsMap.routeFromCurrentLocation(destination);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-
-        //if not a Buddy --> go back to complete normal w/ no route:
-        else{
-            wingsMap.removeRoute();     //sets the map back to normal
-        }
-    }
 
     public HomeFragment() {}    // Required empty public constructor
 
@@ -177,6 +103,15 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate");
+        if (getArguments() != null) {
+            mode = getArguments().getString(KEY_MODE);
+            Log.d(TAG, "onCreate():  mode =" + mode);
+        }
+    }
+    @Override
     /**
      * Purpose:         Called automatically when creating Fragment instance. To inflate a corresponding layout file "fragment_home.xml"
      */
@@ -191,13 +126,22 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
 
         //3.) Error check mapFragment
         if (mapFragment != null) {
-
             //3a.) getMapAsync() --> initializes maps system and view:
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
-                    //when map is ready --> load it
-                    loadMap(googleMap);                 //initializes everything on map!
+                    if(mode != null) {
+                        //when map is ready --> load it
+                        if (mode.equals(KEY_BASIC)) {
+                            basicLoadMap(googleMap);                 //initializes everything on map!
+                        }
+                        else{
+                            tripLoadMap(googleMap);
+                        }
+                    }
+                    else{
+                        Log.d(TAG, "onCreateView() mode is null!");
+                    }
                 }
             });
         }
@@ -207,7 +151,6 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
         return view;
     }
 
-
     @Override
     /**
      * Purpose;         Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
@@ -215,37 +158,113 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        //1.) Connect Views:
         btnSearch = view.findViewById(R.id.btnSearch);
         etSearchBar = view.findViewById(R.id.etSearchBar);
         fabChooseBuddy = (ExtendedFloatingActionButton) view.findViewById(R.id.fabChooseBuddy);
         fabCancelBuddy = view.findViewById(R.id.fabCancelBuddy);
-        tvTitle = view.findViewById(R.id.tvTitle);
+ //       tvTitle = view.findViewById(R.id.tvTitle);
 
-        //1.) Check if the user currently needs a buddy --> check their isBuddy field --> if is a buddy do they hasBuddy?
+
+        //2b.) fabCancelBuddy --> get rid of all stuff that isn't just User stuff --> cancels everything
+        fabCancelBuddy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mode.equals(KEY_ONTRIP)) {
+                    resetUser(otherUser);
+                }
+                resetUser(currUser);
+            }
+        });
+
+        //2.) Check which mode we're displaying:
+        if(mode.equals(KEY_BASIC)){
+            basicSetUp();
+        }
+        else{
+            //Everything should be not toggleable --> doesn;t set listeners:
+            fabChooseBuddy.setVisibility(View.INVISIBLE);     //automatically invisible until the user wants to be a Buddy
+            fabCancelBuddy.setVisibility(View.VISIBLE);         //to cancel the trip or meetup
+
+            //Keep drawing route
+        }
+    }
+
+    private void tripLoadMap(GoogleMap map) {
+        Log.d(TAG, "in basicLoadMap():");
+        wingsMap = new WingsMap(map, getContext(), getViewLifecycleOwner());   //automatically constantly shows current location
+
+        //Figure out what we routing to and from:
+        //BuddyMeetUp or BuddyTrip?
+        userBuddyInstance = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
+        try {
+            userBuddyInstance.fetchIfNeeded();
+
+            if(userBuddyInstance.getOnMeetup()){
+                //Get the destination in the BuddyMeetUp (= the otherBuddy's currentLocation)
+                meetUpInstance = userBuddyInstance.getBuddyMeetUpInstance();
+                otherUser = meetUpInstance.getReceiverBuddy().getUser();
+                WingsGeoPoint otherCurrentGeoPoint = (WingsGeoPoint) otherUser.getParseObject(User.KEY_CURRENTLOCATION);
+                otherCurrentGeoPoint.fetchIfNeeded();
+
+                destination = new LatLng(otherCurrentGeoPoint.getLatitude(), otherCurrentGeoPoint.getLongitude());
+            }
+            else{
+                //get the destination in the BuddyTrip
+                buddyTrip = userBuddyInstance.getBuddyTripInstance();
+                WingsGeoPoint destinationGeoPoint = buddyTrip.getDestination();
+
+                destination = new LatLng(destinationGeoPoint.getLatitude(), destinationGeoPoint.getLongitude());
+            }
+
+            wingsMap.routeFromCurrentLocation(destination);
+            if(wingsMap.isNearEnough()){
+                if(meetUpInstance != null) {
+                    makeConfirmBuddyDialog();
+                }
+                else{
+                    makeConfirmSafeArrivalDialog();
+                }
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void basicSetUp(){
+        //2.) Is the current user a buddy?
         if(currUser.getBoolean(User.KEY_ISBUDDY)) {   //if they are a buddy
             Log.d(TAG, "onViewCreated(): current user IS a Buddy!");
+
+            // --> Get the buddyInstance:
             Buddy buddyInstance = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
             try {
                 buddyInstance.fetchIfNeeded();
 
+
+                //2.) Check if they already have a buddy:
+                //If not --> they still need one -->
                 if (!buddyInstance.getHasBuddy()) {      //if they don't have a buddy but they want one, we need to show th button
                     Log.d(TAG, "onViewCreated(): This buddy is still looking for a buddy!");
                     fabChooseBuddy.setVisibility(View.VISIBLE);
                     fabCancelBuddy.setVisibility(View.VISIBLE);
-                    tvTitle.setVisibility(View.VISIBLE);
-                } else {
-                    fabChooseBuddy.setVisibility(View.INVISIBLE);
+                    //                tvTitle.setVisibility(View.VISIBLE);
+                }
+                else{
+                    fabChooseBuddy.setVisibility(View.INVISIBLE);     //automatically invisible until the user wants to be a Buddy
                     fabCancelBuddy.setVisibility(View.INVISIBLE);
-                    tvTitle.setVisibility(View.INVISIBLE);
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
             }
         }
+
+        //3.) Otherwise --> not a buddy, hide it all
         else {
             fabChooseBuddy.setVisibility(View.INVISIBLE);     //automatically invisible until the user wants to be a Buddy
             fabCancelBuddy.setVisibility(View.INVISIBLE);
-            tvTitle.setVisibility(View.INVISIBLE);
+//            tvTitle.setVisibility(View.INVISIBLE);
         }
 
 
@@ -255,27 +274,6 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
             @Override
             public void onClick(View view) {
                 listener.toChooseBuddyFragment();
-            }
-        });
-
-        //2b.) fabCancelBuddy --> get rid of all Buddy stuff
-        fabCancelBuddy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Make all buttons stuff invisible again:
-                fabCancelBuddy.setVisibility(View.INVISIBLE);
-                fabChooseBuddy.setVisibility(View.INVISIBLE);
-                listener.setBuddyRequestBttn(false);
-
-                //Make Buddy field in user null again:
-                currUser.put(User.KEY_BUDDY, new Buddy());      //im sure there's a better way to erase it but not enough time rn
-
-                //set isBuddy field = false again
-                currUser.put(User.KEY_ISBUDDY, false);
-                currUser.saveInBackground();
-
-                //reset map:
-                wingsMap.removeRoute();     //sets the map back to normal
             }
         });
 
@@ -300,14 +298,52 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
                 if(possibleAddresses != null) {
                     makeConfirmDestinationDialog(etSearchBar.getText().toString());
                 }
-
             }
         });
     }
 
+    private void resetUser(ParseUser userToErase) {
+        Log.d(TAG, "in resetUser()");
+        //1.) Make all buttons stuff invisible:
+        fabCancelBuddy.setVisibility(View.INVISIBLE);
+        fabChooseBuddy.setVisibility(View.INVISIBLE);
+        listener.setBuddyRequestBttn(false);
+
+        //2.) Make Buddy field in user null again:
+        userToErase.put(User.KEY_BUDDY, new Buddy());      //im sure there's a better way to erase it but not enough time rn
+        userToErase.put(User.KEY_ISBUDDY, false);
+        userToErase.put(User.KEY_QUERIEDDESTINATION, new WingsGeoPoint(userToErase, 0, 0));
+        userToErase.put(User.KEY_DESTINATIONSTR, "default");
+        userToErase.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Log.d(TAG, "resetUser(): successfully reset user");
+                }
+                else{
+                    Log.d(TAG, "resetUser(): error reset user, error = " + e.getMessage());
+                }
+            }
+        });
+
+        //reset map:
+        wingsMap.removeRoute();     //sets the map back to normal
+
+        //remove destination:
+        Buddy buddy = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
+        try {
+            buddy.fetchIfNeeded();
+            buddy.setDestination(new WingsGeoPoint(currUser, 0, 0));
+            buddy.saveInBackground();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     //Purpose:          Initializes our "map" field, starts continuously checking for location updates
-    protected void loadMap(GoogleMap map) {
-        Log.d(TAG, "in loadMap():");
+    protected void basicLoadMap(GoogleMap map) {
+        Log.d(TAG, "in basicLoadMap():");
         wingsMap = new WingsMap(map, getContext(), getViewLifecycleOwner());   //automatically constantly shows current location
 
         //Check who we are: should we check queriedDestination or intendedDestination?
@@ -327,7 +363,77 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
 
                     //3.) Save "destination" field to intendedDestination + route to it
                     destination = new LatLng(intendedDestination.getLatitude(), intendedDestination.getLongitude());
-                    wingsMap.routeFromCurrentLocation(destination);
+
+                    /*while(true) {
+                        Log.d(TAG, "in while loop");*/
+                        wingsMap.routeFromCurrentLocation(destination);
+                        /*while(!wingsMap.getIsReady()){}
+                        try {
+                            Log.d(TAG, "sleeping now");
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                   /* new Thread(new Runnable(){
+                        @Override
+                        public void run() {
+                            while(true) {
+                                Log.d(TAG, "in run()");
+                                wingsMap.routeFromCurrentLocation(destination);
+                                try {
+                                    Thread.sleep(5000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }).start();*/
+                    /*((Activity) getContext()).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            while(true) {
+                                Log.d(TAG, "in run()");
+                                CountDownLatch latch = new CountDownLatch(1);
+                                wingsMap.routeFromCurrentLocation(destination, latch);
+                                try {
+                                    latch.await();
+                                    Log.d(TAG, "finished run()");
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });*/
+
+                    /*AsyncTask.execute(new Runnable(){
+                        @Override
+                        public void run() {
+                            CountDownLatch outLatch = new CountDownLatch(1);
+
+                            ((Activity) getContext()).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    while(true) {
+                                        Log.d(TAG, "in UIThread run()");
+                                        CountDownLatch latch = new CountDownLatch(1);
+                                        wingsMap.routeFromCurrentLocation(destination, latch);
+                                        try {
+                                            latch.await();
+                                            Log.d(TAG, "finished run()");
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+                            });
+                            try {
+                                outLatch.await();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });*/
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -390,4 +496,139 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
         confirmDestDialog.setTargetFragment(HomeFragment.this, 1);
         confirmDestDialog.show(getFragmentManager(), "ConfirmDestinationDialogTag");
     }
+
+    public void  makeConfirmSafeArrivalDialog(){
+        ConfirmSafeArrivalDialog dialog = ConfirmSafeArrivalDialog.newInstance(buddyTrip.getObjectId());
+        dialog.setTargetFragment(HomeFragment.this, 1);
+        dialog.show(getFragmentManager(), "ConfirmSafeArrivalDialogTag");
+    }
+
+    public void makeConfirmBuddyDialog(){
+        ConfirmBuddyDialog dialog = ConfirmBuddyDialog.newInstance(meetUpInstance.getObjectId());
+        dialog.setTargetFragment(HomeFragment.this, 1);
+        dialog.show(getFragmentManager(), "ConfirmBuddyDialogTag");
+    }
+
+    @Override
+    //Purpose:      on confirmation --> current user accepts to be a buddy --> set User's isBuddy field to true, and instantiate being a Buddy
+    public void onAccept() {
+        Log.d(TAG, "confirmationDialogBox onAccept(): creating Buddy instance");
+        //1.) Create a new Buddy instance and link it to this user:
+        Buddy buddy = new Buddy(currUser, new WingsGeoPoint(currUser, destination.latitude, destination.longitude));
+        buddy.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Log.d(TAG, "onAccept(): no Error saving Buddy!");
+                }
+                else{
+                    Log.d(TAG, "onAccept(): Error saving Buddy!");
+                }
+            }
+        });
+        currUser.put(User.KEY_ISBUDDY, true);       //update isBuddy = true and link the buddy object!
+        currUser.put(User.KEY_BUDDY, buddy);
+        currUser.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Log.d(TAG, "onAccept() the dialog box: succesfully saved user's isBuddy and Buddy!");
+                }
+                else{
+                    Log.d(TAG, "onAccept() the dialog box: succesfully saved user's isBuddy and Buddy!");
+                }
+            }
+        });
+
+        //2.) Show the BuddyRequest FloatingActionButton in MainActivity, and the fabChooseBuddy button on HomeFrag!
+        fabChooseBuddy.setVisibility(View.VISIBLE);         //navigates to ChooseBuddyFrag from HomeFrag
+        fabCancelBuddy.setVisibility(View.VISIBLE);
+        listener.setBuddyRequestBttn(true);                 //navigates to PotentialBuddyFragment from any frag
+
+        //3.) automatically go to the ChooseBuddyFrag!
+        //listener.toChooseBuddyFragment();
+    }
+
+    @Override
+    public void onConfirm() {
+
+    }
+
+    @Override
+    public void onSafe() {
+
+    }
+
+    @Override
+    //Clear the destination + destinationStr
+    public void onReject() {
+        Log.d(TAG, "confirmationDialogBox onReject(): erasing the queriedDestination");
+        WingsGeoPoint currDestination = (WingsGeoPoint) currUser.getParseObject(User.KEY_QUERIEDDESTINATION);
+        currDestination.setLatitude(0);
+        currDestination.setLongitude(0);
+        currDestination.setLocation(0,0);
+        currUser.put(User.KEY_QUERIEDDESTINATION, currDestination);
+        currUser.put(User.KEY_DESTINATIONSTR, "default");
+        currDestination.saveInBackground();
+
+
+        //1.) if isBuddy --> route back to intendedDestination
+        boolean isBuddy = currUser.getBoolean(User.KEY_ISBUDDY);
+        if(isBuddy){
+            //1a.) Get the Buddy object --> get the intendedDestination
+            Buddy currBuddy = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
+            try {
+                currBuddy.fetchIfNeeded();
+
+                //2.) Obtain the intendedDestination:
+                WingsGeoPoint intendedDestination = currBuddy.getDestination();
+                intendedDestination.fetchIfNeeded();
+
+                //3.) Save "destination" field to intendedDestination + route to it
+                destination = new LatLng(intendedDestination.getLatitude(), intendedDestination.getLongitude());
+                wingsMap.routeFromCurrentLocation(destination);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //if not a Buddy --> go back to complete normal w/ no route:
+        else{
+            wingsMap.removeRoute();     //sets the map back to normal
+        }
+    }
+
+    /*
+        Different modes depending on the parameters passed in from whoever called HomeFragment:
+            - base mode:        --> not a buddy = no title
+                - could query for new destination
+                    --> dialog to confirm destination
+                    just make the dialog box more clear "Confirm destination"
+
+           - already a buddy:  --> maybe no title, just make floating dialog box --> options to find buddies, cancel the trip, or checkout current BuddyRequests
+                - show all buddyRequest buttons:
+                    - the literal buddyRequest button
+                    - button to find buddies
+                    - cancel being a buddy
+               - displays the route to your destination
+               - allows for you to search for a new destination to confirm that one instead
+
+
+          - on an actual trip:  --> will constantly route and draw route
+            - either on BuddyMeetUp
+                - checks for proximity to destination --> show corresponding Dialog (if on HomeFrag --> Toast/notif otherwise)
+
+            - or on the BuddyTrip
+                 - checks for proximity to destination --> show corresponding Dialog (if on HomeFrag --> Toast/notif otherwise)
+
+
+
+
+
+
+
+
+
+
+     */
 }

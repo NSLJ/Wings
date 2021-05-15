@@ -324,7 +324,7 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmSendReque
         }
 
         //Directly go to HomeFragment to start the BuddyMeetUp!
-        listener.toHomeFragment();
+        listener.toHomeFragment(HomeFragment.KEY_ONTRIP);
         Toast.makeText(getContext(), "Start meetup with your buddy!", Toast.LENGTH_LONG).show();
     }
 
@@ -358,7 +358,6 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmSendReque
 
         //Get rid of the BuddyRequest instance entirely since it was rejected?
         //if valid id:
-
             ParseQuery<BuddyRequest> query = ParseQuery.getQuery(BuddyRequest.class);
             query.whereEqualTo(BuddyRequest.KEY_OBJECT_ID, buddyRequestId);
             query.findInBackground(new FindCallback<BuddyRequest>() {
@@ -381,7 +380,6 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmSendReque
     //Purpose:      Create a BuddyRequest where current user is the sender, other user is the receiver, go back to ChooseBuddyFragment, increment the BuddyRequest in UserBuddyRequestsFragment
     public void onAccept(Buddy potentialBuddy) {
         Log.d(TAG, "onAccept()");
-        Toast.makeText(getContext(), "accept button pressed", Toast.LENGTH_SHORT).show();
 
         //TODO: Should technically check if we've already sent a request to this Buddy
         //1.) Get current user's buddy instance:

@@ -72,6 +72,8 @@ public class WingsMap {
     private static final String KEY_SEND_LOCATIONS = "wingsMap_locations";
     private static final String KEY_RESULT = "getRoutesWorker_result";
 
+    CountDownLatch latch;
+
     private ParseUser currentUser;      //B/c we need to make tons of updates to the Parse
     private WingsClient client;
     private Context context;
@@ -97,6 +99,9 @@ public class WingsMap {
     private MarkerOptions startMarker;
     private MarkerOptions endMarker;
 
+    private double distanceFromCurLocation;
+    public boolean isReady;
+
     public WingsMap(GoogleMap map, Context context, LifecycleOwner fragLifecycleOwner){
         this.map = map;
         this.context = context;
@@ -109,6 +114,7 @@ public class WingsMap {
         hasRoutes = false;
         routeDrawn = false;
 
+        isReady = true;
         openAppSetUp();
     }
 
@@ -153,6 +159,14 @@ public class WingsMap {
 
     //Purpose:          Automatically finds and draws the route from current location to the given destination, draws the first route
     public void routeFromCurrentLocation(LatLng destination){
+        isReady = false;
+        ParseGeoPoint curLoc = new ParseGeoPoint(currentLocation.latitude, currentLocation.longitude);
+        distanceFromCurLocation = curLoc.distanceInKilometersTo(new ParseGeoPoint(destination.latitude, destination.longitude))*1000;
+        route(currentLocation, destination);
+    }
+    public void routeFromCurrentLocation(LatLng destination, CountDownLatch latch){
+        ParseGeoPoint curLoc = new ParseGeoPoint(currentLocation.latitude, currentLocation.longitude);
+        distanceFromCurLocation = curLoc.distanceInKilometersTo(new ParseGeoPoint(destination.latitude, destination.longitude))*1000;
         route(currentLocation, destination);
     }
 
@@ -178,6 +192,9 @@ public class WingsMap {
         return foundDestination;
     }
 
+    public void routeFromCurrentLocationForTrips(LatLng destination){
+
+    }
     //Purpose:      To use Geocoder to get the List<Address> that correlate to the given destination string
     public List<Address> getPossibleAddresses(String destination){
         List<Address> possibleAddresses = new ArrayList<>();
@@ -215,8 +232,13 @@ public class WingsMap {
 
                 DataParser parser = new DataParser();           //DataParser does the actual parsing of the JSONObject
                 List<WingsRoute> result = parser.parse(jsonObject);
-                setAllRoutes(result);                           //set allRoutes field = result
-                drawRoute(0);                       //draw the first route
+                if(result == null){
+                    Toast.makeText(context, "No directions available!", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    setAllRoutes(result);                           //set allRoutes field = result
+                    drawRoute(0);                       //draw the first route
+                }
             }
 
             @Override
@@ -243,6 +265,12 @@ public class WingsMap {
 
 
     //All helper methods:
+
+    //hardcode +- 15 meters
+    public boolean isNearEnough(){
+        return (distanceFromCurLocation < 15);
+    }
+
 
     //Purpose:      Automatically set up the map this way.
     private void generalSetUp(){
@@ -327,9 +355,13 @@ public class WingsMap {
         setMarker(destination, BitmapDescriptorFactory.HUE_RED);
         routeDrawn = true;
         polylineDrawn = map.addPolyline(lineOptions);
-
+        isReady = true;
+        //latch.countDown();
     }
 
+    public boolean getIsReady(){
+        return isReady;
+    }
     public void setMarker(LatLng destination, float color){
         Log.d(TAG, "setMaker()");
         MarkerOptions markerOptions = new MarkerOptions();
