@@ -4,8 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/gray"
     android:orientation="vertical"
     tools:context=".mainactivity.fragments.HomeFragment">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="false"
+        android:layout_centerHorizontal="false"
+        android:fontFamily="@font/satisfy"
+        android:text="Destination: "
+        android:textAlignment="center"
+        android:textColor="@color/gray_100"
+        android:textSize="25sp" />
 
     <RelativeLayout
         android:id="@+id/rlSearchBar"
@@ -76,6 +89,7 @@
             android:textSize="14sp"
             android:textStyle="bold"
             app:backgroundTint="@color/red" />
+
     </RelativeLayout>
 
 

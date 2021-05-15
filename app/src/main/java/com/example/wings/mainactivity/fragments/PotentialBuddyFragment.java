@@ -5,19 +5,21 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wings.R;
 import com.example.wings.WingsMap;
 import com.example.wings.mainactivity.MAFragmentsListener;
-import com.example.wings.mainactivity.fragments.dialogs.ConfirmBuddyRequestDialog;
-import com.example.wings.mainactivity.fragments.dialogs.ConfirmDestinationDialog;
+import com.example.wings.mainactivity.fragments.dialogs.ConfirmSendRequestDialog;
+import com.example.wings.mainactivity.fragments.dialogs.RespondBuddyRequestDialog;
 import com.example.wings.models.Buddy;
 import com.example.wings.models.BuddyRequest;
 import com.example.wings.models.User;
@@ -32,26 +34,36 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
-import java.util.ArrayList;
 import java.util.List;
 
 //Purpose:      To display a selected other user's information when looking for a buddy --> displays map, routes, locations, ialogbox, etc
 //              will display different Dialogs depending on who is calling this Fragment. This Fragment is only accessed in special occasions essentially
 
-public class PotentialBuddyFragment extends Fragment implements ConfirmBuddyRequestDialog.ResultListener {
+//TODO: create another dialog fragment and have other fragments give this one parameters of which dialogbox to show
+//TODO: Figure out more hoe dialog boxes work, make them prettier, now how to still interact with the background, or at least not just disapper by touching the screen --> can leave us on this screen
+//TODO: Make Titles for this fragment bc looking at a ton of maps really gets confusing for screen to screen
+
+public class PotentialBuddyFragment extends Fragment implements ConfirmSendRequestDialog.ResultListener {
     private static final String TAG = "PotentialBuddyFragment";
-    public static final String KEY_USERID = "potentialBuddyId";
+    private static final String KEY_USERID = "potentialBuddyId";
+    private static final String KEY_DIALOG = "dialogTypeToShow";
+
+    public static final String KEY_SHOW_CONFIRMSEND = "confirmSendDialog";
+    public static final String KEY_SHOW_RESPONDREQUEST = "respondRequestDialog";            //will be publically accessed so other frags and activites cand easily go to
 
     private MAFragmentsListener listener;
 
     private String potentialBuddyId;
+    private String dialogToShow;
+    DialogFragment dialog;
+
     private ParseUser potentialBuddy;
     private Buddy potentialBuddyInstance;
 
     private SupportMapFragment mapFragment;
     private WingsMap wingsMap;
+    private TextView tvTitle;
 
     private LatLng potentialBuddyLocation;
     private LatLng potentialBuddyDestination;
@@ -59,7 +71,7 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmBuddyRequ
     public PotentialBuddyFragment() {}
 
 
-    //Methods to override from ConfirmBuddyRequestDialog resultlistener:
+    //Methods to override from ConfirmSendRequestDialog resultlistener:
     @Override
     //Purpose:      Create a BuddyRequest where current user is the sender, other user is the receiver, go back to ChooseBuddyFragment, increment the BuddyRequest in UserBuddyRequestsFragment
     public void onAccept(Buddy potentialBuddy) {
@@ -135,6 +147,8 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmBuddyRequ
         if (getArguments() != null) {
             potentialBuddyId = getArguments().getString(KEY_USERID);
             Log.d(TAG, "onCreate():  potentialBuddyId =" + potentialBuddyId);
+            dialogToShow = getArguments().getString(KEY_DIALOG);
+            Log.d(TAG, "onCreate(): dialogKey=" + dialogToShow);
         }
     }
 
@@ -168,6 +182,19 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmBuddyRequ
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        //set title accordingly to what purpose is, initialize the dialog to show accordingly
+        tvTitle = view.findViewById(R.id.tvTitle);
+        if(dialogToShow.equals(KEY_SHOW_CONFIRMSEND)){
+            tvTitle.setText("Send Request to this Buddy?");
+            dialog = ConfirmSendRequestDialog.newInstance(potentialBuddyId);
+        }
+
+        if(dialogToShow.equals(KEY_SHOW_RESPONDREQUEST)){
+            tvTitle.setText("Respond to this Buddy Request");
+            dialog = RespondBuddyRequestDialog.newInstance(potentialBuddyId);
+        }
+
+
         //Initalize potentialBuddy:
         if(potentialBuddyId != null) {
             queryPotentialBuddy();
@@ -182,6 +209,7 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmBuddyRequ
                 listener.toChooseBuddyFragment();
             }
         });
+
     }
 
     private void queryPotentialBuddy(){
@@ -219,8 +247,8 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmBuddyRequ
                 wingsMap.setMarker(potentialBuddyLocation, BitmapDescriptorFactory.HUE_BLUE);
                 wingsMap.route(potentialBuddyLocation, potentialBuddyDestination);
 
-                //Show dialog:
-                makeConfirmBuddyRequestDialog();
+                //Show dialog after showing map:
+                showDialog(dialogToShow);
 
             } catch (ParseException e) {
                 Log.d(TAG, "onViewCreated(): error fetching buddy instance");
@@ -239,11 +267,16 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmBuddyRequ
     }
 
     //Purpose:      Creates a ConfirmDestinationDialog with the given destination string to display
-    public void makeConfirmBuddyRequestDialog(){
+  /*  public void makeConfirmBuddyRequestDialog(){
         Log.d(TAG, "makeConfirmBuddyRequestDialog(): potentialBuddyId=" + potentialBuddyId);
-        ConfirmBuddyRequestDialog dialog = ConfirmBuddyRequestDialog.newInstance(potentialBuddyId);
+        ConfirmSendRequestDialog dialog = ConfirmSendRequestDialog.newInstance(potentialBuddyId);
         dialog.setTargetFragment(PotentialBuddyFragment.this, 1);
         dialog.show(getFragmentManager(), "ConfirmBuddyRequestDialogTag");
+    }*/
+
+    public void showDialog(String tag){
+        dialog.setTargetFragment(PotentialBuddyFragment.this, 1);
+        dialog.show(getFragmentManager(), tag);
     }
 
 

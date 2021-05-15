@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     private static final String TAG = "MainActivity";
     public static final String KEY_PROFILESETUPFRAG = "ProfileSetupFrag?";          //to get whether or not the current user's profile is set up from the StartActivity
     public static final String KEY_USERID = "potentialBuddyId";
+    private static final String KEY_DIALOG = "dialogTypeToShow";
 
     private static final String KEY_APPROVED_REQUEST = "whichSentRequest?"; //these two are for responses with sentrequests
     private static final String KEY_ISAPPROVED = "anyRequestsApproved?";
@@ -449,9 +450,10 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     }
 
     @Override
-    public void toPotentialBuddyFragment(String userId) {
+    public void toPotentialBuddyFragment(String userId, String dialogKey) {
         Bundle bundle = new Bundle();;
         bundle.putString(KEY_USERID, userId);
+        bundle.putString(KEY_DIALOG, dialogKey);
         Fragment frag = new PotentialBuddyFragment();
         frag.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();

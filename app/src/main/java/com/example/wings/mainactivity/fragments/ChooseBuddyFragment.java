@@ -109,7 +109,7 @@ public class ChooseBuddyFragment extends Fragment {
                 ParseUser userClicked = usersToDisplay.get(position);
                 String objectId = userClicked.getObjectId();
                 Log.d(TAG, "onClick(): position = " + position + "   objectId to send = " + objectId);
-                listener.toPotentialBuddyFragment(objectId);
+                listener.toPotentialBuddyFragment(objectId, PotentialBuddyFragment.KEY_SHOW_CONFIRMSEND);               //Show a ConfirmSendQuestDialog!!
             }
         };
 
@@ -269,7 +269,7 @@ public class ChooseBuddyFragment extends Fragment {
         return new ParseGeoPoint(newLat, newLong);
     }
 
-
+/*
     //Purpose:          Calculates and populates the distances between our currentLocation and their's. Assumes the potentialBuddies field is initialized, initializes usersToDisplay
     private void parseModel(List<Buddy> buddiesToShow){
         Log.d(TAG, "in parseModel()");
@@ -298,7 +298,7 @@ public class ChooseBuddyFragment extends Fragment {
         Log.d(TAG, "parseModel is done: usersToDisplay = " + usersToDisplay.toString());
         Log.d(TAG, "parseModel is done: distances = " + distancesList.toString());
         buddyAdapter.notifyDataSetChanged();
-    }
+    }*/
 
     private void parse(List<Buddy> buddiesToShow){
         for(int i = 0; i < buddiesToShow.size(); i++){

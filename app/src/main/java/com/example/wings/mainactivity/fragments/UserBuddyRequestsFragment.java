@@ -121,17 +121,41 @@ public class UserBuddyRequestsFragment extends Fragment {
 
         //Set on click listener:
         //2.) Create an ChooseBuddyAdapter.OnClickListener to create a ChooseBuddyAdapter -- will be used by both recycler views as tapping on any row does the same thing
-        ChooseBuddyAdapter.OnClickListener onClickListener = new ChooseBuddyAdapter.OnClickListener() {
+        ChooseBuddyAdapter.OnClickListener senderOnClickListener = new ChooseBuddyAdapter.OnClickListener() {
             @Override
             public void onClick(int position) {
                 //I think position = corresponds to the indexes in the List<> models but may be backwards or something:
-                //TODO: go to that one potential buddies fragment
-                Toast.makeText(getContext(), "You clicked on a request, I should show a dialog rn", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "You clicked on a request, going to PotentialBuddyFragment + some specific dialog to show", Toast.LENGTH_SHORT).show();
+                ParseUser thisUser = peopleSentTo.get(position);
+                try {
+                    thisUser.fetchIfNeeded();
+                    String objectId = thisUser.getObjectId();
+                    listener.toPotentialBuddyFragment(objectId, PotentialBuddyFragment.KEY_SHOW_RESPONDREQUEST);        //Display a RespondBuddyRequestDialog
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
         };
 
-        sentRequestsAdapter = new ChooseBuddyAdapter(getContext(), peopleSentTo, distanceFromSent, onClickListener);
-        receivedRequestAdapter = new ChooseBuddyAdapter(getContext(), peopleReceivedFrom, distanceFromReceivers, onClickListener);
+        //2.) Create an ChooseBuddyAdapter.OnClickListener to create a ChooseBuddyAdapter -- will be used by both recycler views as tapping on any row does the same thing
+        ChooseBuddyAdapter.OnClickListener receiverOnClickListener = new ChooseBuddyAdapter.OnClickListener() {
+            @Override
+            public void onClick(int position) {
+                //I think position = corresponds to the indexes in the List<> models but may be backwards or something:
+                Toast.makeText(getContext(), "You clicked on a request, going to PotentialBuddyFragment + some specific dialog to show", Toast.LENGTH_SHORT).show();
+                ParseUser thisUser = peopleReceivedFrom.get(position);
+                try {
+                    thisUser.fetchIfNeeded();
+                    String objectId = thisUser.getObjectId();
+                    listener.toPotentialBuddyFragment(objectId, PotentialBuddyFragment.KEY_SHOW_RESPONDREQUEST);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        sentRequestsAdapter = new ChooseBuddyAdapter(getContext(), peopleSentTo, distanceFromSent, senderOnClickListener);
+        receivedRequestAdapter = new ChooseBuddyAdapter(getContext(), peopleReceivedFrom, distanceFromReceivers, receiverOnClickListener);
 
         //set up both rv's:
         rvSentRequests.setAdapter(sentRequestsAdapter);

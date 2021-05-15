@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wings.mainactivity.fragments.dialogs.ConfirmDestinationDialog;
@@ -49,7 +50,7 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
  * implementing this better!
  *
  */
-
+//TODO: Make Titles for this fragment bc looking at a ton of maps really gets confusing for screen to screen, only when is buddy obviously
 public class HomeFragment extends Fragment implements ConfirmDestinationDialog.ResultListener {
     private static final String TAG = "HomeFragment";
     private static final long UPDATE_INTERVAL = 5000;
@@ -78,6 +79,7 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
     //layout views:
     Button btnSearch;
     EditText etSearchBar;
+    TextView tvTitle;
 
 
     @Override
@@ -217,6 +219,7 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
         etSearchBar = view.findViewById(R.id.etSearchBar);
         fabChooseBuddy = (ExtendedFloatingActionButton) view.findViewById(R.id.fabChooseBuddy);
         fabCancelBuddy = view.findViewById(R.id.fabCancelBuddy);
+        tvTitle = view.findViewById(R.id.tvTitle);
 
         //1.) Check if the user currently needs a buddy --> check their isBuddy field --> if is a buddy do they hasBuddy?
         if(currUser.getBoolean(User.KEY_ISBUDDY)) {   //if they are a buddy
@@ -229,9 +232,11 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
                     Log.d(TAG, "onViewCreated(): This buddy is still looking for a buddy!");
                     fabChooseBuddy.setVisibility(View.VISIBLE);
                     fabCancelBuddy.setVisibility(View.VISIBLE);
+                    tvTitle.setVisibility(View.VISIBLE);
                 } else {
                     fabChooseBuddy.setVisibility(View.INVISIBLE);
                     fabCancelBuddy.setVisibility(View.INVISIBLE);
+                    tvTitle.setVisibility(View.INVISIBLE);
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -240,6 +245,7 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
         else {
             fabChooseBuddy.setVisibility(View.INVISIBLE);     //automatically invisible until the user wants to be a Buddy
             fabCancelBuddy.setVisibility(View.INVISIBLE);
+            tvTitle.setVisibility(View.INVISIBLE);
         }
 
 

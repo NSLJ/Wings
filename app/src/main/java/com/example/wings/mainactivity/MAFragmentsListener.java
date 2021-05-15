@@ -23,5 +23,5 @@ public interface MAFragmentsListener {
     public void toHelpFragment();
     public void setBuddyRequestBttn(boolean answer);
     public void toUserBuddyRequestFragment();
-    public void toPotentialBuddyFragment(String potentialBuddyId);
+    public void toPotentialBuddyFragment(String potentialBuddyId, String keyShowDialog);
 }
