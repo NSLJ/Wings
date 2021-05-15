@@ -3,6 +3,7 @@ package com.example.wings;
 import android.app.Application;
 
 import com.example.wings.models.Buddy;
+import com.example.wings.models.BuddyMeetUp;
 import com.example.wings.models.BuddyRequest;
 import com.example.wings.models.BuddyTrip;
 import com.example.wings.models.TrustedContact;
@@ -31,6 +32,7 @@ public class ParseApplication extends Application {
         ParseObject.registerSubclass(BuddyTrip.class);
         ParseObject.registerSubclass(TrustedContact.class);
         ParseObject.registerSubclass(WingsGeoPoint.class);
+        ParseObject.registerSubclass(BuddyMeetUp.class);
 
         // Initializes Parse SDK as soon as the application is created
         Parse.initialize(new Parse.Configuration.Builder(this)

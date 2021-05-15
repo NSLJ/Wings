@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -19,12 +20,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.wings.R;
-import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.Buddy;
 import com.example.wings.models.User;
 import com.example.wings.models.WingsGeoPoint;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -34,13 +32,16 @@ import com.parse.ParseUser;
 
 import java.util.List;
 
-//Purpose:      To display a Dialog Box to confirm a buddy request with a specific user!
-public class ConfirmBuddyRequestDialog extends DialogFragment {
-    private static final String TAG = "ConfirmBuddyRequestDialog";
+//Purpose:          Expects to receive the user to display's id. the other user.
+public class RespondBuddyRequestDialog extends DialogFragment {
+    private static final String TAG = "RespondBuddyRequestDialog";
     public static final String KEY_USERID = "buddyId";
+    private static final String KEY_BUDDYREQUESTID = "buddyRequestId";
 
-    private ConfirmBuddyRequestDialog.ResultListener listener;
+    private RespondBuddyRequestDialog.ResultListener listener;
+
     private String potentialBuddyId;
+    private String buddyRequestId;
     private ParseUser potentialBuddy;
     private double distance;
 
@@ -54,17 +55,19 @@ public class ConfirmBuddyRequestDialog extends DialogFragment {
     private RatingBar ratingBar;
 
     //Purpose:      so the PotentialBuddyFragment will be able to handle info from the Dialog!
-    public interface ResultListener{
-        public void onAccept(Buddy buddy);
-        public void onReject();
+    public interface ResultListener {
+        public void onAccept(Buddy buddy, String buddyRequestId);
+        public void onReject(String buddyRequestId);
     }
 
-    public ConfirmBuddyRequestDialog() {}
+    public RespondBuddyRequestDialog() {
+    }
 
-    public static ConfirmBuddyRequestDialog newInstance(String otherUserId) {
-        ConfirmBuddyRequestDialog fragment = new ConfirmBuddyRequestDialog();
+    public static RespondBuddyRequestDialog newInstance(String otherUserId, String buddyRequestId) {
+        RespondBuddyRequestDialog fragment = new RespondBuddyRequestDialog();
         Bundle args = new Bundle();
         args.putString(KEY_USERID, otherUserId);
+        args.putString(KEY_BUDDYREQUESTID, buddyRequestId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -72,10 +75,9 @@ public class ConfirmBuddyRequestDialog extends DialogFragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        try{
-            listener = (ConfirmBuddyRequestDialog.ResultListener) getTargetFragment();
-        }
-        catch(ClassCastException e){
+        try {
+            listener = (RespondBuddyRequestDialog.ResultListener) getTargetFragment();
+        } catch (ClassCastException e) {
             Log.e(TAG, "onAttach: ClassCastException: " + e.getMessage());
         }
     }
@@ -86,6 +88,7 @@ public class ConfirmBuddyRequestDialog extends DialogFragment {
         if (getArguments() != null) {
             //Initalize potentialBuddyId:
             potentialBuddyId = getArguments().getString(KEY_USERID, "defaultVal");
+            buddyRequestId = getArguments().getString(KEY_BUDDYREQUESTID, "defaultVal");
             Log.d(TAG, "onCreate():  potentialBuddyId =" + potentialBuddyId);
         }
     }
@@ -94,7 +97,7 @@ public class ConfirmBuddyRequestDialog extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_confirm_buddy_request_dialog, container, false);
+        return inflater.inflate(R.layout.fragment_respond_buddy_request_dialog, container, false);
     }
 
     @Override
@@ -110,24 +113,22 @@ public class ConfirmBuddyRequestDialog extends DialogFragment {
         bttnReject = view.findViewById(R.id.ibttnReject);
         ratingBar = view.findViewById(R.id.rbRating);
 
-
         //Initalize ParseUser and Buddy:
-        if(potentialBuddyId != null) {
+        if (potentialBuddyId != null) {
             queryPotentialBuddy();
-        }
-        else{
+        } else {
             Log.d(TAG, "potentialBuddyId = null");
         }
     }
 
-    private void queryPotentialBuddy(){
-        Log.d(TAG, "in queryPotentialBuddy(): potentialBuddyId="+ potentialBuddyId);
+    private void queryPotentialBuddy() {
+        Log.d(TAG, "in queryPotentialBuddy(): potentialBuddyId=" + potentialBuddyId);
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.whereEqualTo(ParseUser.KEY_OBJECT_ID, potentialBuddyId);
         query.findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> objects, ParseException e) {
-                if(e == null){
+                if (e == null) {
                     Log.d(TAG, "in queryPotentialBuddy(): success!: response=" + objects.toString());
                     setPotentialBuddy(objects.get(0));
                     setUp();
@@ -136,8 +137,8 @@ public class ConfirmBuddyRequestDialog extends DialogFragment {
         });
     }
 
-    private void setUp(){
-        if(potentialBuddy != null) {
+    private void setUp() {
+        if (potentialBuddy != null) {
             Log.d(TAG, "in setUp(): potentialBuddy is NOT null");
             WingsGeoPoint otherCurrLocationGeoPoint = (WingsGeoPoint) potentialBuddy.getParseObject(User.KEY_CURRENTLOCATION);
             try {
@@ -151,15 +152,15 @@ public class ConfirmBuddyRequestDialog extends DialogFragment {
                 currLocationGeoPoint.fetchIfNeeded();
                 ParseGeoPoint currentLocation = currLocationGeoPoint.getLocation();
 
-                distance = currentLocation.distanceInKilometersTo(potentialBuddyLocation)*1000;      //* 1000 to convert to m
+                distance = currentLocation.distanceInKilometersTo(potentialBuddyLocation) * 1000;      //* 1000 to convert to m
 
 
                 //Fill in Views:
-                double roundedDistance = Math.round(distance*100.0)/100.0;
+                double roundedDistance = Math.round(distance * 100.0) / 100.0;
                 tvDistance.setText(Double.toString(roundedDistance) + " m away from your destination");
 
                 ParseFile imageFile = potentialBuddy.getParseFile(User.KEY_PROFILEPICTURE);
-                if(imageFile != null) {
+                if (imageFile != null) {
                     Glide.with(getContext()).load(imageFile.getFile()).into(ivProfile);
                 }
                 tvName.setText(potentialBuddy.getString(User.KEY_FIRSTNAME));
@@ -171,7 +172,7 @@ public class ConfirmBuddyRequestDialog extends DialogFragment {
                     @Override
                     public void onClick(View v) {
                         Log.d(TAG, "bttnReject - onClick:");
-                        listener.onReject();
+                        listener.onReject(buddyRequestId);
                         getDialog().dismiss();
                     }
                 });
@@ -183,7 +184,7 @@ public class ConfirmBuddyRequestDialog extends DialogFragment {
                         Buddy buddyInstance = (Buddy) potentialBuddy.getParseObject(User.KEY_BUDDY);
                         try {
                             buddyInstance.fetchIfNeeded();
-                            listener.onAccept(buddyInstance);
+                            listener.onAccept(buddyInstance, buddyRequestId);
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
@@ -198,9 +199,10 @@ public class ConfirmBuddyRequestDialog extends DialogFragment {
         }
     }
 
-    private void setPotentialBuddy(ParseUser otherUser){
+    private void setPotentialBuddy(ParseUser otherUser) {
         Log.d(TAG, "setPotentialBuddy()");
         potentialBuddy = otherUser;
     }
+
 
 }
