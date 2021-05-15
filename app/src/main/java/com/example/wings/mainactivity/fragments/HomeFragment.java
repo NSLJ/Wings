@@ -1,10 +1,7 @@
 package com.example.wings.mainactivity.fragments;
 
-import android.app.Activity;
 import android.content.Context;
 import android.location.Address;
-import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,10 +16,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.wings.mainactivity.fragments.dialogs.ConfirmBuddyDialog;
 import com.example.wings.mainactivity.fragments.dialogs.ConfirmDestinationDialog;
 import com.example.wings.R;
 import com.example.wings.WingsMap;
 import com.example.wings.mainactivity.MAFragmentsListener;
+import com.example.wings.mainactivity.fragments.dialogs.ConfirmSafeArrivalDialog;
 import com.example.wings.models.Buddy;
 import com.example.wings.models.BuddyMeetUp;
 import com.example.wings.models.BuddyTrip;
@@ -32,9 +31,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -42,7 +39,6 @@ import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
@@ -56,7 +52,7 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
  *
  */
 
-public class HomeFragment extends Fragment implements ConfirmDestinationDialog.ResultListener {
+public class HomeFragment extends Fragment implements ConfirmDestinationDialog.ResultListener, ConfirmSafeArrivalDialog.ResultListener, ConfirmBuddyDialog.ResultListener{
     private static final String TAG = "HomeFragment";
     private static final String KEY_MODE = "whatMode?";
     public static final String KEY_BASIC = "basicMode";         //not on a trip
@@ -155,7 +151,6 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
         return view;
     }
 
-
     @Override
     /**
      * Purpose;         Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
@@ -223,6 +218,14 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
             }
 
             wingsMap.routeFromCurrentLocation(destination);
+            if(wingsMap.isNearEnough()){
+                if(meetUpInstance != null) {
+                    makeConfirmBuddyDialog();
+                }
+                else{
+                    makeConfirmSafeArrivalDialog();
+                }
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -298,7 +301,6 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
             }
         });
     }
-
 
     private void resetUser(ParseUser userToErase) {
         Log.d(TAG, "in resetUser()");
@@ -495,6 +497,18 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
         confirmDestDialog.show(getFragmentManager(), "ConfirmDestinationDialogTag");
     }
 
+    public void  makeConfirmSafeArrivalDialog(){
+        ConfirmSafeArrivalDialog dialog = ConfirmSafeArrivalDialog.newInstance(buddyTrip.getObjectId());
+        dialog.setTargetFragment(HomeFragment.this, 1);
+        dialog.show(getFragmentManager(), "ConfirmSafeArrivalDialogTag");
+    }
+
+    public void makeConfirmBuddyDialog(){
+        ConfirmBuddyDialog dialog = ConfirmBuddyDialog.newInstance(meetUpInstance.getObjectId());
+        dialog.setTargetFragment(HomeFragment.this, 1);
+        dialog.show(getFragmentManager(), "ConfirmBuddyDialogTag");
+    }
+
     @Override
     //Purpose:      on confirmation --> current user accepts to be a buddy --> set User's isBuddy field to true, and instantiate being a Buddy
     public void onAccept() {
@@ -533,6 +547,16 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
 
         //3.) automatically go to the ChooseBuddyFrag!
         //listener.toChooseBuddyFragment();
+    }
+
+    @Override
+    public void onConfirm() {
+
+    }
+
+    @Override
+    public void onSafe() {
+
     }
 
     @Override

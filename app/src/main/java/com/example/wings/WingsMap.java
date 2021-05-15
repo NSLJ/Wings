@@ -99,6 +99,7 @@ public class WingsMap {
     private MarkerOptions startMarker;
     private MarkerOptions endMarker;
 
+    private double distanceFromCurLocation;
     public boolean isReady;
 
     public WingsMap(GoogleMap map, Context context, LifecycleOwner fragLifecycleOwner){
@@ -159,10 +160,13 @@ public class WingsMap {
     //Purpose:          Automatically finds and draws the route from current location to the given destination, draws the first route
     public void routeFromCurrentLocation(LatLng destination){
         isReady = false;
+        ParseGeoPoint curLoc = new ParseGeoPoint(currentLocation.latitude, currentLocation.longitude);
+        distanceFromCurLocation = curLoc.distanceInKilometersTo(new ParseGeoPoint(destination.latitude, destination.longitude))*1000;
         route(currentLocation, destination);
     }
     public void routeFromCurrentLocation(LatLng destination, CountDownLatch latch){
-        this.latch = latch;
+        ParseGeoPoint curLoc = new ParseGeoPoint(currentLocation.latitude, currentLocation.longitude);
+        distanceFromCurLocation = curLoc.distanceInKilometersTo(new ParseGeoPoint(destination.latitude, destination.longitude))*1000;
         route(currentLocation, destination);
     }
 
@@ -188,6 +192,9 @@ public class WingsMap {
         return foundDestination;
     }
 
+    public void routeFromCurrentLocationForTrips(LatLng destination){
+
+    }
     //Purpose:      To use Geocoder to get the List<Address> that correlate to the given destination string
     public List<Address> getPossibleAddresses(String destination){
         List<Address> possibleAddresses = new ArrayList<>();
@@ -258,6 +265,12 @@ public class WingsMap {
 
 
     //All helper methods:
+
+    //hardcode +- 15 meters
+    public boolean isNearEnough(){
+        return (distanceFromCurLocation < 15);
+    }
+
 
     //Purpose:      Automatically set up the map this way.
     private void generalSetUp(){

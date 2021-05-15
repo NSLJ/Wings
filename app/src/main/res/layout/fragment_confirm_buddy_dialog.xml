@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context=".mainactivity.fragments.dialogs.ConfirmBuddyDialog">
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/gray_background"
+    android:paddingBottom="10dp">
+
+    <ImageView
+        android:id="@+id/ivOtherPic"
+        android:layout_width="95dp"
+        android:layout_height="92dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="8dp"
+        tools:src="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/tvFirstName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="45dp"
+        android:layout_marginTop="4dp"
+        android:layout_toEndOf="@+id/ivOtherPic"
+        android:fontFamily="@font/satisfy"
+        android:text="Annie"
+        android:textColor="@color/gray"
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/tvText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvFirstName"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="15dp"
+        android:layout_toEndOf="@+id/ivOtherPic"
+        android:fontFamily="@font/lato"
+        android:text="On their way to meet you"
+        android:textColor="@color/gray"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/tvUserBuddyId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="124dp"
+        android:background="@drawable/et_rounded_corners_style"
+        android:fontFamily="@font/lato"
+        android:text="User Buddy ID"
+        android:textColor="@color/gray"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvOtherBuddyId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="150dp"
+        android:background="@drawable/et_rounded_corners_style"
+        android:fontFamily="@font/lato"
+        android:text="Other Buddy ID"
+        android:textColor="@color/gray"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/etPin"
+        android:layout_width="100dp"
+        android:layout_height="22dp"
+        android:layout_alignParentTop="true"
+
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="107dp"
+        android:layout_marginEnd="71dp"
+        android:background="@drawable/et_rounded_corners_style"
+        android:fontFamily="@font/lato"
+        android:hint="Enter PIN #"
+        android:textAlignment="center"
+        android:textColor="@color/gray"
+        android:textSize="15sp" />
+
+    <Button
+        android:id="@+id/btnConfirmBuddy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="134dp"
+        android:layout_marginEnd="35dp"
+        android:backgroundTint="@color/logo_teal"
+        android:fontFamily="@font/lato"
+        android:text="Confirm Buddy"
+        android:textColor="@color/white"
+        android:textSize="15sp" />
+</RelativeLayout>
+
+</RelativeLayout>
