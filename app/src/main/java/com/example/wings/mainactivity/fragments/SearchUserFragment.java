@@ -71,16 +71,14 @@ public class SearchUserFragment extends Fragment {
         rvUsers = view.findViewById(R.id.rvsearchforfriends);
         users = new ArrayList<>();
         adapter = new UserAdapter(getContext(), users);
-        tester = view.findViewById(R.id.tvtester);
-        tester2 = view.findViewById(R.id.tvtester2);
-        tester3 = view.findViewById(R.id.tvtester3);
+
 
         rvUsers.setAdapter(adapter);
         rvUsers.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        tester.setText("onViewCreated");
-        queryUsers();
-        tester3.setText("out of queryusers");
+
+   //     queryUsers();
+
 
 
 

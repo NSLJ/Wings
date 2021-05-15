@@ -1,37 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
-xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-tools:context=".mainactivity.fragments.dialogs.ConfirmDestinationDialog">
-
-
-<RelativeLayout
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="130dp"
-    android:padding="10dp">
+    android:layout_height="match_parent"
+    tools:context=".mainactivity.fragments.dialogs.ConfirmDestinationDialog">
 
-    <TextView
-        android:id="@+id/tvHeading"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Find a Buddy near this destination?"
-        android:textColor="#000"
-        android:textSize="18sp" />
+    <RelativeLayout
 
-    <TextView
-        android:id="@+id/tvDestination"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tvHeading"
-        android:layout_marginTop="10dp"
-        android:background="@null"
-        android:text="Destination: "
-        android:textColor="#000"
-        android:textSize="14sp" />
+        android:layout_width="fill_parent"
+        android:layout_height="140dp"
+        android:background="@color/gray_background"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/tvHeading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/lato"
+            android:text="Find a buddy near this destination?"
+            android:textColor="@color/gray"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/tvDestination"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvHeading"
+            android:layout_marginTop="15dp"
+            android:background="@null"
+            android:fontFamily="@font/lato"
+            android:text="Destination: "
+            android:textColor="@color/gray"
+            android:textSize="15sp" />
 
     <ImageButton
         android:id="@+id/ibttnAccept"
@@ -55,54 +57,76 @@ tools:context=".mainactivity.fragments.dialogs.ConfirmDestinationDialog">
         android:text="CANCEL"
         android:textColor="#33bbff"
         android:textSize="18sp" />
-
-</RelativeLayout>
-
-<!--The actual layout but it makes the dialog box look weird for some reason
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:background="#121212">
-
-        <TextView
-            android:id="@+id/tvDestination"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="false"
-            android:layout_marginLeft="57dp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/most_opaque_rounded"
-            android:fontFamily="@font/lato"
-            android:paddingTop="5dp"
-            android:paddingRight="300dp"
-            android:textColor="@color/gray"
-            android:textColorHint="@color/gray"
-            android:textSize="24sp" />
-
-        <ImageButton
-            android:id="@+id/ibttnAccept"
-            style="@android:style/Widget.Holo.ImageButton"
-            android:layout_width="51dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tvDestination"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="102dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="5dp"
-            app:srcCompat="@drawable/accept_button" />
-
-        <ImageButton
-            android:id="@+id/ibttnReject"
-            style="@android:style/Widget.Holo.ImageButton"
+<!--
+        <Button
+            android:id="@+id/btnConfirmDestination"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvDestination"
-            android:layout_marginStart="100dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="5dp"
-            android:layout_toEndOf="@+id/ibttnAccept"
-            app:srcCompat="@drawable/cancel_button" />
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/logo_teal"
+            android:text="Confirm Destination" /> -->
 
-    </RelativeLayout> -->
+
+    </RelativeLayout>
+
+
+    <!--The actual layout but it makes the dialog box look weird for some reason -->
+    <!--    <RelativeLayout
+         android:layout_width="match_parent"
+         android:layout_height="120dp"
+         android:background="#121212">
+
+         <TextView
+             android:id="@+id/tvDestination"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_centerHorizontal="false"
+             android:layout_marginLeft="57dp"
+             android:layout_marginTop="20dp"
+             android:background="@drawable/most_opaque_rounded"
+             android:fontFamily="@font/lato"
+             android:paddingTop="5dp"
+             android:paddingRight="300dp"
+             android:textColor="@color/gray"
+             android:textColorHint="@color/gray"
+             android:textSize="24sp" />
+
+         <Button
+             android:id="@+id/btnConfirmDestination"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_below="@+id/tvDestination"
+             android:layout_centerHorizontal="true"
+             android:layout_marginTop="20dp"
+             android:layout_marginBottom="10dp"
+             android:backgroundTint="@color/logo_teal"
+             android:text="Confirm Destination" />
+
+         <ImageButton
+             android:id="@+id/ibttnAccept"
+             style="@android:style/Widget.Holo.ImageButton"
+             android:layout_width="51dp"
+             android:layout_height="wrap_content"
+             android:layout_below="@+id/tvDestination"
+             android:layout_alignParentStart="true"
+             android:layout_marginStart="102dp"
+             android:layout_marginTop="15dp"
+             android:layout_marginBottom="5dp"
+             app:srcCompat="@drawable/accept_button" />
+
+         <ImageButton
+             android:id="@+id/ibttnReject"
+             style="@android:style/Widget.Holo.ImageButton"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_below="@+id/tvDestination"
+             android:layout_marginStart="100dp"
+             android:layout_marginTop="15dp"
+             android:layout_marginBottom="5dp"
+             android:layout_toEndOf="@+id/ibttnAccept"
+             app:srcCompat="@drawable/cancel_button" /> -->
+<!-- </RelativeLayout>-->
 
 </RelativeLayout>

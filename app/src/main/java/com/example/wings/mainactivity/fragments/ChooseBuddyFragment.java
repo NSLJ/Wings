@@ -97,7 +97,7 @@ public class ChooseBuddyFragment extends Fragment {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.toHomeFragment();
+                listener.toHomeFragment(HomeFragment.KEY_BASIC);
             }
         });
 

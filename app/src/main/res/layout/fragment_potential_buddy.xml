@@ -11,9 +11,12 @@
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/gray_background"
+        android:backgroundTint="@color/gray_background"
         android:fontFamily="@font/satisfy"
         android:text="Title here"
         android:textAlignment="center"
+        android:textColor="#FFFFFF"
         android:textSize="25sp" />
 
     <fragment

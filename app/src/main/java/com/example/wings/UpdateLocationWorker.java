@@ -53,12 +53,14 @@ public class UpdateLocationWorker extends Worker {
             }
         }
     };
+
     double longitude, latitude;
     String result;
     CountDownLatch latch = new CountDownLatch(1);               //to for all tasks to finish
     CountDownLatch waitForParse = new CountDownLatch(1);        // used for getCurrentLocation to wait for updateCur
     FusedLocationProviderClient flpClient;
     Context context;
+
 
     public UpdateLocationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);

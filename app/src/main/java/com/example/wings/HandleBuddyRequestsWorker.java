@@ -58,16 +58,16 @@ public class HandleBuddyRequestsWorker extends Worker {
         int initialNumRequests = data.getInt(KEY_INITIAL_COUNT, -2);
         Log.d(TAG, "in doWork(): initialNumReq="+initialNumRequests);
 
-        currentUser = ParseUser.getCurrentUser();
-        currentBuddyInstance = (Buddy) currentUser.getParseObject(User.KEY_BUDDY);
         try {
+            currentUser = ParseUser.getCurrentUser();
+            currentUser.fetchIfNeeded();
+            currentBuddyInstance = (Buddy) currentUser.getParseObject(User.KEY_BUDDY);
             currentBuddyInstance.fetchIfNeeded();
             latch.countDown();
         } catch (ParseException e) {
             Log.d(TAG, "in constructor: currentBuddyInstance couldn't be fetched");
             e.printStackTrace();
         }
-
 
 
         try {
@@ -85,12 +85,12 @@ public class HandleBuddyRequestsWorker extends Worker {
             numRequestsChanged = true;
         }
 
-/*
+
         //2.) Get all sentRequests and check if any of them are approved:
         List<BuddyRequest> sentRequests = currentBuddyInstance.getSentRequests();
-        Log.d(TAG, "in doWork() sentRequests=" + sentRequests.toString());   */
+        Log.d(TAG, "in doWork() sentRequests=" + sentRequests.toString());
         boolean isApproved = false;
-   /*     int approvedRequestIndex = -1;
+        int approvedRequestIndex = -1;
         for(int i = 0; i < sentRequests.size(); i++){
             BuddyRequest currSentRequest = sentRequests.get(i);
             try {
@@ -100,7 +100,7 @@ public class HandleBuddyRequestsWorker extends Worker {
                     Log.d(TAG, "in doWork() in isConfirmed");
 
                     isApproved = true;
-             /*       approvedRequestIndex = i;
+                   approvedRequestIndex = i;
                     break;
                 }
             } catch (ParseException e) {
@@ -109,7 +109,7 @@ public class HandleBuddyRequestsWorker extends Worker {
             }
 
         }
-*/
+
         Data output =  new Data.Builder()
                 .putBoolean(KEY_CHANGED, numRequestsChanged)
                 .putInt(KEY_NUM_RECEIVED, numReceived)

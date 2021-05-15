@@ -4,44 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray"
+    android:background="#28C4C4C4"
     android:orientation="vertical"
     tools:context=".mainactivity.fragments.HomeFragment">
-
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="false"
-        android:layout_centerHorizontal="false"
-        android:fontFamily="@font/satisfy"
-        android:text="Destination: "
-        android:textAlignment="center"
-        android:textColor="@color/gray_100"
-        android:textSize="25sp" />
 
     <RelativeLayout
         android:id="@+id/rlSearchBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="40dp">
 
         <EditText
             android:id="@+id/etSearchBar"
-            android:layout_width="350dp"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
             android:ems="10"
+            android:fontFamily="@font/lato"
+            android:gravity="center"
             android:hint="Search for a destination"
             android:inputType="textPersonName"
-            android:textColorLink="#FFFFFF" />
+            android:textAlignment="textStart" />
 
         <Button
             android:id="@+id/btnSearch"
-            android:layout_width="wrap_content"
+            android:layout_width="15dp"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/etSearchBar"
-            android:layout_alignEnd="@id/etSearchBar"
-            android:layout_alignBottom="@id/etSearchBar"
             android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
             android:layout_marginStart="-35dp"
             android:layout_toEndOf="@+id/etSearchBar"
             android:text="search" />

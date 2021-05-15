@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     public static final String KEY_USERID = "potentialBuddyId";
     private static final String KEY_DIALOG = "dialogTypeToShow";
     private static final String KEY_BUDDYREQUESTID = "buddyRequestId";
+    private static final String KEY_MODE = "whatMode?";
 
     private static final String KEY_APPROVED_REQUEST = "whichSentRequest?"; //these two are for responses with sentrequests
     private static final String KEY_ISAPPROVED = "anyRequestsApproved?";
@@ -170,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                 else{
                     keepTracking= true;
                     startTracking();           //infinitely runs as long as keepTracking = true;
-                    setWatchRequests(true);
+                   // setWatchRequests(true);
                 }
 
 
@@ -367,7 +368,28 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                                     break;
 
                                 case R.id.action_home:
+                                    Bundle bundle = new Bundle();;
+
+                                    ParseUser currUser = ParseUser.getCurrentUser();
+                                    if(currUser.getBoolean(User.KEY_ISBUDDY)) {
+                                        Buddy buddyInstance = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
+                                        try {
+                                            buddyInstance.fetchIfNeeded();
+                                            if(buddyInstance.getHasBuddy()){
+                                                bundle.putString(KEY_MODE, HomeFragment.KEY_ONTRIP);
+                                            }
+                                            else{
+                                                bundle.putString(KEY_MODE, HomeFragment.KEY_BASIC);
+                                            }
+                                        } catch (ParseException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                    else{
+                                        bundle.putString(KEY_MODE, HomeFragment.KEY_BASIC);
+                                    }
                                     fragment = new HomeFragment();
+                                    fragment.setArguments(bundle);
                                     break;
 
                                 case R.id.action_profile:
@@ -393,8 +415,12 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         this.invalidateOptionsMenu();
     }
     @Override
-    public void toHomeFragment() {
-        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new HomeFragment()).commit();
+    public void toHomeFragment(String modeKey) {
+        Bundle bundle = new Bundle();;
+        bundle.putString(KEY_MODE, modeKey);
+        Fragment frag = new HomeFragment();
+        frag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
     }
     public void toProfileSetupFragment(){
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new ProfileSetupFragment()).commit();
@@ -507,8 +533,9 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                     //called every time WorkInfo is changed
                     public void onChanged(@Nullable WorkInfo workInfo) {
                         Log.d(TAG, "watchRequests(): onChanged()");
-                        //If workInfo is there and it is succeeded --> update the text
+
                         if (workInfo != null) {
+
                             //Check if finished:
                             if(workInfo.getState().isFinished()){
                                 if(workInfo.getState() == WorkInfo.State.SUCCEEDED){
@@ -516,11 +543,14 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
                                     Data output = workInfo.getOutputData();
 
+                                    //Check if any of our sent requests were approved
                                     boolean anyApproved = output.getBoolean(KEY_ISAPPROVED, false);
                                     Log.d(TAG, "watchRequests(): anyApproved=" + anyApproved);
+
                                     if(anyApproved){
                                         int sentRequestIndex = output.getInt(KEY_APPROVED_REQUEST, -1);
                                         Log.d(TAG, "watchRequests(): sentRequestindex=" + sentRequestIndex);
+
                                         //break out of the loop bc there's an approved request now
                                         setRunRequestHandling(false);
                                         Toast.makeText(getApplicationContext(), "One of your sent requests was approved!", Toast.LENGTH_SHORT).show();

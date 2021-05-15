@@ -13,7 +13,7 @@ import com.parse.ParseUser;
 //          can be done with in-class listeners later so that only specific Fragments can invoke specific methods  i.e HomeFragment.HomeFragmentListener{}
 public interface MAFragmentsListener {
     public void setRestrictScreen(boolean answer);
-    public void toHomeFragment();
+    public void toHomeFragment(String modeKey);
     public void toProfileSetupFragment();
     public void toUserProfileFragment();
     public void toSearchUserFragment();

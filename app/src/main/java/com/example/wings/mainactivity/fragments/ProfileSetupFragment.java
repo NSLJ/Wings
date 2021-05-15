@@ -152,7 +152,7 @@ public class ProfileSetupFragment extends Fragment {
                 //Delete this once fragment is fully done!
                 saveProfileSetup();         //makes profileSetup = true and saves it!
                 mlistener.setRestrictScreen(false);
-                mlistener.toHomeFragment();
+                mlistener.toHomeFragment(HomeFragment.KEY_BASIC);
             }
         });
 
