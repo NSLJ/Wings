@@ -19,13 +19,18 @@ import android.widget.Toast;
 import com.example.wings.R;
 import com.example.wings.adapters.ChooseBuddyAdapter;
 import com.example.wings.mainactivity.MAFragmentsListener;
+import com.example.wings.mainactivity.fragments.dialogs.RespondBuddyRequestDialog;
 import com.example.wings.models.Buddy;
+import com.example.wings.models.BuddyMeetUp;
 import com.example.wings.models.BuddyRequest;
 import com.example.wings.models.User;
 import com.example.wings.models.WingsGeoPoint;
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +40,7 @@ import java.util.List;
  */
 
 
-public class UserBuddyRequestsFragment extends Fragment {
+public class UserBuddyRequestsFragment extends Fragment{
     private static final String TAG = "UserBuddyRequestsFragment";
 
     private MAFragmentsListener listener;
@@ -59,7 +64,8 @@ public class UserBuddyRequestsFragment extends Fragment {
     List<BuddyRequest> sentRequests;
     List<BuddyRequest> receivedRequests;
 
-    public UserBuddyRequestsFragment() {}
+    public UserBuddyRequestsFragment() {
+    }
 
 
     public static UserBuddyRequestsFragment newInstance(String param1, String param2) {
@@ -102,8 +108,8 @@ public class UserBuddyRequestsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        rvSentRequests = view.findViewById(R.id.rvSent);
-        rvReceivedRequests = view.findViewById(R.id.rvReceived);
+        rvSentRequests = view.findViewById(R.id.rvSent);                    //displays the receivers sent those request TO --> no clickability
+        rvReceivedRequests = view.findViewById(R.id.rvReceived);            //displays the Senders these requests came from
         btnBack = view.findViewById(R.id.btnBack);
 
         btnBack.setOnClickListener(new View.OnClickListener() {
@@ -125,15 +131,7 @@ public class UserBuddyRequestsFragment extends Fragment {
             @Override
             public void onClick(int position) {
                 //I think position = corresponds to the indexes in the List<> models but may be backwards or something:
-                Toast.makeText(getContext(), "You clicked on a request, going to PotentialBuddyFragment + some specific dialog to show", Toast.LENGTH_SHORT).show();
-                ParseUser thisUser = peopleSentTo.get(position);
-                try {
-                    thisUser.fetchIfNeeded();
-                    String objectId = thisUser.getObjectId();
-                    listener.toPotentialBuddyFragment(objectId, PotentialBuddyFragment.KEY_SHOW_RESPONDREQUEST);        //Display a RespondBuddyRequestDialog
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+                Toast.makeText(getContext(), "You are waiting for this Buddy to respond!", Toast.LENGTH_SHORT).show();
             }
         };
 
@@ -143,11 +141,12 @@ public class UserBuddyRequestsFragment extends Fragment {
             public void onClick(int position) {
                 //I think position = corresponds to the indexes in the List<> models but may be backwards or something:
                 Toast.makeText(getContext(), "You clicked on a request, going to PotentialBuddyFragment + some specific dialog to show", Toast.LENGTH_SHORT).show();
+                BuddyRequest requestInQuestion = receivedRequests.get(position);
                 ParseUser thisUser = peopleReceivedFrom.get(position);
                 try {
                     thisUser.fetchIfNeeded();
                     String objectId = thisUser.getObjectId();
-                    listener.toPotentialBuddyFragment(objectId, PotentialBuddyFragment.KEY_SHOW_RESPONDREQUEST);
+                    listener.toPotentialBuddyFragment(objectId, PotentialBuddyFragment.KEY_SHOW_RESPONDREQUEST, requestInQuestion.getObjectId());
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -181,7 +180,7 @@ public class UserBuddyRequestsFragment extends Fragment {
     }
 
     //Purpose:      To initialize/get the sentRequests and receivedRequests
-    public void getRequests(){
+    public void getRequests() {
         Buddy buddyInstance = (Buddy) currentUser.getParseObject(User.KEY_BUDDY);
         try {
             buddyInstance.fetchIfNeeded();
@@ -195,12 +194,12 @@ public class UserBuddyRequestsFragment extends Fragment {
     }
 
     //Purpose:      take out the ParseUser and find the distances b/w our currentLocation and the other ParseUser's currentLocation, assume our currentLocation is initialized.
-    public void getParseUsers(List<BuddyRequest> requestList, boolean getSender){
+    public void getParseUsers(List<BuddyRequest> requestList, boolean getSender) {
         List<ParseUser> result = new ArrayList<>();
         List<Double> distancesList = new ArrayList<>();         //use setter methods to set them appropriately at the end
 
-        for(int i = 0; i < requestList.size(); i++) {
-            BuddyRequest currentRequest =  requestList.get(i);
+        for (int i = 0; i < requestList.size(); i++) {
+            BuddyRequest currentRequest = requestList.get(i);
             if (getSender) {
                 try {
                     currentRequest.fetchIfNeeded();
@@ -220,7 +219,7 @@ public class UserBuddyRequestsFragment extends Fragment {
                     otherCurrLocationGeoPoint.fetchIfNeeded();
                     ParseGeoPoint otherCurrLocation = otherCurrLocationGeoPoint.getLocation();
 
-                    double currDistance = currentLocation.distanceInKilometersTo(otherCurrLocation)*1000;     //*1000 to get meters
+                    double currDistance = currentLocation.distanceInKilometersTo(otherCurrLocation) * 1000;     //*1000 to get meters
 
                     //Add the found distance to our List<Double>
                     distancesList.add(currDistance);
@@ -250,7 +249,7 @@ public class UserBuddyRequestsFragment extends Fragment {
                     otherCurrLocationGeoPoint.fetchIfNeeded();
                     ParseGeoPoint otherCurrLocation = otherCurrLocationGeoPoint.getLocation();
 
-                    double currDistance = currentLocation.distanceInKilometersTo(otherCurrLocation)*1000;     //*1000 to get meters
+                    double currDistance = currentLocation.distanceInKilometersTo(otherCurrLocation) * 1000;     //*1000 to get meters
 
                     //Add the found distance to our List<Double>
                     distancesList.add(currDistance);
@@ -262,12 +261,11 @@ public class UserBuddyRequestsFragment extends Fragment {
         }
 
         //Once results are initialized --> set them in the class fields:
-        if(!getSender){         //If I got the receivers -->
+        if (!getSender) {         //If I got the receivers -->
             //save to the sender models:
             setPeopleSentTo(result);
             setDistanceFromSent(distancesList);
-        }
-        else{
+        } else {
             //save to the receiver models:
             setPeopleReceivedFrom(result);
             setDistanceFromReceivers(distancesList);
@@ -278,6 +276,7 @@ public class UserBuddyRequestsFragment extends Fragment {
         peopleSentTo.addAll(result);
         sentRequestsAdapter.notifyDataSetChanged();
     }
+
     private void setDistanceFromSent(List<Double> distancesList) {
         distanceFromSent.addAll(distancesList);
         sentRequestsAdapter.notifyDataSetChanged();
@@ -292,6 +291,5 @@ public class UserBuddyRequestsFragment extends Fragment {
         distanceFromReceivers.addAll(distancesList);
         receivedRequestAdapter.notifyDataSetChanged();
     }
-
 
 }

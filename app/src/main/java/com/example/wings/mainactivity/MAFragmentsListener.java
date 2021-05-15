@@ -1,5 +1,6 @@
 package com.example.wings.mainactivity;
 
+import com.example.wings.models.BuddyRequest;
 import com.parse.ParseUser;
 
 /**
@@ -23,5 +24,5 @@ public interface MAFragmentsListener {
     public void toHelpFragment();
     public void setBuddyRequestBttn(boolean answer);
     public void toUserBuddyRequestFragment();
-    public void toPotentialBuddyFragment(String potentialBuddyId, String keyShowDialog);
+    public void toPotentialBuddyFragment(String potentialBuddyId, String keyShowDialog, String buddyRequestId);
 }

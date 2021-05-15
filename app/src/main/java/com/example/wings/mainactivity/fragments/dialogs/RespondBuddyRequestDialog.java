@@ -36,10 +36,12 @@ import java.util.List;
 public class RespondBuddyRequestDialog extends DialogFragment {
     private static final String TAG = "RespondBuddyRequestDialog";
     public static final String KEY_USERID = "buddyId";
+    private static final String KEY_BUDDYREQUESTID = "buddyRequestId";
 
     private RespondBuddyRequestDialog.ResultListener listener;
 
     private String potentialBuddyId;
+    private String buddyRequestId;
     private ParseUser potentialBuddy;
     private double distance;
 
@@ -54,18 +56,18 @@ public class RespondBuddyRequestDialog extends DialogFragment {
 
     //Purpose:      so the PotentialBuddyFragment will be able to handle info from the Dialog!
     public interface ResultListener {
-        public void onAccept(Buddy buddy);
-
-        public void onReject();
+        public void onAccept(Buddy buddy, String buddyRequestId);
+        public void onReject(String buddyRequestId);
     }
 
     public RespondBuddyRequestDialog() {
     }
 
-    public static RespondBuddyRequestDialog newInstance(String otherUserId) {
+    public static RespondBuddyRequestDialog newInstance(String otherUserId, String buddyRequestId) {
         RespondBuddyRequestDialog fragment = new RespondBuddyRequestDialog();
         Bundle args = new Bundle();
         args.putString(KEY_USERID, otherUserId);
+        args.putString(KEY_BUDDYREQUESTID, buddyRequestId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -86,6 +88,7 @@ public class RespondBuddyRequestDialog extends DialogFragment {
         if (getArguments() != null) {
             //Initalize potentialBuddyId:
             potentialBuddyId = getArguments().getString(KEY_USERID, "defaultVal");
+            buddyRequestId = getArguments().getString(KEY_BUDDYREQUESTID, "defaultVal");
             Log.d(TAG, "onCreate():  potentialBuddyId =" + potentialBuddyId);
         }
     }
@@ -169,7 +172,7 @@ public class RespondBuddyRequestDialog extends DialogFragment {
                     @Override
                     public void onClick(View v) {
                         Log.d(TAG, "bttnReject - onClick:");
-                        listener.onReject();
+                        listener.onReject(buddyRequestId);
                         getDialog().dismiss();
                     }
                 });
@@ -181,7 +184,7 @@ public class RespondBuddyRequestDialog extends DialogFragment {
                         Buddy buddyInstance = (Buddy) potentialBuddy.getParseObject(User.KEY_BUDDY);
                         try {
                             buddyInstance.fetchIfNeeded();
-                            listener.onAccept(buddyInstance);
+                            listener.onAccept(buddyInstance, buddyRequestId);
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }

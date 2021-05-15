@@ -21,6 +21,7 @@ import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.mainactivity.fragments.dialogs.ConfirmSendRequestDialog;
 import com.example.wings.mainactivity.fragments.dialogs.RespondBuddyRequestDialog;
 import com.example.wings.models.Buddy;
+import com.example.wings.models.BuddyMeetUp;
 import com.example.wings.models.BuddyRequest;
 import com.example.wings.models.User;
 import com.example.wings.models.WingsGeoPoint;
@@ -34,7 +35,9 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //Purpose:      To display a selected other user's information when looking for a buddy --> displays map, routes, locations, ialogbox, etc
@@ -44,10 +47,11 @@ import java.util.List;
 //TODO: Figure out more hoe dialog boxes work, make them prettier, now how to still interact with the background, or at least not just disapper by touching the screen --> can leave us on this screen
 //TODO: Make Titles for this fragment bc looking at a ton of maps really gets confusing for screen to screen
 
-public class PotentialBuddyFragment extends Fragment implements ConfirmSendRequestDialog.ResultListener {
+public class PotentialBuddyFragment extends Fragment implements ConfirmSendRequestDialog.ResultListener, RespondBuddyRequestDialog.ResultListener{
     private static final String TAG = "PotentialBuddyFragment";
     private static final String KEY_USERID = "potentialBuddyId";
     private static final String KEY_DIALOG = "dialogTypeToShow";
+    private static final String KEY_BUDDYREQUESTID = "buddyRequestId";
 
     public static final String KEY_SHOW_CONFIRMSEND = "confirmSendDialog";
     public static final String KEY_SHOW_RESPONDREQUEST = "respondRequestDialog";            //will be publically accessed so other frags and activites cand easily go to
@@ -55,6 +59,7 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmSendReque
     private MAFragmentsListener listener;
 
     private String potentialBuddyId;
+    private String buddyRequestId;
     private String dialogToShow;
     DialogFragment dialog;
 
@@ -69,54 +74,6 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmSendReque
     private LatLng potentialBuddyDestination;
 
     public PotentialBuddyFragment() {}
-
-
-    //Methods to override from ConfirmSendRequestDialog resultlistener:
-    @Override
-    //Purpose:      Create a BuddyRequest where current user is the sender, other user is the receiver, go back to ChooseBuddyFragment, increment the BuddyRequest in UserBuddyRequestsFragment
-    public void onAccept(Buddy potentialBuddy) {
-        Log.d(TAG, "onAccept()");
-        Toast.makeText(getContext(), "accept button pressed", Toast.LENGTH_SHORT).show();
-
-        //TODO: Should technically check if we've already sent a request to this Buddy
-        //1.) Get current user's buddy instance:
-        ParseUser user = ParseUser.getCurrentUser();
-        Buddy buddyInstance = (Buddy) user.getParseObject(User.KEY_BUDDY);
-        try {
-            buddyInstance.fetchIfNeeded();
-
-            //2.) Create and save BuddyRequest:
-            BuddyRequest request = new BuddyRequest(buddyInstance, potentialBuddy);
-            request.saveInBackground();
-
-            //3.) Get buddyInstance's list of sentBuddyRequests:
-            List<BuddyRequest> sentRequests = buddyInstance.getSentRequests();
-            sentRequests.add(request);
-            buddyInstance.setSentRequests(sentRequests);
-            buddyInstance.saveInBackground();
-
-            //4.) Save the receivedRequest in the potentialBuddy now --> later this is how its received:
-            List<BuddyRequest> othersReceivedRequests = potentialBuddy.getReceivedRequests();
-            othersReceivedRequests.add(request);
-            potentialBuddy.setReceivedRequests(othersReceivedRequests);
-            potentialBuddy.saveInBackground();
-
-
-            //5.) Go back to ChooseBuddyFrag
-            listener.toChooseBuddyFragment();
-        } catch (ParseException e) {
-            Log.d(TAG, "onAccept: error getting buddy request I think, error=" + e.getMessage());
-            e.printStackTrace();
-        }
-
-    }
-
-    @Override
-    //Purpose:      Just go back to the ChooseBuddyFragment
-    public void onReject() {
-        Toast.makeText(getContext(), "reject button pressed", Toast.LENGTH_SHORT).show();
-        listener.toChooseBuddyFragment();
-    }
 
 
     @Override
@@ -149,6 +106,7 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmSendReque
             Log.d(TAG, "onCreate():  potentialBuddyId =" + potentialBuddyId);
             dialogToShow = getArguments().getString(KEY_DIALOG);
             Log.d(TAG, "onCreate(): dialogKey=" + dialogToShow);
+            buddyRequestId = getArguments().getString(KEY_BUDDYREQUESTID);
         }
     }
 
@@ -191,7 +149,7 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmSendReque
 
         if(dialogToShow.equals(KEY_SHOW_RESPONDREQUEST)){
             tvTitle.setText("Respond to this Buddy Request");
-            dialog = RespondBuddyRequestDialog.newInstance(potentialBuddyId);
+            dialog = RespondBuddyRequestDialog.newInstance(potentialBuddyId, buddyRequestId);
         }
 
 
@@ -279,5 +237,190 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmSendReque
         dialog.show(getFragmentManager(), tag);
     }
 
+
+    //Overrided for RespondBuddyRequestDialog
+    //Methods that are called when RespondBuddyRequest tells us whether current user chose to accept or not accept the request
+    @Override
+    public void onAccept(Buddy confirmedBuddy, String buddyRequestId) {     //given the Buddy we just confirmed with
+        //Accept the request -->
+        //Make BuddyMeetUp
+        //Get buddyInstance
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        Buddy currBuddy = (Buddy) currentUser.getParseObject(User.KEY_BUDDY);
+        try {
+            currBuddy.fetchIfNeeded();
+
+            BuddyMeetUp buddyMeetUp = new BuddyMeetUp(confirmedBuddy, currBuddy);
+            buddyMeetUp.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if(e == null){
+                        Log.d(TAG, "we saved the buddyMeetUp instance ok!");
+                    }
+                    else{
+                        Log.d(TAG, "error saving the buddyMeetUp, error=" +e.getMessage());
+                    }
+                }
+            });
+
+            //Change the Buddy fields:
+            currBuddy.setHasBuddy(true);
+            currBuddy.setOnMeetup(true);
+            currBuddy.setBuddyMeetUp(buddyMeetUp);
+            currBuddy.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if(e == null){
+                        Log.d(TAG, "we saved curBuddy ok!");
+                    }
+                    else{
+                        Log.d(TAG, "error saving currBuddy error=" +e.getMessage());
+                    }
+                }
+            });
+
+            confirmedBuddy.setHasBuddy(true);
+            confirmedBuddy.setOnMeetup(true);
+            confirmedBuddy.setBuddyMeetUp(buddyMeetUp);
+            confirmedBuddy.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if(e == null){
+                        Log.d(TAG, "we saved confirmedBuddy ok!");
+                    }
+                    else{
+                        Log.d(TAG, "error saving confirmedBuddy error=" +e.getMessage());
+                    }
+                }
+            });
+
+            //4.) Get rid of the BuddyRequest entirely (by making everything empty)
+            currBuddy.setReceivedRequests(new ArrayList<>());
+            currBuddy.setSentRequests(new ArrayList());
+            confirmedBuddy.setReceivedRequests(new ArrayList());
+            confirmedBuddy.setSentRequests(new ArrayList());
+            //Technically should go through each BuddyRequest in each list and make null/empty
+
+            //if valid id:
+            if(!buddyRequestId.equals("none")) {
+                ParseQuery<BuddyRequest> query = ParseQuery.getQuery(BuddyRequest.class);
+                query.whereEqualTo(BuddyRequest.KEY_OBJECT_ID, buddyRequestId);
+                query.findInBackground(new FindCallback<BuddyRequest>() {
+                    @Override
+                    public void done(List<BuddyRequest> objects, ParseException e) {
+                        BuddyRequest requestInQuestion =  objects.get(0);
+                        try {
+                            requestInQuestion.delete();
+                        } catch (ParseException parseException) {
+                            parseException.printStackTrace();
+                        }
+                    }
+                });
+
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        //Directly go to HomeFragment to start the BuddyMeetUp!
+        listener.toHomeFragment();
+        Toast.makeText(getContext(), "Start meetup with your buddy!", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onReject(String buddyRequestId) {
+        if(!buddyRequestId.equals("none")) {
+            //1.) Get buddyInstance:
+            ParseUser currentUser = ParseUser.getCurrentUser();
+            Buddy currBuddy = (Buddy) currentUser.getParseObject(User.KEY_BUDDY);
+            try {
+                currBuddy.fetchIfNeeded();
+
+                //Get all receivedRequests:
+                List<BuddyRequest> receivedRequests = currBuddy.getReceivedRequests();
+                for(int i = 0; i < receivedRequests.size(); i++){
+                    BuddyRequest currRequest = receivedRequests.get(i);
+                    if(currRequest.getObjectId().equals(buddyRequestId)){
+                        receivedRequests.remove(i);
+                        break;
+                    }
+                }
+
+                currBuddy.setReceivedRequests(receivedRequests);
+                currBuddy.saveInBackground();
+            }catch(ParseException e){
+                Log.d(TAG, "onReject() after RespondBuddyRequestDialog");
+            }
+
+            //Take this Buddy Request out of the list of ReceivedRequests!
+
+
+        //Get rid of the BuddyRequest instance entirely since it was rejected?
+        //if valid id:
+
+            ParseQuery<BuddyRequest> query = ParseQuery.getQuery(BuddyRequest.class);
+            query.whereEqualTo(BuddyRequest.KEY_OBJECT_ID, buddyRequestId);
+            query.findInBackground(new FindCallback<BuddyRequest>() {
+                @Override
+                public void done(List<BuddyRequest> objects, ParseException e) {
+                    BuddyRequest requestInQuestion = objects.get(0);
+                    try {
+                        requestInQuestion.delete();
+                    } catch (ParseException parseException) {
+                        parseException.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
+
+
+    //Methods to override from ConfirmSendRequestDialog resultlistener:
+    @Override
+    //Purpose:      Create a BuddyRequest where current user is the sender, other user is the receiver, go back to ChooseBuddyFragment, increment the BuddyRequest in UserBuddyRequestsFragment
+    public void onAccept(Buddy potentialBuddy) {
+        Log.d(TAG, "onAccept()");
+        Toast.makeText(getContext(), "accept button pressed", Toast.LENGTH_SHORT).show();
+
+        //TODO: Should technically check if we've already sent a request to this Buddy
+        //1.) Get current user's buddy instance:
+        ParseUser user = ParseUser.getCurrentUser();
+        Buddy buddyInstance = (Buddy) user.getParseObject(User.KEY_BUDDY);
+        try {
+            buddyInstance.fetchIfNeeded();
+
+            //2.) Create and save BuddyRequest:
+            BuddyRequest request = new BuddyRequest(buddyInstance, potentialBuddy);
+            request.saveInBackground();
+
+            //3.) Get buddyInstance's list of sentBuddyRequests:
+            List<BuddyRequest> sentRequests = buddyInstance.getSentRequests();
+            sentRequests.add(request);
+            buddyInstance.setSentRequests(sentRequests);
+            buddyInstance.saveInBackground();
+
+            //4.) Save the receivedRequest in the potentialBuddy now --> later this is how its received:
+            List<BuddyRequest> othersReceivedRequests = potentialBuddy.getReceivedRequests();
+            othersReceivedRequests.add(request);
+            potentialBuddy.setReceivedRequests(othersReceivedRequests);
+            potentialBuddy.saveInBackground();
+
+
+            //5.) Go back to ChooseBuddyFrag
+            listener.toChooseBuddyFragment();
+        } catch (ParseException e) {
+            Log.d(TAG, "onAccept: error getting buddy request I think, error=" + e.getMessage());
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    //Purpose:      Just go back to the ChooseBuddyFragment
+    public void onReject() {
+        Toast.makeText(getContext(), "reject button pressed", Toast.LENGTH_SHORT).show();
+        listener.toChooseBuddyFragment();
+    }
 
 }

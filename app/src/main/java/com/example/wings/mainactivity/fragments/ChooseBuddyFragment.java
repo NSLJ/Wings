@@ -109,7 +109,7 @@ public class ChooseBuddyFragment extends Fragment {
                 ParseUser userClicked = usersToDisplay.get(position);
                 String objectId = userClicked.getObjectId();
                 Log.d(TAG, "onClick(): position = " + position + "   objectId to send = " + objectId);
-                listener.toPotentialBuddyFragment(objectId, PotentialBuddyFragment.KEY_SHOW_CONFIRMSEND);               //Show a ConfirmSendQuestDialog!!
+                listener.toPotentialBuddyFragment(objectId, PotentialBuddyFragment.KEY_SHOW_CONFIRMSEND, "none");               //Show a ConfirmSendQuestDialog!!
             }
         };
 

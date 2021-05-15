@@ -23,14 +23,17 @@ public class Buddy extends ParseObject {
     public static final String KEY_OBJECTID = "objectId";
     public static final String KEY_USER = "user";
     public static final String KEY_DESTINATION = "intendedDestination";
-
-    public static final String KEY_MEETINGPOINT = "MeetingPoint";
     public static final String KEY_RECIEVEDREQUESTS = "receivedBuddyRequests";
     public static final String KEY_SENTREQUESTS = "sentBuddyRequests";
-    public static final String KEY_HASBUDDY = "hasBuddy";
-    public static final String KEY_ONMEETINGBUDDY = "onMeetingBuddy";
+    public static final String KEY_HASBUDDY = "hasBuddy";       //they are paired and they SHOULD also have either a BuddyMeetp or BuddyTrip
+
+    public static final String KEY_ONMEETUP = "onMeetup";
+    public static final String KEY_BUDDYMEETUP = "buddyMeetUpInstance";
+
     public static final String KEY_ONBUDDYTRIP = "onBuddyTrip";
-    public static final String KEY_BUDDYTRIP = "buddyTrip";
+    public static final String KEY_BUDDYTRIP = "buddyTripInstance";
+
+    //for now just use their buddy objectID as their buddy id for everything --> typically should be regenerating it every time
 
     public Buddy(){}
 
@@ -46,6 +49,10 @@ public class Buddy extends ParseObject {
         setSentRequests(sentRequests);
 
         setHasBuddy(false);
+        setOnMeetup(false);
+        setBuddyMeetUp(new BuddyMeetUp());
+        setOnBuddyTrip(false);
+        setBuddyTrip(new BuddyTrip());
     }
 
     //Getters and setters
@@ -68,15 +75,13 @@ public class Buddy extends ParseObject {
         put(KEY_DESTINATION, destination);
     }
     public WingsGeoPoint getDestination(){
-        return (WingsGeoPoint) getParseObject(KEY_DESTINATION);
-    }
-
-
-    public ParseGeoPoint getMeetingPoint(){
-        return getParseGeoPoint(KEY_MEETINGPOINT);
-    }
-    public void setMeetingPoint(ParseGeoPoint meetingPoint){
-        put(KEY_MEETINGPOINT, meetingPoint);
+        WingsGeoPoint point = (WingsGeoPoint) getParseObject(KEY_DESTINATION);
+        try {
+            point.fetchIfNeeded();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return point;
     }
 
     public void setReceivedRequests(List<BuddyRequest> allReceivedRequests){
@@ -86,7 +91,6 @@ public class Buddy extends ParseObject {
     public List<BuddyRequest> getReceivedRequests(){
         return getList(KEY_RECIEVEDREQUESTS);
     }
-
 
     public void setSentRequests(List<BuddyRequest> allSentRequests){
         put(KEY_SENTREQUESTS, allSentRequests);
@@ -103,24 +107,42 @@ public class Buddy extends ParseObject {
         put(KEY_HASBUDDY, has);
     }
 
-
-
-    public boolean getOnMeetingBuddy(){
-        return getBoolean(KEY_ONMEETINGBUDDY);
+    public boolean getOnMeetup(){
+        return getBoolean(KEY_ONMEETUP);
     }
-    public void setOnMeetingBuddy(boolean meeting){
-        put(KEY_ONMEETINGBUDDY, meeting);
+    public void setOnMeetup(boolean answer){
+        put(KEY_ONMEETUP, answer);
     }
+
+    public BuddyMeetUp getBuddyMeetUpInstance(){
+        BuddyMeetUp meetUp = (BuddyMeetUp) getParseObject(KEY_BUDDYMEETUP);
+        try {
+            meetUp.fetchIfNeeded();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return meetUp;
+    }
+    public void setBuddyMeetUp(BuddyMeetUp meetUp){
+        put(KEY_BUDDYMEETUP, meetUp);
+    }
+
     public boolean getOnBuddyTrip(){
         return getBoolean(KEY_ONBUDDYTRIP);
     }
-    public void setOnBuddyTrip(boolean onTrip){
-        put(KEY_ONBUDDYTRIP, onTrip);
+    public void setOnBuddyTrip(boolean answer){
+        put(KEY_ONBUDDYTRIP, answer);
     }
-    public ParseObject getBuddyTrip(){
-        return getParseObject(KEY_BUDDYTRIP);
+    public BuddyTrip getBuddyTripInstance(){
+        BuddyTrip trip = (BuddyTrip) getParseObject(KEY_BUDDYTRIP);
+        try {
+            trip.fetchIfNeeded();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return trip;
     }
-    public String getObjectID() {
-        return getString(KEY_OBJECTID);
+    public void setBuddyTrip(BuddyTrip trip){
+        put(KEY_BUDDYTRIP, trip);
     }
 }
