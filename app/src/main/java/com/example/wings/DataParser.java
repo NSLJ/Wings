@@ -20,64 +20,6 @@ import okhttp3.Route;
 public class DataParser {
     private static final String TAG = "DataParser";
 
-
-   /* public List<List<HashMap<String, String>>> parse(JSONObject jsonObject) {
-        Log.d("DataParser", "in parse()");
-        List<List<HashMap<String, String>>> routes = new ArrayList<>(); //list of multiple routes
-        JSONArray jRoutes = null;
-        JSONArray jLegs = null;
-        JSONArray jSteps = null;
-
-        //List<Route> routes = new ArrayList<>();
-
-        try {
-            //get the "routes" JSONArray in the JSONObject
-            jRoutes = jsonObject.getJSONArray("routes");
-
-            //Traversing all routes:
-            for (int i = 0; i < jRoutes.length(); i++) {
-                Log.d("DataParser", "parse(): jRoutes.length=" + jRoutes.length());
-                jLegs = ((JSONObject) jRoutes.get(i)).getJSONArray("legs");
-                List path = new ArrayList<HashMap<String, String>>();
-
-                //Traverse all legs:
-                for (int j = 0; j < jLegs.length(); j++) {
-                    Log.d("DataParser", "parse(): jLegs.length=" + jLegs.length());
-                    jSteps = ((JSONObject) jLegs.get(j)).getJSONArray("steps");
-
-                    //To obtain and decode the polyline in each step/instruction in the route
-                    for (int k = 0; k < jSteps.length(); k++) {
-                        Log.d("DataParser", "parse(): jSteps.length=" + jSteps.length());
-                        String polyline = "";
-                        polyline = (String) ((JSONObject) ((JSONObject) jSteps.get(k)).get("polyline")).get("points");
-                        List list = decodePoly(polyline);
-
-                        //Log.d("DataParser", "in parse(): after decodePoly(): list = " + list.toString());
-
-                        //Yes, there are multiple LatLngs in just one polyline in just one step
-                        //To obtain each LatLng in the decoded polyline stored in "list", and store it into a HashMap
-                        for (int l = 0; l < list.size(); l++) {
-                            Log.d("DataParser", "parse(): list.length=" + list.size());
-                            //create and initalize hashmap and add to the path field:
-                            HashMap<String, String> hm = new HashMap<>();
-                            hm.put("lat", Double.toString(((LatLng) list.get(l)).latitude));
-                            hm.put("lng", Double.toString(((LatLng) list.get(l)).longitude));
-
-                            //each path = a route, has the combined hashmaps of latlngs
-                            path.add(hm);       //Each LatLng is represented by 1 instance of a Hashmap, so path = List of LatLngs basically just in multiple Hashmaps
-                        }
-                    }
-                    routes.add(path);       //To save all routes as a List filled with Lists of HashMaps (that hold all the LatLngs), each List of HashMaps = just 1 decode polyline
-                }
-
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return routes;
-    }*/
-
     //Returns all possible routes as WingsRoute objects, this currently works
    public List<WingsRoute> parse(JSONObject jsonObject) {
        Log.d("DataParser", "in parse()");
@@ -128,7 +70,6 @@ public class DataParser {
 
                    //4.) To obtain and decode the polyline in each step/instruction in the route, save it and set it into our WingsRoute object
                    for (int k = 0; k < allSteps.length(); k++) {
-                       Log.d("DataParser", "parse(): allSteps.length=" + allSteps.length());
 
                        //4a.) Get the current step and get the polyline object's "points" field as a string:
                        JSONObject currentStep = (JSONObject) allSteps.get(k);
@@ -163,7 +104,6 @@ public class DataParser {
 
    //
         private List<LatLng> decodePoly(String encoded) {
-            Log.d("DataParser", "in decodePoly()");
             List<LatLng> poly = new ArrayList<>();
 
             int index = 0, len = encoded.length();

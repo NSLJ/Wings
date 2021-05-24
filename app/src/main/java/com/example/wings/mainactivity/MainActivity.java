@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         //Create the request
         OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(UpdateLocationWorker.class)
                 .setInputData(data)         //send data
-                .setInitialDelay(5, TimeUnit.SECONDS)      //wait 5 seconds before doing it         //TODO: don't hardcode, make this time frame a constant
+                .setInitialDelay(2, TimeUnit.MINUTES)      //wait 5 seconds before doing it         //TODO: don't hardcode, make this time frame a constant
                 .build();
 
         //Queue up the request

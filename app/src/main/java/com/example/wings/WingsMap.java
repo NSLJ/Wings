@@ -157,21 +157,16 @@ public class WingsMap {
                 - destination only ever from Parse database, will never need
      */
 
-    //Purpose:          Automatically finds and draws the route from current location to the given destination, draws the first route
-    public void routeFromCurrentLocation(LatLng destination){
+    //Purpose:          Automatically finds and draws the route from current location to the given destination, draws the first route. animateMap = whether or not to move the map once done drawing route. animateMap = whether or not to move the map once done drawing route
+    public void routeFromCurrentLocation(LatLng destination, boolean animateMap){
         isReady = false;
         ParseGeoPoint curLoc = new ParseGeoPoint(currentLocation.latitude, currentLocation.longitude);
         distanceFromCurLocation = curLoc.distanceInKilometersTo(new ParseGeoPoint(destination.latitude, destination.longitude))*1000;
-        route(currentLocation, destination);
-    }
-    public void routeFromCurrentLocation(LatLng destination, CountDownLatch latch){
-        ParseGeoPoint curLoc = new ParseGeoPoint(currentLocation.latitude, currentLocation.longitude);
-        distanceFromCurLocation = curLoc.distanceInKilometersTo(new ParseGeoPoint(destination.latitude, destination.longitude))*1000;
-        route(currentLocation, destination);
+        route(currentLocation, destination, animateMap);
     }
 
-    //Purpose:          Finds and chooses the first Address found from the given destination text. Routes from currentLocation, return the destination so HomeFragment can use it!
-    public LatLng routeFromCurrentLocation(String destinationTxt){
+    //Purpose:          Finds and chooses the first Address found from the given destination text. Routes from currentLocation, return the destination so HomeFragment can use it! animateMap = whether or not to move the map once done drawing route
+    public LatLng routeFromCurrentLocation(String destinationTxt, boolean animateMap){
         //Get possible addresses and choose the first one for now:
         LatLng foundDestination = null;
 
@@ -187,14 +182,12 @@ public class WingsMap {
             setUserDestinationString(destinationTxt);
 
             //2.) Find all routes from current location to destination, choose first route to draw
-            routeFromCurrentLocation(foundDestination);
+            routeFromCurrentLocation(foundDestination, animateMap);
         }
         return foundDestination;
     }
 
-    public void routeFromCurrentLocationForTrips(LatLng destination){
 
-    }
     //Purpose:      To use Geocoder to get the List<Address> that correlate to the given destination string
     public List<Address> getPossibleAddresses(String destination){
         List<Address> possibleAddresses = new ArrayList<>();
@@ -210,8 +203,8 @@ public class WingsMap {
         return possibleAddresses;
     }
 
-    //Purpose:          Automatically finds draws the first route from given start location and destination, initializes the allRoutes field
-    public void route(LatLng startLocation, LatLng destination){
+    //Purpose:          Automatically finds draws the first route from given start location and destination, initializes the allRoutes field. animateMap = whether or not to move the map once done drawing route
+    public void route(LatLng startLocation, LatLng destination, boolean animateMap){
         Log.d(TAG, "route()");
 
         //1.) If there is already a route drawn, clear the map before re-drawing on it:
@@ -237,7 +230,7 @@ public class WingsMap {
                 }
                 else {
                     setAllRoutes(result);                           //set allRoutes field = result
-                    drawRoute(0);                       //draw the first route
+                    drawRoute(0, animateMap);                       //draw the first route
                 }
             }
 
@@ -328,21 +321,26 @@ public class WingsMap {
                     @Override
                     //When obtains the location update --> updates our Location field, "currentLocation"
                     public void onLocationResult(LocationResult locationResult) {
-                        onLocationChanged(locationResult.getLastLocation());        //our method
+                        onLocationUpdated(locationResult.getLastLocation());        //our method
                     }
                 },
                 Looper.myLooper()
         );
     }
-    public void onLocationChanged(@NonNull Location location) {
+    public void onLocationUpdated(@NonNull Location location) {
         if (location != null) {
-            currentLocation = new LatLng(location.getLatitude(), location.getLongitude());        //to change map display automatically
+            LatLng receivedLocation = new LatLng(location.getLatitude(), location.getLongitude());
+            if((!currentLocation.equals(receivedLocation)) && destination != null){
+                Log.d(TAG, "onLocationUpdated(): currentLocation != to location updated --> re-drawing route");
+                route(receivedLocation, destination, false);
+            }
+            currentLocation = receivedLocation;     //to change map display automatically
         }
     }
 
 
     //Purpose:      draws the route given the position of which route wanted in allRoutes. Assumes the allRoutes field is already initalized!
-    private void drawRoute(int routePosition){
+    private void drawRoute(int routePosition, boolean animateMap){
         Log.d(TAG, "drawRoute()");
         chosenRoute = allRoutes.get(routePosition);
         PolylineOptions lineOptions = chosenRoute.getLineOptions();
@@ -352,17 +350,16 @@ public class WingsMap {
         lineOptions.color(Color.BLUE);
         lineOptions.geodesic(true);
 
-        setMarker(destination, BitmapDescriptorFactory.HUE_RED);
+        setMarker(destination, BitmapDescriptorFactory.HUE_RED, animateMap);
         routeDrawn = true;
         polylineDrawn = map.addPolyline(lineOptions);
         isReady = true;
-        //latch.countDown();
     }
 
     public boolean getIsReady(){
         return isReady;
     }
-    public void setMarker(LatLng destination, float color){
+    public void setMarker(LatLng destination, float color, boolean animateMap){
         Log.d(TAG, "setMaker()");
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(destination);
@@ -370,7 +367,9 @@ public class WingsMap {
         map.addMarker(markerOptions);
        // map.animateCamera(CameraUpdateFactory.newLatLng(destination));
       //  map.animateCamera(CameraUpdateFactory.zoomTo(9));
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(destination, 12));
+        if(animateMap) {
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(destination, 12));
+        }
     }
 
     //All setters and getters

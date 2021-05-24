@@ -2,6 +2,7 @@ package com.example.wings.models;
 
 import android.util.Log;
 
+import com.parse.FindCallback;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
@@ -59,6 +60,22 @@ public class WingsGeoPoint extends ParseObject {
         return getNumber(KEY_LONGITUDE).doubleValue();
     }
 
+    public void reset(){
+        setLatitude(0);
+        setLongitude(0);
+        setLocation(0, 0);
+        this.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Log.d(TAG, "this WingsGeoPoint reset successfully.");
+                }
+                else{
+                    Log.d(TAG, "this WingsGeoPoint reset successfully.");
+                }
+            }
+        });
+    }
 
 
 }

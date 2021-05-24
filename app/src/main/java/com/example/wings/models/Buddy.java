@@ -145,4 +145,45 @@ public class Buddy extends ParseObject {
     public void setBuddyTrip(BuddyTrip trip){
         put(KEY_BUDDYTRIP, trip);
     }
+
+    //Clears all fields:
+    public void reset(){
+        //Reset intendedDestination
+        WingsGeoPoint intendedDestination = getDestination();
+        intendedDestination.reset();
+        setDestination(intendedDestination);
+
+        //All default values:
+        List<BuddyRequest> receivedRequests = new ArrayList<>();
+        setReceivedRequests(receivedRequests);
+
+        List<BuddyRequest> sentRequests = new ArrayList<>();
+        setSentRequests(sentRequests);
+
+        setHasBuddy(false);
+        setOnMeetup(false);
+
+        //Reset BuddyMeetUp and BuddyTrip:
+       // BuddyMeetUp meetUp = getBuddyMeetUpInstance();
+        //meetUp.reset();
+        setBuddyMeetUp(new BuddyMeetUp());
+
+        //BuddyTrip buddyTrip = getBuddyTripInstance();
+        //buddyTrip.reset();
+        setBuddyTrip(new BuddyTrip());
+        setOnBuddyTrip(false);
+
+        this.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Log.d(TAG, "this Buddy reset successfully!");
+                }
+                else{
+                    Log.d(TAG, "Buddy reset failure!");
+                }
+            }
+        });
+
+    }
 }
