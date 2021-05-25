@@ -115,8 +115,8 @@ public class UserBuddyRequestsFragment extends Fragment{
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //just go to homeFragment bc why not:
-                listener.toHomeFragment(HomeFragment.KEY_BASIC);
+                //just go to homeFragment bc why not:               //TODO: go bach to previous fragment instead
+                listener.toBuddyHomeFragment(BuddyHomeFragment.KEY_FIND_BUDDY_MODE);
             }
         });
         peopleSentTo = new ArrayList<>();
@@ -146,7 +146,8 @@ public class UserBuddyRequestsFragment extends Fragment{
                 try {
                     thisUser.fetchIfNeeded();
                     String objectId = thisUser.getObjectId();
-                    listener.toPotentialBuddyFragment(objectId, PotentialBuddyFragment.KEY_SHOW_RESPONDREQUEST, requestInQuestion.getObjectId());
+                    listener.toConfirmBuddyHomeFragment(ConfirmBuddyHomeFragment.KEY_ANSWER_MODE, objectId, requestInQuestion.getObjectId());
+                   // listener.toPotentialBuddyFragment(objectId, PotentialBuddyFragment.KEY_SHOW_RESPONDREQUEST, requestInQuestion.getObjectId());
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }

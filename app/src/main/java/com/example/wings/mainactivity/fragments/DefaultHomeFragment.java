@@ -40,7 +40,7 @@ import java.util.List;
  *                  In charge of confirming a destination to start being a Buddy! --> navigates to BuddyHomeFragment to display the buddy aquiring buttons needed.
  */
 public class DefaultHomeFragment extends Fragment {
-    private static final String TAG = "HomeFragment";
+    private static final String TAG = "DefaultHomeFragment";
 
     private MAFragmentsListener listener;
     ParseUser currUser = ParseUser.getCurrentUser();
@@ -138,7 +138,7 @@ public class DefaultHomeFragment extends Fragment {
                         Log.d(TAG, "queriedDestination successfully initialized");
 
                         //2.) Display the confirmDestinationOverlay:
-                        displayDestination.setText(destinationTxt);
+                        displayDestination.setText("Intended Destination: " + destinationTxt);
                         confirmDestinationOverlay.setVisibility(View.VISIBLE);
                     }
                     else{

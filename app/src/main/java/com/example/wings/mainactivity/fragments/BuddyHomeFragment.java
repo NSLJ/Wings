@@ -225,6 +225,7 @@ public class BuddyHomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 resetUser(currUser);
+                listener.setBuddyRequestBttn(false);
                 listener.toDefaultHomeFragment();
             }
         });

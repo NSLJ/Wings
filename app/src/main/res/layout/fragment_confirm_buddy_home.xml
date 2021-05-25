@@ -30,13 +30,13 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             class="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="340dp"></fragment>
+            android:layout_height="350dp"></fragment>
 
         <RelativeLayout
             android:id="@+id/buddyRequestOverlay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="340dp"
+            android:layout_marginTop="350dp"
             android:background="@color/gray_background"
             android:paddingBottom="10dp">
 

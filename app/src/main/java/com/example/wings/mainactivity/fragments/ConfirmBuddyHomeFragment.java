@@ -52,7 +52,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
     private static final String TAG = "ConfirmBuddyHomeFragment";
     public static final String KEY_MODE = "whatMode?";     //mode passed in
     public static final String KEY_OTHER_USER_ID = "otherUserId";
-    private static final String KEY_BUDDYREQUESTID = "buddyRequestId";
+    public static final String KEY_BUDDYREQUESTID = "buddyRequestId";
 
     public static final String KEY_SEND_MODE = "modeSendRequest";
     public static final String KEY_ANSWER_MODE = "modeAnswerRequest";
@@ -161,8 +161,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
         });
 
         queryOtherUser(otherUserId);
-        drawOtherRoute();
-        setUp();
+
     }
 
 
@@ -177,6 +176,8 @@ public class ConfirmBuddyHomeFragment extends Fragment {
                 if (e == null) {
                     Log.d(TAG, "in queryPotentialBuddy(): success!: response=" + objects.toString());
                     setOtherUser(objects.get(0));
+                    drawOtherRoute();
+                    setUp();
                 }
                 else{
                     Log.d(TAG, "queryPotentialBuddy(): error=" + e.getLocalizedMessage());

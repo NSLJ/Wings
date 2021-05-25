@@ -32,6 +32,7 @@ import com.example.wings.mainactivity.fragments.BuddyHomeFragment;
 import com.example.wings.mainactivity.fragments.ChooseBuddyFragment;
 import com.example.wings.commonFragments.EditTrustedContactsFragment;
 import com.example.wings.commonFragments.HelpFragment;
+import com.example.wings.mainactivity.fragments.ConfirmBuddyHomeFragment;
 import com.example.wings.mainactivity.fragments.DefaultHomeFragment;
 import com.example.wings.mainactivity.fragments.HomeFragment;
 import com.example.wings.mainactivity.fragments.OtherProfileFragment;
@@ -447,6 +448,27 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     @Override
     public void toDefaultHomeFragment() {
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new DefaultHomeFragment()).commit();
+    }
+
+    @Override
+    public void toConfirmBuddyHomeFragment(String modeKey, String otherUserId) {
+        Bundle bundle = new Bundle();;
+        bundle.putString(KEY_MODE, modeKey);
+        bundle.putString(ConfirmBuddyHomeFragment.KEY_OTHER_USER_ID, otherUserId);
+        Fragment frag = new ConfirmBuddyHomeFragment();
+        frag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
+    }
+
+    @Override
+    public void toConfirmBuddyHomeFragment(String modeKey, String otherUserId, String buddyRequestId) {
+        Bundle bundle = new Bundle();;
+        bundle.putString(KEY_MODE, modeKey);
+        bundle.putString(ConfirmBuddyHomeFragment.KEY_OTHER_USER_ID, otherUserId);
+        bundle.putString(ConfirmBuddyHomeFragment.KEY_BUDDYREQUESTID, buddyRequestId);
+        Fragment frag = new BuddyHomeFragment();
+        frag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
     }
 
     public void toProfileSetupFragment(){
