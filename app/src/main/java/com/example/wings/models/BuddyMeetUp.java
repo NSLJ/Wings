@@ -90,4 +90,6 @@ public class BuddyMeetUp extends ParseObject {
     public void setNearEachOther(boolean answer){
         put(KEY_NEAREACHOTHER, answer);
     }
+
+
 }

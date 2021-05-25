@@ -202,8 +202,8 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmSendReque
                 potentialBuddyLocation = new LatLng(currLocationGeoPoint.getLatitude(), currLocationGeoPoint.getLongitude());
 
                 //Map the route of potentialBuddyLoc --> potentialBuddyDestination:
-                wingsMap.setMarker(potentialBuddyLocation, BitmapDescriptorFactory.HUE_BLUE);
-                wingsMap.route(potentialBuddyLocation, potentialBuddyDestination);
+                wingsMap.setMarker(potentialBuddyLocation, BitmapDescriptorFactory.HUE_BLUE, true);
+                wingsMap.route(potentialBuddyLocation, potentialBuddyDestination, true);
 
                 //Show dialog after showing map:
                 showDialog(dialogToShow);

@@ -31,6 +31,7 @@ import com.example.wings.R;
 import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.User;
 import com.example.wings.startactivity.SAFragmentsListener;
+import com.parse.ParseACL;
 import com.parse.ParseUser;
 
 import java.io.File;
@@ -260,6 +261,8 @@ public class ProfileSetupFragment extends Fragment {
     private void saveProfileSetup(){
         Log.d(TAG, "in saveProfileSetup():");
         user.put(User.KEY_PROFILESETUP, true);
+       // ParseACL acl = user.getACL();
+       // acl.setPublicWriteAccess(true);         //for now, allow other users to change their info --> used when a buddy cancels the buddy pair
         user.saveInBackground(e -> {
             if(e==null){
                 //Save successfull
