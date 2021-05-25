@@ -9,7 +9,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.Gravity;
@@ -18,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -130,8 +128,8 @@ public class RespondBuddyRequestDialog extends DialogFragment {
         tvName = view.findViewById(R.id.tvFirstName);
         tvEmail = view.findViewById(R.id.tvEmail);
         tvDistance = view.findViewById(R.id.tvDistance);
-        bttnAccept = view.findViewById(R.id.ibttnAccept);
-        bttnReject = view.findViewById(R.id.ibttnReject);
+        bttnAccept = view.findViewById(R.id.ivAccept);
+        bttnReject = view.findViewById(R.id.ivReject);
         ratingBar = view.findViewById(R.id.rbRating);
 
         //Initalize ParseUser and Buddy:

@@ -259,9 +259,9 @@ public class WingsMap {
 
     //All helper methods:
 
-    //hardcode +- 15 meters
-    public boolean isNearEnough(){
-        return (distanceFromCurLocation < 15);
+
+    public boolean isNearEnough(int meters){
+        return (distanceFromCurLocation < meters);
     }
 
 

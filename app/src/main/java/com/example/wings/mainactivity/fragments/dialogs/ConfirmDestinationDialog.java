@@ -1,6 +1,5 @@
 package com.example.wings.mainactivity.fragments.dialogs;
 
-import android.app.ActionBar;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -120,8 +119,8 @@ public class ConfirmDestinationDialog extends DialogFragment {
         });*/
 
         // Get field from view
-        ibttnAccept = (ImageButton) view.findViewById(R.id.ibttnAccept);
-        ibttnReject = (ImageButton) view.findViewById(R.id.ibttnReject);
+        ibttnAccept = (ImageButton) view.findViewById(R.id.ivAccept);
+        ibttnReject = (ImageButton) view.findViewById(R.id.ivReject);
 
         ibttnReject.setOnClickListener(new View.OnClickListener() {
             @Override

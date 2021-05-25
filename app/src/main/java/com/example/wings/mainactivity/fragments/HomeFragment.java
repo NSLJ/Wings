@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.wings.mainactivity.fragments.dialogs.ConfirmBuddyDialog;
@@ -37,7 +37,6 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -45,42 +44,41 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 /**
  * HomeFragment.java
- * Purpose:         This displays the default screen of the app!
+ * Purpose:         This displays the home screen of the app! Depending on who (what Context) called this, the layout and functionality will be different!
  *
- * Hello Coders! Here is a good sample of how the interface works with the Fragments! Please read through the documentation and let me know if you have any questions or comments on how we could be
- * implementing this better!
  *
  */
 
 public class HomeFragment extends Fragment implements ConfirmDestinationDialog.ResultListener, ConfirmSafeArrivalDialog.ResultListener, ConfirmBuddyDialog.ResultListener{
     private static final String TAG = "HomeFragment";
     private static final String KEY_MODE = "whatMode?";
-    public static final String KEY_BASIC = "basicMode";         //not on a trip
-    public static final String KEY_ONTRIP = "tripMode";
+    public static final String KEY_BASIC = "basicMode";         //not on a trip mode -> able to search for destination, for buddies, e.g. everything before a confirmation of buddy
+    public static final String KEY_ONTRIP = "tripMode";         //everything after confirmation of buddy
 
 
     ParseUser currUser = ParseUser.getCurrentUser();
-
     private String mode;
+    private MAFragmentsListener listener;
 
-    private MAFragmentsListener listener;       //notice we did not "implements" it! We are just using an object of this interface!
-    private ExtendedFloatingActionButton fabChooseBuddy;
-    private ExtendedFloatingActionButton fabCancelBuddy;
-
-    private WingsMap wingsMap;
-    private SupportMapFragment mapFragment;
-
-    private LatLng destination;
-
-    Button btnSearch;
-    EditText etSearchBar;
-
+    //Fields to track if in "tripMode":
     Buddy userBuddyInstance;
     BuddyMeetUp meetUpInstance;
     BuddyTrip buddyTrip;
     ParseUser otherUser;
 
+    //For displaying map
+    private WingsMap wingsMap;
+    private SupportMapFragment mapFragment;
+    private LatLng destination;
 
+    //Views:
+    private Button btnSearch;
+    private EditText etSearchBar;
+    private ExtendedFloatingActionButton fabChooseBuddy;
+    private ExtendedFloatingActionButton fabCancelBuddy;
+    private RelativeLayout chooseDestinationOverlay;
+
+    private View mainView;
 
     public HomeFragment() {}    // Required empty public constructor
 
@@ -97,7 +95,6 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
             throw new ClassCastException(context.toString() + " must implement MAFragmentsListener");
         }
     }
-
     @Override
     /**
      * Purpose:     Ensure to initialize the "mode" field once this Fragment is created. mode = whether the fragment should function as if user is currently on a buddy trip, or is looking to be on one (default)
@@ -112,19 +109,34 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
     }
     @Override
     /**
-     * Purpose:         Called automatically when creating Fragment instance. To inflate a corresponding layout file "fragment_home.xml"
+     * Purpose:         Called automatically when creating Fragment instance. To inflate a corresponding layout file "fragment_home.xml"--> ensure to display and setup the map
      */
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        //1.) Initialize view:
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        //1.) Figure out which layout needed:
+        if(mode.equals(KEY_BASIC)){
+            mainView = inflater.inflate(R.layout.fragment_default_home, container, false);
+            setMapFragment();
+        }
 
-        //2.) Initialize map fragment:
+        return mainView;
+    }
+
+    //Purpose:      Used to toggle between layouts while user is in HomeFragment
+    private void setViewLayout(int id){
+        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mainView = inflater.inflate(id, null);
+        ViewGroup rootView = (ViewGroup) getView();
+        rootView.removeAllViews();
+        rootView.addView(mainView);
+    }
+
+    private void setMapFragment(){
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
 
-        //3.) Error check mapFragment
+        //Error check mapFragment
         if (mapFragment != null) {
-            //3a.) getMapAsync() --> initializes maps system and view:
+            // getMapAsync() --> initializes maps system and view:
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
@@ -146,7 +158,6 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
         else {
             Toast.makeText(getContext(), "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
         }
-        return view;
     }
 
     @Override
@@ -162,6 +173,8 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
         fabChooseBuddy = (ExtendedFloatingActionButton) view.findViewById(R.id.fabChooseBuddy);
         fabCancelBuddy = view.findViewById(R.id.fabCancelBuddy);
 
+        chooseDestinationOverlay = view.findViewById(R.id.chooseDestinationOverlay);
+        chooseDestinationOverlay.setVisibility(View.INVISIBLE);
         //2b.) fabCancelBuddy --> get rid of all stuff that isn't just User stuff --> cancels everything
         fabCancelBuddy.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -179,7 +192,7 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
             basicSetUp();
         }
         else{
-            //Everything should be not toggleable --> doesn;t set listeners:
+            //Everything should be not toggleable --> doesn't set listeners:
             fabChooseBuddy.setVisibility(View.INVISIBLE);     //automatically invisible until the user wants to be a Buddy
             fabCancelBuddy.setVisibility(View.VISIBLE);         //to cancel the trip or meetup
         }
@@ -213,14 +226,14 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
             }
 
             wingsMap.routeFromCurrentLocation(destination, true);
-            if(wingsMap.isNearEnough()){
+            /*if(wingsMap.isNearEnough()){
                 if(meetUpInstance != null) {
                     makeConfirmBuddyDialog();
                 }
                 else{
                     makeConfirmSafeArrivalDialog();
                 }
-            }
+            }*/
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -291,7 +304,8 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
                 List<Address> possibleAddresses = wingsMap.getPossibleAddresses(etSearchBar.getText().toString());
                 Log.d(TAG, "btnSearch.onClick(): possibleAddressses = " + possibleAddresses.toString());
                 if(possibleAddresses != null) {
-                    makeConfirmDestinationDialog(etSearchBar.getText().toString());
+                    //makeConfirmDestinationDialog(etSearchBar.getText().toString());
+                    chooseDestinationOverlay.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -383,7 +397,7 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
             //Map the queriedDestination:
 
             //1.) Obtain the queriedDestination
-                WingsGeoPoint queriedDestination = (WingsGeoPoint) currUser.getParseObject(User.KEY_QUERIEDDESTINATION);
+             /*   WingsGeoPoint queriedDestination = (WingsGeoPoint) currUser.getParseObject(User.KEY_QUERIEDDESTINATION);
                 try {
                     queriedDestination.fetchIfNeeded();
 
@@ -410,7 +424,7 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
                     }
                 } catch (ParseException e) {
                     e.printStackTrace();
-                }
+                }*/
             //2b.) else --> its not filled, do nothin
         }
     }

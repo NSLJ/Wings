@@ -1,5 +1,7 @@
 package com.example.wings.mainactivity;
 
+import android.view.View;
+
 import com.example.wings.models.BuddyRequest;
 import com.parse.ParseUser;
 
@@ -23,6 +25,10 @@ public interface MAFragmentsListener {
     public void toEditTrustedContactsFragment();
     public void toHelpFragment();
     public void setBuddyRequestBttn(boolean answer);
+    public void setBuddyRequestBttnOnClickListener(View.OnClickListener onClickListener);
     public void toUserBuddyRequestFragment();
     public void toPotentialBuddyFragment(String potentialBuddyId, String keyShowDialog, String buddyRequestId);
+    public void toBuddyHomeFragment(String modeKey, String meetUpId);
+    public void toBuddyHomeFragment(String modeKey);
+    public void toDefaultHomeFragment();
 }

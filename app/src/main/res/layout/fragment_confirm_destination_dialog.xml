@@ -36,7 +36,7 @@
             android:textSize="15sp" />
 
     <ImageButton
-        android:id="@+id/ibttnAccept"
+        android:id="@+id/ivAccept"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_alignParentRight="true"
@@ -47,7 +47,7 @@
         android:textSize="18sp" />
 
     <ImageButton
-        android:id="@+id/ibttnReject"
+        android:id="@+id/ivReject"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_alignParentLeft="true"

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Layout used when need the fullest screen map + no search bar. Four cases: (1) Waiting to confirm a buddy request, (2) On BuddyMeetUp, (3) on BuddyTrip, (4) after BuddyTrip -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#28C4C4C4"
+    android:orientation="vertical"
+    tools:context=".mainactivity.fragments.HomeFragment">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            class="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="540dp"></fragment>
+
+        <!-- Option 1: Display find buddy or cancel request buttons (used when already confirmed a destination and waiting to confirm a buddy-->
+        <RelativeLayout
+            android:id="@+id/needBuddyButtonOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="400dp"
+            android:layout_marginBottom="64dp">
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/fabChooseBuddy"
+                android:layout_width="284dp"
+                android:layout_height="37dp"
+                android:layout_above="@+id/fabCancelBuddy"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="63dp"
+                android:layout_marginTop="17dp"
+                android:layout_marginEnd="69dp"
+                android:layout_marginBottom="5dp"
+                android:elevation="6dp"
+                android:fontFamily="@font/lato"
+                android:text="Find a buddy"
+                android:textAlignment="center"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/logo_teal" />
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/fabCancelBuddy"
+                android:layout_width="284dp"
+                android:layout_height="37dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="63dp"
+                android:layout_marginEnd="69dp"
+                android:layout_marginBottom="5dp"
+                android:elevation="6dp"
+                android:fontFamily="@font/lato"
+                android:text="Cancel "
+                android:textAlignment="center"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/red" />
+        </RelativeLayout>
+
+
+        <!-- Option 2:  User is on a BuddyMeetUp, this is visible when the user gets close distance to their buddy -->
+        <RelativeLayout
+            android:id="@+id/confirmMeetingOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="350dp"
+            android:background="@color/gray_background"
+            android:paddingBottom="10dp">
+
+            <ImageView
+                android:id="@+id/ivConfirmMeetingPic"
+                android:layout_width="95dp"
+                android:layout_height="92dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="8dp"
+                tools:src="@tools:sample/avatars" />
+
+            <TextView
+                android:id="@+id/tvConfirmMeetingName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginStart="45dp"
+                android:layout_marginTop="4dp"
+                android:layout_toEndOf="@+id/ivConfirmMeetingPic"
+                android:fontFamily="@font/satisfy"
+                android:text="Annie"
+                android:textColor="@color/gray"
+                android:textSize="27sp" />
+
+            <TextView
+                android:id="@+id/tvAnswerRequestText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvConfirmMeetingName"
+                android:layout_centerHorizontal="true"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="5dp"
+                android:layout_toEndOf="@+id/ivConfirmMeetingPic"
+                android:fontFamily="@font/lato"
+                android:text="On their way to meet you"
+                android:textColor="@color/gray"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvUserBuddyId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="44dp"
+                android:layout_marginTop="124dp"
+                android:background="@drawable/et_rounded_corners_style"
+                android:fontFamily="@font/lato"
+                android:text="User Buddy ID"
+                android:textColor="@color/gray"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvOtherBuddyId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="44dp"
+                android:layout_marginTop="150dp"
+                android:background="@drawable/et_rounded_corners_style"
+                android:fontFamily="@font/lato"
+                android:text="Other Buddy ID"
+                android:textColor="@color/gray"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/etPin"
+                android:layout_width="100dp"
+                android:layout_height="22dp"
+                android:layout_alignParentTop="true"
+
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="107dp"
+                android:layout_marginEnd="71dp"
+                android:background="@drawable/et_rounded_corners_style"
+                android:fontFamily="@font/lato"
+                android:hint="Enter PIN #"
+                android:textAlignment="center"
+                android:textColor="@color/gray"
+                android:textSize="15sp" />
+
+            <Button
+                android:id="@+id/btnConfirmBuddy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="134dp"
+                android:layout_marginEnd="35dp"
+                android:backgroundTint="@color/logo_teal"
+                android:fontFamily="@font/lato"
+                android:text="Confirm Buddy"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+        </RelativeLayout>
+
+
+
+
+
+    </RelativeLayout>
+</LinearLayout>

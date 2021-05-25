@@ -13,7 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:autofillHints="Friends"
-        android:background="@drawable/btn_rounded_corners_style" />
+        android:background="@drawable/btn_rounded_corners_style"
+        android:inputType="textWebEditText" />
 
 
     <androidx.recyclerview.widget.RecyclerView

@@ -28,9 +28,11 @@ import android.widget.Toast;
 import com.example.wings.HandleBuddyRequestsWorker;
 import com.example.wings.R;
 import com.example.wings.UpdateLocationWorker;
+import com.example.wings.mainactivity.fragments.BuddyHomeFragment;
 import com.example.wings.mainactivity.fragments.ChooseBuddyFragment;
 import com.example.wings.commonFragments.EditTrustedContactsFragment;
 import com.example.wings.commonFragments.HelpFragment;
+import com.example.wings.mainactivity.fragments.DefaultHomeFragment;
 import com.example.wings.mainactivity.fragments.HomeFragment;
 import com.example.wings.mainactivity.fragments.OtherProfileFragment;
 import com.example.wings.mainactivity.fragments.PotentialBuddyFragment;
@@ -368,7 +370,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                                     break;
 
                                 case R.id.action_home:
-                                    Bundle bundle = new Bundle();;
+                                   /* Bundle bundle = new Bundle();;
 
                                     ParseUser currUser = ParseUser.getCurrentUser();
                                     if(currUser.getBoolean(User.KEY_ISBUDDY)) {
@@ -389,7 +391,9 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                                         bundle.putString(KEY_MODE, HomeFragment.KEY_BASIC);
                                     }
                                     fragment = new HomeFragment();
-                                    fragment.setArguments(bundle);
+                                    fragment.setArguments(bundle);*/
+
+                                    fragment = new DefaultHomeFragment();
                                     break;
 
                                 case R.id.action_profile:
@@ -422,6 +426,29 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         frag.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
     }
+    @Override
+    public void toBuddyHomeFragment(String modeKey) {
+        Bundle bundle = new Bundle();;
+        bundle.putString(KEY_MODE, modeKey);
+        Fragment frag = new BuddyHomeFragment();
+        frag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
+    }
+    @Override
+    public void toBuddyHomeFragment(String modeKey, String meetUpId) {
+        Bundle bundle = new Bundle();;
+        bundle.putString(KEY_MODE, modeKey);
+        bundle.putString(BuddyHomeFragment.KEY_BUDDYMEETUPID, meetUpId);
+        Fragment frag = new BuddyHomeFragment();
+        frag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
+    }
+
+    @Override
+    public void toDefaultHomeFragment() {
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new DefaultHomeFragment()).commit();
+    }
+
     public void toProfileSetupFragment(){
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new ProfileSetupFragment()).commit();
     }
@@ -470,6 +497,11 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         else{
             fabBuddyRequests.setVisibility(View.INVISIBLE);
         }
+    }
+
+    @Override
+    public void setBuddyRequestBttnOnClickListener(View.OnClickListener onClickListener) {
+        fabBuddyRequests.setOnClickListener(onClickListener);
     }
 
     @Override
