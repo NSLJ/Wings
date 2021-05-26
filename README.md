@@ -1,7 +1,7 @@
 # Wings
 With Wings, You Never Walk Alone
 
-## Progress so far (Updated 5/5/2021) - will be updated again soon!...
+## Progress so far (Updated 5/5/2021) - will be updated again soon!
 <img src="5-5-walkthrough.gif">
 
 ## Table of Contents
