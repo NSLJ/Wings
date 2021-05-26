@@ -131,14 +131,14 @@ public class DefaultHomeFragment extends Fragment {
                 else {
                     //1b.) Check if there are possible addresses to map to:
                     List<Address> possibleAddresses = wingsMap.getPossibleAddresses(etSearchBar.getText().toString());
-                    if(possibleAddresses != null) {
-
+                    if(possibleAddresses != null || possibleAddresses.size() == 0) {
+                        Log.d(TAG, "btnSearch clicked: possibleAddresses is NOT null, possibleAddresses="+possibleAddresses.toString());
                         //1c.) Get + draw the route:
                         queriedDestination = wingsMap.routeFromCurrentLocation(destinationTxt, true);
                         Log.d(TAG, "queriedDestination successfully initialized");
 
                         //2.) Display the confirmDestinationOverlay:
-                        displayDestination.setText("Intended Destination: " + destinationTxt);
+                        displayDestination.setText("Intended destination: " + destinationTxt);
                         confirmDestinationOverlay.setVisibility(View.VISIBLE);
                     }
                     else{

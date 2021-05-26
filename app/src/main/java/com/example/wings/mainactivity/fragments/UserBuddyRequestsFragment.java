@@ -139,6 +139,7 @@ public class UserBuddyRequestsFragment extends Fragment{
         ChooseBuddyAdapter.OnClickListener receiverOnClickListener = new ChooseBuddyAdapter.OnClickListener() {
             @Override
             public void onClick(int position) {
+                Log.d(TAG, "chooseBuddyAdapter clicked!");
                 //I think position = corresponds to the indexes in the List<> models but may be backwards or something:
                 Toast.makeText(getContext(), "You clicked on a request, going to PotentialBuddyFragment + some specific dialog to show", Toast.LENGTH_SHORT).show();
                 BuddyRequest requestInQuestion = receivedRequests.get(position);

@@ -136,11 +136,11 @@
                 android:id="@+id/ivReject"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_alignParentTop="true"
+                android:layout_alignParentTop="false"
 
-                android:layout_alignParentEnd="true"
+                android:layout_marginStart="15dp"
                 android:layout_marginTop="140dp"
-                android:layout_marginEnd="44dp"
+                android:layout_toEndOf="@+id/btnSendRequest"
                 android:textColor="#33bbff"
                 android:textSize="18sp"
                 tools:src="@drawable/cancel_button" />

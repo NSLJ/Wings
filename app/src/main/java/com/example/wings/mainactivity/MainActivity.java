@@ -466,7 +466,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         bundle.putString(KEY_MODE, modeKey);
         bundle.putString(ConfirmBuddyHomeFragment.KEY_OTHER_USER_ID, otherUserId);
         bundle.putString(ConfirmBuddyHomeFragment.KEY_BUDDYREQUESTID, buddyRequestId);
-        Fragment frag = new BuddyHomeFragment();
+        Fragment frag = new ConfirmBuddyHomeFragment();
         frag.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
     }

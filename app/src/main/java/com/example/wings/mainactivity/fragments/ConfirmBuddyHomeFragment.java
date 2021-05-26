@@ -42,6 +42,7 @@ import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * ConfirmBuddyHomeFragment.java
@@ -106,9 +107,11 @@ public class ConfirmBuddyHomeFragment extends Fragment {
         if (getArguments() != null) {
             mode = getArguments().getString(KEY_MODE);
             otherUserId = getArguments().getString(KEY_OTHER_USER_ID);
+            Log.d(TAG, "onCreate(): mode="+mode);
 
             if(mode.equals(KEY_ANSWER_MODE)){       //if we are answering the request --> a BuddyRequest already exists!, otherwise we are sending a request and a BuddyRequest does not yet exist
                 buddyRequestId = getArguments().getString(KEY_BUDDYREQUESTID);
+                Log.d(TAG, "onCreate(): buddyRequestId received=" +buddyRequestId);
             }
         }
     }
@@ -156,7 +159,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
         btnBack.setOnClickListener(new View.OnClickListener() {         //TODO: I think we should keep a history of fragment passing in MainActivity to just go to some "previous" fragment instead
             @Override
             public void onClick(View v) {
-                listener.toChooseBuddyFragment();
+                listener.toBuddyHomeFragment(BuddyHomeFragment.KEY_FIND_BUDDY_MODE);
             }
         });
 
@@ -215,7 +218,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
             }
     }
 
-    //Purpose:      populate views and handle visibility depending on mode field! Implements corresponding onclick listeners. Assumes otherUser and otherCurrLocation is already initalized!
+    //Purpose:      Populate views and handle visibility depending on mode field! Implements corresponding onclick listeners. Assumes otherUser and otherCurrLocation is already initalized!
     private void setUp(){
         if(otherUser != null && otherCurrLocation != null) {
             //1.) Populate the views shared by both modes:
@@ -281,44 +284,57 @@ public class ConfirmBuddyHomeFragment extends Fragment {
 
     //Purpose:      Handlers for when in answer request mode. If accept the request --> make a BuddyMeetUp, update BuddyRequest
     public void onAccept(Buddy confirmedBuddy, String buddyRequestId) {     //given the Buddy we just confirmed with
+        Log.d(TAG, "onAccept(), mode= answering request");
+        CountDownLatch waitForSaving = new CountDownLatch(4);           //so we wait for all Parse saving before navigating to next fragment at end of method
+
         //1.) Create a BuddyMeetUp:
         try {
             Buddy currBuddy = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
             currBuddy.fetchIfNeeded();
             BuddyMeetUp buddyMeetUp = new BuddyMeetUp(confirmedBuddy, currBuddy);       //other buddy is the sender, and current user is the receiver
-            buddyMeetUp.saveInBackground(new SaveCallback() {
+            buddyMeetUp.save();/*InBackground(new SaveCallback() { //TODO: technically should be saving in background, but doing this way ensures main thread will not move forward prematurely
                 @Override
                 public void done(ParseException e) {
                     if(e == null){
                         Log.d(TAG, "we saved the buddyMeetUp instance ok!");
+                        waitForSaving.countDown();
                     }
                     else{
                         Log.d(TAG, "error saving the buddyMeetUp, error=" +e.getMessage());
                     }
                 }
-            });
+            });*/
 
             //2.) Change the Buddy fields:
             //2a.) for current user's buddy instance:
-            updateBuddy(currBuddy, buddyMeetUp);
-            updateBuddy(confirmedBuddy, buddyMeetUp);
+            updateBuddy(currBuddy, buddyMeetUp, waitForSaving);
+            updateBuddy(confirmedBuddy, buddyMeetUp, waitForSaving);
+
 
             //3.) Delete the entire BuddyRequest:
             ParseQuery<BuddyRequest> query = ParseQuery.getQuery(BuddyRequest.class);
             query.whereEqualTo(BuddyRequest.KEY_OBJECT_ID, buddyRequestId);
-            query.findInBackground(new FindCallback<BuddyRequest>() {
+            query.find();/*InBackground(new FindCallback<BuddyRequest>() {
                 @Override
                 public void done(List<BuddyRequest> objects, ParseException e) {
                     BuddyRequest requestInQuestion =  objects.get(0);
                     try {
                         requestInQuestion.delete();
+                        waitForSaving.countDown();
                     } catch (ParseException parseException) {
                         parseException.printStackTrace();
                     }
                 }
-            });
+            });*/
+
 
             //Directly go to BuddyHomeFragment to start the BuddyMeetUp!
+           /* try {
+                Log.d(TAG, "onAccept(): MAListener waiting for all database saving to finish before moving on!");
+                waitForSaving.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }*/
             listener.toBuddyHomeFragment(BuddyHomeFragment.KEY_MEET_BUDDY_MODE, buddyMeetUp.getObjectId());
             Toast.makeText(getContext(), "Start meetup with your buddy!", Toast.LENGTH_LONG).show();
 
@@ -328,28 +344,35 @@ public class ConfirmBuddyHomeFragment extends Fragment {
     }
 
     //Purpose;      helper method for the onAccept(), updates a given Buddy object to embody a BuddyMeetUp.
-    private void updateBuddy(Buddy buddyToUpdate, BuddyMeetUp buddyMeetUp){
+    private void updateBuddy(Buddy buddyToUpdate, BuddyMeetUp buddyMeetUp, CountDownLatch latch){
         buddyToUpdate.setHasBuddy(true);
         buddyToUpdate.setOnMeetup(true);
         buddyToUpdate.setBuddyMeetUp(buddyMeetUp);
         buddyToUpdate.setReceivedRequests(new ArrayList<>());
         buddyToUpdate.setSentRequests(new ArrayList());
-        buddyToUpdate.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if(e == null){
-                    Log.d(TAG, "we saved buddy ok!");
+        try {
+            buddyToUpdate.save();/*InBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if(e == null){
+                        Log.d(TAG, "we saved buddy ok!");
+                        latch.countDown();
+                    }
+                    else{
+                        Log.d(TAG, "error saving buddy error=" +e.getMessage());
+                    }
                 }
-                else{
-                    Log.d(TAG, "error saving buddy error=" +e.getMessage());
-                }
-            }
-        });
+            });*/
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     //Purpose:      Handler for when in answer request mode, on reject --> remove this BuddyRequest from the list of receivedRequest + delete the entire BuddyRequest
     public void onReject(String buddyRequestId) {
         Log.d(TAG, "onReject():  remove the request from the list and delete the entire request!");
+        CountDownLatch waitForSaving = new CountDownLatch(2);
+
             //1.) Remove the BuddyRequest from the current user's list of ReceivedRequests:
             Buddy currBuddy = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
             try {
@@ -364,7 +387,15 @@ public class ConfirmBuddyHomeFragment extends Fragment {
                 }
 
                 currBuddy.setReceivedRequests(receivedRequests);
-                currBuddy.saveInBackground();
+                currBuddy.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if(e == null){
+                            Log.d(TAG, "onReject(): currBuddy successfully saved");
+                            waitForSaving.countDown();
+                        }
+                    }
+                });
             }catch(ParseException e){
                 Log.d(TAG, "onReject() after RespondBuddyRequestDialog");
             }
@@ -380,6 +411,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
                         BuddyRequest requestInQuestion = objects.get(0);
                         try {
                             requestInQuestion.delete();
+                            waitForSaving.countDown();
                         } catch (ParseException parseException) {
                             parseException.printStackTrace();
                         }
@@ -387,13 +419,21 @@ public class ConfirmBuddyHomeFragment extends Fragment {
                 }
             });
 
+        try {
+            Log.d(TAG, "onReject(): MAListener waiting for all parse saving to finish");
+            waitForSaving.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         //3.) Go back to Home page w/ mode = finding buddies:
         listener.toBuddyHomeFragment(BuddyHomeFragment.KEY_FIND_BUDDY_MODE);
     }
 
+
     //Purpose:      Handler for mode = sending request. This is called when the btnSendRequest button is clicked. Creates a BuddyRequest where current user is the sender, other user is the receiver, goes back to ChooseBuddyFragment, increment the BuddyRequest in UserBuddyRequestsFragment
     public void sendRequest(Buddy potentialBuddy) {
         Log.d(TAG, "onAccept()");
+        //CountDownLatch waitForSaving = new CountDownLatch(3);
 
         //1.) Get current user's buddy instance:
         Buddy buddyInstance = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
@@ -402,21 +442,44 @@ public class ConfirmBuddyHomeFragment extends Fragment {
 
             //2.) Create and save BuddyRequest:
             BuddyRequest request = new BuddyRequest(buddyInstance, potentialBuddy);
-            request.saveInBackground();
+            request.save();
 
             //3.) Get buddyInstance's list of sentBuddyRequests:
             List<BuddyRequest> sentRequests = buddyInstance.getSentRequests();
             sentRequests.add(request);
             buddyInstance.setSentRequests(sentRequests);
-            buddyInstance.saveInBackground();
+            buddyInstance.save()/*InBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if(e == null){
+                        Log.d(TAG, "sendRequest(): buddy sentRequest list saved successfully");
+                        waitForSaving.countDown();
+                    }
+                }
+            })*/;
 
             //4.) Save the receivedRequest in the potentialBuddy now --> later this is how its received:
             List<BuddyRequest> othersReceivedRequests = potentialBuddy.getReceivedRequests();
             othersReceivedRequests.add(request);
             potentialBuddy.setReceivedRequests(othersReceivedRequests);
-            potentialBuddy.saveInBackground();
+            potentialBuddy.save()/*InBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if(e == null){
+                        Log.d(TAG, "sendRequest(): buddy receivedRequests list saved succesfully");
+                        waitForSaving.countDown();
+                    }
+                }
+            })*/;
 
             //5.) Go back to ChooseBuddyFrag
+           /* try {
+                Log.d(TAG, "sendRequest(): MAFragmentsListner waiting for all parse updates to finish...");
+                waitForSaving.await();
+                //Thread.sleep(3500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }*/
             listener.toChooseBuddyFragment();
         } catch (ParseException e) {
             Log.d(TAG, "onAccept: error getting buddy request I think, error=" + e.getMessage());

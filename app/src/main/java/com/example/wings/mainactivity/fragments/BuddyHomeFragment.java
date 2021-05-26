@@ -31,11 +31,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -117,6 +115,7 @@ public class BuddyHomeFragment extends Fragment {
             //If on meet buddy mode --> expect to receive extra data (buddyMeetUpId)
             if(mode.equals(KEY_MEET_BUDDY_MODE)){
                 meetUpId = getArguments().getString(KEY_BUDDYMEETUPID);
+                Log.d(TAG, "onCreate(): meetUpId="+meetUpId);
             }
         }
     }
@@ -163,9 +162,22 @@ public class BuddyHomeFragment extends Fragment {
             destination = new LatLng(intendedDestination.getLatitude(), intendedDestination.getLongitude());
             wingsMap.routeFromCurrentLocation(destination, true);
 
-
         } catch (ParseException e) {
             Log.d(TAG, "loadMap(): error fetching currBuddy, error = " + e.getLocalizedMessage());
+        }
+
+        //Ensures to set everyone once map is done loading:
+        if(mode.equals(KEY_FIND_BUDDY_MODE)){
+            setFindBuddyMode();
+        }
+        else if(mode.equals(KEY_MEET_BUDDY_MODE)){
+            setMeetBuddyMode();
+        }
+        else if(mode.equals(KEY_ON_TRIP_MODE)){
+            setOnTripMode();
+        }
+        else{
+            Toast.makeText(getContext(), "Error! BuddyHomeFragment received a mode that wasn't valid!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -194,22 +206,12 @@ public class BuddyHomeFragment extends Fragment {
         confirmMeetingOverlay.setVisibility(View.INVISIBLE);
         //do same for confirmArrivalOverlay
 
-        if(mode.equals(KEY_FIND_BUDDY_MODE)){
-            setFindBuddyMode();
-        }
-        else if(mode.equals(KEY_MEET_BUDDY_MODE)){
-            setMeetBuddyMode();
-        }
-        else if(mode.equals(KEY_ON_TRIP_MODE)){
-            setOnTripMode();
-        }
-        else{
-            Toast.makeText(getContext(), "Error! BuddyHomeFragment received a mode that wasn't valid!", Toast.LENGTH_SHORT).show();
-        }
+
     }
 
     //Purpose:  In charge of setting up necessary handlers in Find buddy mode:
     private void setFindBuddyMode(){
+        Log.d(TAG, "setFindBuddyMode()");
         needBuddyButtonOverlay.setVisibility(View.VISIBLE);
 
         //onClick --> go to ChooseBuddyFragment to see list of potential buddies"
@@ -242,11 +244,10 @@ public class BuddyHomeFragment extends Fragment {
 
     //Purpose:  In charge of setting up necessary handlers in meeting buddy mode. Watches current location until it become near enough to invoke the confirmMeetUpOverlay. Then, populates data into views. Assumes the user has a Buddy and BuddyMeetUp instantiated.
     private void setMeetBuddyMode(){
-
-
+        Log.d(TAG, "setMeetBuddyMode()");
         //1.) Setup the confirmMeetUpOverlay --> Query for and instantiate BuddyMeetUp instance and populate views
         queryBuddyMeetUp();
-        populateMeetUpViews();
+
         btnConfirmBuddyMeetup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -330,6 +331,7 @@ public class BuddyHomeFragment extends Fragment {
                 if (e == null) {
                     Log.d(TAG, "in queryBuddyMeetUp(): success!: response=" + objects.toString());
                     setBuddyMeetUp(objects.get(0));
+                    populateMeetUpViews();
                 }
             }
         });
@@ -337,16 +339,28 @@ public class BuddyHomeFragment extends Fragment {
     private void setBuddyMeetUp(BuddyMeetUp meetUp){
         meetUpInstance = meetUp;
     }
-    private void queryOtherUser(String id) {
+    private void queryOtherBuddy(String id) {
         Log.d(TAG, "in queryOtherUser(): otherUserId=" + id);
-        ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.whereEqualTo(ParseUser.KEY_OBJECT_ID, id);
-        query.findInBackground(new FindCallback<ParseUser>() {
+        ParseQuery<Buddy> query = ParseQuery.getQuery(Buddy.class);
+        query.whereEqualTo(Buddy.KEY_OBJECT_ID, id);
+        query.findInBackground(new FindCallback<Buddy>() {
             @Override
-            public void done(List<ParseUser> objects, ParseException e) {
+            public void done(List<Buddy> objects, ParseException e) {
                 if (e == null) {
                     Log.d(TAG, "in queryPotentialBuddy(): success!: response=" + objects.toString());
-                    setOtherUser(objects.get(0));
+                    Buddy otherBuddyInstance = (Buddy) objects.get(0);
+                    setOtherUser(otherBuddyInstance.getUser());
+                    if(otherUser != null){
+                        ParseFile imageFile = otherUser.getParseFile(User.KEY_PROFILEPICTURE);
+                        if (imageFile != null) {
+                            try {
+                                Glide.with(getContext()).load(imageFile.getFile()).into(ivProfilePic);
+                            } catch (ParseException error) {
+                                error.printStackTrace();
+                            }
+                        }
+                        tvName.setText(otherUser.getString(User.KEY_FIRSTNAME));
+                    }
                 }
                 else{
                     Log.d(TAG, "queryPotentialBuddy(): error=" + e.getLocalizedMessage());
@@ -383,8 +397,8 @@ public class BuddyHomeFragment extends Fragment {
                 }
 
                 //2.) Populate other views relying on otherUser:
-                queryOtherUser(otherUserId);                            //instantiates otherUser
-                if(otherUser != null){
+                queryOtherBuddy(otherUserId);                            //instantiates otherUser
+                /*if(otherUser != null){
                     ParseFile imageFile = otherUser.getParseFile(User.KEY_PROFILEPICTURE);
                     if (imageFile != null) {
                         try {
@@ -394,7 +408,7 @@ public class BuddyHomeFragment extends Fragment {
                         }
                     }
                     tvName.setText(otherUser.getString(User.KEY_FIRSTNAME));
-                }
+                }*/
 
             } catch (ParseException e) {
                 e.printStackTrace();

@@ -171,7 +171,7 @@ public class WingsMap {
         LatLng foundDestination = null;
 
         List<Address> possibleAddresses = getPossibleAddresses(destinationTxt);
-        if(possibleAddresses == null){
+        if(possibleAddresses == null || possibleAddresses.size() == 0){
             Toast.makeText(context, "No addresses exist!", Toast.LENGTH_SHORT).show();
         }
         else {
