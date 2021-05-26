@@ -32,13 +32,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -307,8 +305,8 @@ public class ConfirmBuddyHomeFragment extends Fragment {
 
             //2.) Change the Buddy fields:
             //2a.) for current user's buddy instance:
-            updateBuddy(currBuddy, buddyMeetUp, waitForSaving);
-            updateBuddy(confirmedBuddy, buddyMeetUp, waitForSaving);
+            updateHaveBuddy(currBuddy, buddyMeetUp, waitForSaving);
+            updateHaveBuddy(confirmedBuddy, buddyMeetUp, waitForSaving);
 
 
             //3.) Delete the entire BuddyRequest:
@@ -344,7 +342,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
     }
 
     //Purpose;      helper method for the onAccept(), updates a given Buddy object to embody a BuddyMeetUp.
-    private void updateBuddy(Buddy buddyToUpdate, BuddyMeetUp buddyMeetUp, CountDownLatch latch){
+    private void updateHaveBuddy(Buddy buddyToUpdate, BuddyMeetUp buddyMeetUp, CountDownLatch latch){
         buddyToUpdate.setHasBuddy(true);
         buddyToUpdate.setOnMeetup(true);
         buddyToUpdate.setBuddyMeetUp(buddyMeetUp);
@@ -376,6 +374,19 @@ public class ConfirmBuddyHomeFragment extends Fragment {
 
                 currBuddy.setReceivedRequests(receivedRequests);
                 currBuddy.save();
+
+
+                //2.) Remove the BuddyRequest from the other user's list of SentRequests:
+                List<BuddyRequest> otherSentRequests = otherBuddyInstance.getSentRequests();
+                for(int i = 0; i < otherSentRequests.size(); i++){
+                    BuddyRequest currRequest = otherSentRequests.get(i);
+                    if(currRequest.getObjectId().equals(buddyRequestId)){
+                        otherSentRequests.remove(i);
+                        break;
+                    }
+                }
+                otherBuddyInstance.setSentRequests(otherSentRequests);
+                otherBuddyInstance.save();
             }catch(ParseException e){
                 Log.d(TAG, "onReject() after RespondBuddyRequestDialog");
             }

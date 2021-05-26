@@ -76,7 +76,7 @@
             android:id="@+id/confirmMeetingOverlay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="350dp"
+            android:layout_marginTop="365dp"
             android:background="@color/gray_background"
             android:paddingBottom="10dp">
 
@@ -97,12 +97,12 @@
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginStart="45dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="10dp"
                 android:layout_toEndOf="@+id/ivConfirmMeetingPic"
                 android:fontFamily="@font/satisfy"
                 android:text="Annie"
                 android:textColor="@color/gray"
-                android:textSize="27sp" />
+                android:textSize="30sp" />
 
             <TextView
                 android:id="@+id/tvAnswerRequestText"
@@ -122,13 +122,19 @@
                 android:id="@+id/tvUserBuddyId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/tvOtherBuddyId"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="44dp"
-                android:layout_marginTop="124dp"
+                android:layout_marginTop="110dp"
                 android:background="@drawable/et_rounded_corners_style"
                 android:fontFamily="@font/lato"
+                android:paddingLeft="5dp"
+                android:paddingTop="5dp"
+                android:paddingRight="5dp"
+                android:paddingBottom="5dp"
                 android:text="User Buddy ID"
+                android:textAlignment="center"
                 android:textColor="@color/gray"
                 android:textSize="16sp" />
 
@@ -136,12 +142,16 @@
                 android:id="@+id/tvOtherBuddyId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/tvUserBuddyId"
                 android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
                 android:layout_marginStart="44dp"
-                android:layout_marginTop="150dp"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/et_rounded_corners_style"
                 android:fontFamily="@font/lato"
+                android:paddingLeft="5dp"
+                android:paddingTop="5dp"
+                android:paddingRight="5dp"
+                android:paddingBottom="5dp"
                 android:text="Other Buddy ID"
                 android:textColor="@color/gray"
                 android:textSize="16sp" />
@@ -153,7 +163,7 @@
                 android:layout_alignParentTop="true"
 
                 android:layout_alignParentEnd="true"
-                android:layout_marginTop="107dp"
+                android:layout_marginTop="90dp"
                 android:layout_marginEnd="71dp"
                 android:background="@drawable/et_rounded_corners_style"
                 android:fontFamily="@font/lato"
@@ -169,7 +179,7 @@
                 android:layout_alignParentTop="true"
 
                 android:layout_alignParentEnd="true"
-                android:layout_marginTop="134dp"
+                android:layout_marginTop="120dp"
                 android:layout_marginEnd="35dp"
                 android:backgroundTint="@color/logo_teal"
                 android:fontFamily="@font/lato"

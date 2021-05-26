@@ -49,6 +49,7 @@ public class BuddyHomeFragment extends Fragment {
     private static final String TAG = "BuddyHomeFragment";
     public static final String KEY_MODE = "whatMode?";     //mode passed in
     public static final String KEY_BUDDYMEETUPID = "buddyMeetUpId";
+    public static final String KEY_CLOSE_ENOUGH = "userCloseEnough?";           //used when MainActivity needs to tell this frag that the user is close enough to the meetUp/destination
 
     //Three possible modes, one of these choices must be passed in by the Context calling it in order for this fragment to function
     public static final String KEY_FIND_BUDDY_MODE = "modeFindBuddy";
@@ -59,11 +60,12 @@ public class BuddyHomeFragment extends Fragment {
     private String mode;
     private String otherUserId;
     private String meetUpId;
+    private boolean closeEnough;
 
     ParseUser currUser = ParseUser.getCurrentUser();
 
     //Fields for mapping:
-    private WingsMap wingsMap;
+    public static WingsMap wingsMap;
     private LatLng destination;
 
     //Views:
@@ -74,7 +76,7 @@ public class BuddyHomeFragment extends Fragment {
     private ExtendedFloatingActionButton fabGoChooseBuddyFrag;
     private ExtendedFloatingActionButton fabCancelBuddy;
 
-    private RelativeLayout confirmMeetingOverlay;
+    public static RelativeLayout confirmMeetingOverlay;
     //views in this overlay:
     private ImageView ivProfilePic;
     private TextView tvName;
@@ -115,8 +117,12 @@ public class BuddyHomeFragment extends Fragment {
             //If on meet buddy mode --> expect to receive extra data (buddyMeetUpId)
             if(mode.equals(KEY_MEET_BUDDY_MODE)){
                 meetUpId = getArguments().getString(KEY_BUDDYMEETUPID);
+                closeEnough = getArguments().getBoolean(KEY_CLOSE_ENOUGH);
+
                 Log.d(TAG, "onCreate(): meetUpId="+meetUpId);
             }
+
+            //Must do same for buddyTrip
         }
     }
 
@@ -151,20 +157,6 @@ public class BuddyHomeFragment extends Fragment {
     private void loadMap(GoogleMap map) {
         Log.d(TAG, "in loadMap():");
         wingsMap = new WingsMap(map, getContext(), getViewLifecycleOwner());        //automatically constantly shows current location
-
-        //1.) obtain the user's intended destination + save it + draw route:
-        Buddy currBuddy = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
-        try {
-            currBuddy.fetchIfNeeded();
-            WingsGeoPoint intendedDestination = currBuddy.getDestination();
-
-            //2.) Save "destination" field to intendedDestination + route to it
-            destination = new LatLng(intendedDestination.getLatitude(), intendedDestination.getLongitude());
-            wingsMap.routeFromCurrentLocation(destination, true);
-
-        } catch (ParseException e) {
-            Log.d(TAG, "loadMap(): error fetching currBuddy, error = " + e.getLocalizedMessage());
-        }
 
         //Ensures to set everyone once map is done loading:
         if(mode.equals(KEY_FIND_BUDDY_MODE)){
@@ -201,12 +193,22 @@ public class BuddyHomeFragment extends Fragment {
         etPin = view.findViewById(R.id.etPin);
         btnConfirmBuddyMeetup = view.findViewById(R.id.btnConfirmBuddy);
 
-        //2.) by default, show none of the overlays:
-        needBuddyButtonOverlay.setVisibility(View.INVISIBLE);
+        //2.) by default, do not show meetUp and safeArrival overlays:              NOTE: needBuddyButtonOverlay may be visible as all modes need the fabCancelBuddy
         confirmMeetingOverlay.setVisibility(View.INVISIBLE);
+        //confirmArrivalOverlay.setVisibility(View.INVISIBLE);
         //do same for confirmArrivalOverlay
 
 
+        //3.) This cancel button can be shown on all modes + has the same functionality:
+        // onClick --> reset user and go back to DefaultHomeFrag
+        fabCancelBuddy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resetUser(currUser);
+                listener.setBuddyRequestBttn(false);
+                listener.toDefaultHomeFragment();
+            }
+        });
     }
 
     //Purpose:  In charge of setting up necessary handlers in Find buddy mode:
@@ -214,21 +216,25 @@ public class BuddyHomeFragment extends Fragment {
         Log.d(TAG, "setFindBuddyMode()");
         needBuddyButtonOverlay.setVisibility(View.VISIBLE);
 
+        //1.) Map the user's intended destination --> obtain + save it + draw route:
+        Buddy currBuddy = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
+        try {
+            currBuddy.fetchIfNeeded();
+            WingsGeoPoint intendedDestination = currBuddy.getDestination();
+
+            //2.) Save "destination" field to intendedDestination + route to it
+            destination = new LatLng(intendedDestination.getLatitude(), intendedDestination.getLongitude());
+            wingsMap.routeFromCurrentLocation(destination, true);
+
+        } catch (ParseException e) {
+            Log.d(TAG, "loadMap(): error fetching currBuddy, error = " + e.getLocalizedMessage());
+        }
+
         //onClick --> go to ChooseBuddyFragment to see list of potential buddies"
         fabGoChooseBuddyFrag.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 listener.toChooseBuddyFragment();
-            }
-        });
-
-        //onClick --> reset user and go back to DefaultHomeFrag
-        fabCancelBuddy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resetUser(currUser);
-                listener.setBuddyRequestBttn(false);
-                listener.toDefaultHomeFragment();
             }
         });
 
@@ -241,9 +247,11 @@ public class BuddyHomeFragment extends Fragment {
         });
     }
 
-
     //Purpose:  In charge of setting up necessary handlers in meeting buddy mode. Watches current location until it become near enough to invoke the confirmMeetUpOverlay. Then, populates data into views. Assumes the user has a Buddy and BuddyMeetUp instantiated.
     private void setMeetBuddyMode(){
+        //Out of the needBuddyButtonOverlay --> ONLY make the cancel button visible:
+        fabGoChooseBuddyFrag.setVisibility(View.INVISIBLE);
+
         Log.d(TAG, "setMeetBuddyMode()");
         //1.) Setup the confirmMeetUpOverlay --> Query for and instantiate BuddyMeetUp instance and populate views
         queryBuddyMeetUp();
@@ -262,7 +270,8 @@ public class BuddyHomeFragment extends Fragment {
 
                     if(attemptedPin.equals(correctPin)){
                         //TODO: start buddytrip here
-                        confirmArrivalOverlay.setVisibility(View.INVISIBLE);
+                        Toast.makeText(getContext(), "You confirmed Meet up with your buddy!", Toast.LENGTH_LONG).show();
+                        listener.stopCheckingProximity();
                     }
                     else{   //pin entered was not correct
                         Toast.makeText(getContext(), "The pin entered is incorrect!", Toast.LENGTH_LONG).show();
@@ -271,10 +280,15 @@ public class BuddyHomeFragment extends Fragment {
             }
         });
 
-        //2.) Watch current location
-        //TODO: This needs to be done in some background loop
-        if (wingsMap.isNearEnough(15)) {
+        //2.) Set an onclick listener for the floating buddy request button --> show a fragment that displays the BuddyTrip/Meeting status
+
+        //3.) Watch current location
+        //If MainActivity told us that the user is close enough --> show the overlay
+        if(closeEnough){
             confirmMeetingOverlay.setVisibility(View.VISIBLE);
+        }
+        else{
+            listener.startCheckingProximity(15, meetUpId);
         }
 
     }
@@ -360,6 +374,15 @@ public class BuddyHomeFragment extends Fragment {
                             }
                         }
                         tvName.setText(otherUser.getString(User.KEY_FIRSTNAME));
+
+                        //Draw map from current user's current location --> other User's current location:
+                        WingsGeoPoint otherCurrLocationGeoPoint = (WingsGeoPoint) otherUser.getParseObject(User.KEY_CURRENTLOCATION);
+                        try {
+                            otherCurrLocationGeoPoint.fetchIfNeeded();
+                            wingsMap.routeFromCurrentLocation(new LatLng(otherCurrLocationGeoPoint.getLatitude(), otherCurrLocationGeoPoint.getLongitude()), true);
+                        } catch (ParseException parseException) {
+                            parseException.printStackTrace();
+                        }
                     }
                 }
                 else{
@@ -414,5 +437,12 @@ public class BuddyHomeFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static boolean checkNearEnough(){
+        Log.d(TAG, "checkNearEnough(), distanceFromCurrLocation = " + wingsMap.getDistanceFromCurLocation());
+        boolean result = wingsMap.isNearEnough(100);           //unsure if wingsMap will continue to update is all
+        Log.d(TAG, "checkNearEnough(), result = " + result);
+        return result;
     }
 }

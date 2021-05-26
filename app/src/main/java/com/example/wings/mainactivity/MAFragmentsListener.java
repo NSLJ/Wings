@@ -34,4 +34,6 @@ public interface MAFragmentsListener {
     public void toConfirmBuddyHomeFragment(String modeKey, String otherUserId);
     public void toConfirmBuddyHomeFragment(String modeKey, String otherUserId, String buddyRequestId);
     public void toCurrentHomeFragment();
+    public void startCheckingProximity(int meters, String meetUpId);
+    public void stopCheckingProximity();
 }
