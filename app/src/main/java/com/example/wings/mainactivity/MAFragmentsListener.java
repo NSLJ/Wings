@@ -33,4 +33,5 @@ public interface MAFragmentsListener {
     public void toDefaultHomeFragment();
     public void toConfirmBuddyHomeFragment(String modeKey, String otherUserId);
     public void toConfirmBuddyHomeFragment(String modeKey, String otherUserId, String buddyRequestId);
+    public void toCurrentHomeFragment();
 }

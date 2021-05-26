@@ -43,18 +43,12 @@ import com.example.wings.commonFragments.SettingsFragment;
 import com.example.wings.mainactivity.fragments.UserBuddyRequestsFragment;
 import com.example.wings.mainactivity.fragments.UserProfileFragment;
 import com.example.wings.models.Buddy;
-import com.example.wings.models.BuddyRequest;
-import com.example.wings.models.ParcelUser;
 import com.example.wings.models.User;
-import com.example.wings.models.WingsGeoPoint;
 import com.example.wings.startactivity.StartActivity;
-import com.example.wings.startactivity.fragments.RegisterTwoFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.ParseException;
 import com.parse.ParseUser;
-
-import org.parceler.Parcels;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -66,6 +60,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class MainActivity extends AppCompatActivity implements MAFragmentsListener{
     private static final String TAG = "MainActivity";
+
+    //MainActivity specific constants --> to label which HomeFragment currUser needs to go to/previously have gone to:
+    public static final String DEFAULT_HOME = "DefaultHomeFragment";
+    public static final String BUDDY_HOME_FIND_MODE = "BuddyHomeFragment-mode= find a buddy";
+    public static final String BUDDY_HOME_MEETUP_MODE = "BuddyHomeFragment-mode = meeting a buddy";
+    public static final String BUDDY_HOME_ONTRIP_MODE = "BuddyHomeFragment-mode= on a trip";
+
+    public static final String CONFIRM_BUDDY_HOME = "ConfirmBuddyHomeFragment";
+
+    //Other constants used to pass data to other frags:
     public static final String KEY_PROFILESETUPFRAG = "ProfileSetupFrag?";          //to get whether or not the current user's profile is set up from the StartActivity
     public static final String KEY_USERID = "potentialBuddyId";
     private static final String KEY_DIALOG = "dialogTypeToShow";
@@ -84,6 +88,13 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     public static final String KEY_RESULTSTRING = "result_string";
     public static final String KEY_GETCOUNTER = "worker_counter";
 
+
+    //----------Class fields begin here-----------------------------------------------
+    private String previousHomeFrag = "";           //to track which HomeFrag + modes need to go back to when navigating frags      //TODO: I actusally don't know if we'll need to track the previous
+    private String currentHomeFrag = "";
+
+    ParseUser currUser = ParseUser.getCurrentUser();
+    Buddy userBuddyInstance;
 
     final FragmentManager fragmentManager = getSupportFragmentManager();
     private BottomNavigationView bottomNavigationView;
@@ -110,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
         //Set up buddy request button (meant to display the UserBuddyRequestFragment when appl.)
         //Check if the user is currently looking for a buddy (e.g hasBuddy == false)
-        ParseUser currentUser = ParseUser.getCurrentUser();
+       /* ParseUser currentUser = ParseUser.getCurrentUser();
 
         if(currentUser.getBoolean(User.KEY_ISBUDDY)) {   //if they are a buddy
             Buddy buddyInstance = (Buddy) currentUser.getParseObject(User.KEY_BUDDY);
@@ -137,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
             public void onClick(View v) {
                 toUserBuddyRequestFragment();       //the only way to get to this fragment is through this button!
             }
-        });
+        });*/
 
 
         //1.) Find out whether or not need to force ProfileSetupFrag:
@@ -150,9 +161,13 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
         //else create bottom nav menu, go to HomeFrag, and begin tracking location:
         else {
-            //1.) Unrestrict the screen --> shows the safety toolkit and bottom nav bar:
+            //1.) Figure out which HomeFrag to start on:
+            currentHomeFrag = findUserBuddyStatus();
+            Log.d(TAG, "onCreate() - currentHomeFrag = " + currentHomeFrag);
+
+            //2.) Unrestrict the screen --> shows the safety toolkit and bottom nav bar:
             restrictUserScreen = false;
-            setRestrictScreen(restrictUserScreen);
+            setRestrictScreen(restrictUserScreen);      //also automatically pulls the HomeFrag corresponding to the currentHomeFrag field onto screen
         }
             //2.) Start tracking current user's location automatically (will ask permission if needed):
                 //2a.) Clear any old location requests:
@@ -176,8 +191,6 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                     startTracking();           //infinitely runs as long as keepTracking = true;
                    // setWatchRequests(true);
                 }
-
-
     }
 
     /**
@@ -394,7 +407,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                                     fragment = new HomeFragment();
                                     fragment.setArguments(bundle);*/
 
-                                    fragment = new DefaultHomeFragment();
+                                    fragment = getCorrespondingFrag(currentHomeFrag);
                                     break;
 
                                 case R.id.action_profile:
@@ -429,6 +442,10 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     }
     @Override
     public void toBuddyHomeFragment(String modeKey) {
+        //update HomeFrag history:
+        previousHomeFrag = currentHomeFrag;
+        currentHomeFrag = BUDDY_HOME_FIND_MODE;     //I believe this method would only ever be called with find mode, if not --> will need to error check
+
         Bundle bundle = new Bundle();;
         bundle.putString(KEY_MODE, modeKey);
         Fragment frag = new BuddyHomeFragment();
@@ -437,6 +454,15 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     }
     @Override
     public void toBuddyHomeFragment(String modeKey, String meetUpId) {
+        //update HomeFrag history:
+        previousHomeFrag = currentHomeFrag;
+        if(meetUpId.equals(BuddyHomeFragment.KEY_MEET_BUDDY_MODE)){
+            currentHomeFrag = BUDDY_HOME_MEETUP_MODE;
+        }
+        else{
+            currentHomeFrag = BUDDY_HOME_ONTRIP_MODE;                   //would need to error check if ever implement more than these three methods for BuddyHomeFrag
+        }
+
         Bundle bundle = new Bundle();;
         bundle.putString(KEY_MODE, modeKey);
         bundle.putString(BuddyHomeFragment.KEY_BUDDYMEETUPID, meetUpId);
@@ -447,6 +473,10 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
     @Override
     public void toDefaultHomeFragment() {
+        //update HomeFrag history:
+        previousHomeFrag = currentHomeFrag;
+        currentHomeFrag = DEFAULT_HOME;
+
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new DefaultHomeFragment()).commit();
     }
 
@@ -470,6 +500,14 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         frag.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
     }
+
+    @Override
+    //Purpose:          navigates to whatever was the last home fragment (= whatever HomeFrag that corresponds to previousHomeFragment class field)
+    public void toCurrentHomeFragment() {
+        Fragment fragment = getCorrespondingFrag(currentHomeFrag);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, fragment).commit();
+    }
+
 
     public void toProfileSetupFragment(){
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new ProfileSetupFragment()).commit();
@@ -635,5 +673,76 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                         }
                     }
                 });
+    }
+
+    //Purpose:      Finds out at which stage the of a BuddyTrip (if any) the current user is at in order to begin on the correct HomeFrag:
+    private String findUserBuddyStatus(){
+        //1.) Is the user even a buddy?
+        if(!currUser.getBoolean(User.KEY_ISBUDDY)) {        //if not --> they belong to DefaultHomeFrag
+            return DEFAULT_HOME;
+        }
+
+        else{
+            //Then get the currUser's buddy instance:
+            userBuddyInstance = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
+            try {
+                userBuddyInstance.fetchIfNeeded();
+
+                //2.) Do they need a buddy?
+                if (!userBuddyInstance.getHasBuddy()) {
+                    return BUDDY_HOME_FIND_MODE;                //--> they need to find a buddy
+                } else {
+                    //3.) Are they current meeting their buddy or already on a BuddyTrip?
+                    if(userBuddyInstance.getOnMeetup() && (!userBuddyInstance.getOnBuddyTrip()))
+                    {
+                        return BUDDY_HOME_MEETUP_MODE;          //--> they need be tracked to meet their buddy
+                    }
+                    else{
+                        return BUDDY_HOME_ONTRIP_MODE;
+                    }
+                }
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return "error - No HomeFrag applicable.";
+    }
+
+    //Purpose:          Returns which HomeFrag instance corresponds to the currentHomeFrag field. Used by bottomNavigationBar to always go back to the correct HomeFrag + mode when the home icon is pushed
+    private Fragment getCorrespondingFrag(String fragLabel){
+        if(fragLabel.equals(DEFAULT_HOME)){
+            return new DefaultHomeFragment();
+        }
+        else if(fragLabel.equals(BUDDY_HOME_FIND_MODE)){
+            Bundle bundle = new Bundle();;
+            bundle.putString(KEY_MODE, BuddyHomeFragment.KEY_FIND_BUDDY_MODE);
+            Fragment frag = new BuddyHomeFragment();
+            frag.setArguments(bundle);
+            return frag;
+        }
+        else if(fragLabel.equals(BUDDY_HOME_MEETUP_MODE)){
+            //1.) Must find the meetUpId:
+            String meetUpId = userBuddyInstance.getBuddyMeetUpInstance().getObjectId();
+
+            Bundle bundle = new Bundle();;
+            bundle.putString(KEY_MODE, BuddyHomeFragment.KEY_MEET_BUDDY_MODE);
+            bundle.putString(BuddyHomeFragment.KEY_BUDDYMEETUPID, meetUpId);
+            Fragment frag = new BuddyHomeFragment();
+            frag.setArguments(bundle);
+            return frag;
+        }
+        else if(fragLabel.equals(BUDDY_HOME_ONTRIP_MODE)){
+            //TODO: bc this is not yet implemented, will later need to input extra info
+            Bundle bundle = new Bundle();;
+            bundle.putString(KEY_MODE, BuddyHomeFragment.KEY_ON_TRIP_MODE);
+            Fragment frag = new BuddyHomeFragment();
+            frag.setArguments(bundle);
+            return frag;
+        }
+        else{
+            Log.d(TAG, "getCurrentHomeFrag(): error - currentHomeFrag string doesn't match any of the MainActivity keys?");
+            return null;
+        }
     }
 }

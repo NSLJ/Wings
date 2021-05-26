@@ -351,18 +351,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
         buddyToUpdate.setReceivedRequests(new ArrayList<>());
         buddyToUpdate.setSentRequests(new ArrayList());
         try {
-            buddyToUpdate.save();/*InBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if(e == null){
-                        Log.d(TAG, "we saved buddy ok!");
-                        latch.countDown();
-                    }
-                    else{
-                        Log.d(TAG, "error saving buddy error=" +e.getMessage());
-                    }
-                }
-            });*/
+            buddyToUpdate.save();
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -371,7 +360,6 @@ public class ConfirmBuddyHomeFragment extends Fragment {
     //Purpose:      Handler for when in answer request mode, on reject --> remove this BuddyRequest from the list of receivedRequest + delete the entire BuddyRequest
     public void onReject(String buddyRequestId) {
         Log.d(TAG, "onReject():  remove the request from the list and delete the entire request!");
-        CountDownLatch waitForSaving = new CountDownLatch(2);
 
             //1.) Remove the BuddyRequest from the current user's list of ReceivedRequests:
             Buddy currBuddy = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
@@ -387,15 +375,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
                 }
 
                 currBuddy.setReceivedRequests(receivedRequests);
-                currBuddy.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if(e == null){
-                            Log.d(TAG, "onReject(): currBuddy successfully saved");
-                            waitForSaving.countDown();
-                        }
-                    }
-                });
+                currBuddy.save();
             }catch(ParseException e){
                 Log.d(TAG, "onReject() after RespondBuddyRequestDialog");
             }
@@ -404,27 +384,12 @@ public class ConfirmBuddyHomeFragment extends Fragment {
             //2.) Get rid of the BuddyRequest instance entirely:
             ParseQuery<BuddyRequest> query = ParseQuery.getQuery(BuddyRequest.class);
             query.whereEqualTo(BuddyRequest.KEY_OBJECT_ID, buddyRequestId);
-            query.findInBackground(new FindCallback<BuddyRequest>() {
-                @Override
-                public void done(List<BuddyRequest> objects, ParseException e) {
-                    if(e == null) {
-                        BuddyRequest requestInQuestion = objects.get(0);
-                        try {
-                            requestInQuestion.delete();
-                            waitForSaving.countDown();
-                        } catch (ParseException parseException) {
-                            parseException.printStackTrace();
-                        }
-                    }
-                }
-            });
-
         try {
-            Log.d(TAG, "onReject(): MAListener waiting for all parse saving to finish");
-            waitForSaving.await();
-        } catch (InterruptedException e) {
+            query.find();
+        } catch (ParseException e) {
             e.printStackTrace();
         }
+
         //3.) Go back to Home page w/ mode = finding buddies:
         listener.toBuddyHomeFragment(BuddyHomeFragment.KEY_FIND_BUDDY_MODE);
     }

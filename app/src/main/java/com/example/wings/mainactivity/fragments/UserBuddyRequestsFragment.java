@@ -115,8 +115,8 @@ public class UserBuddyRequestsFragment extends Fragment{
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //just go to homeFragment bc why not:               //TODO: go bach to previous fragment instead
-                listener.toBuddyHomeFragment(BuddyHomeFragment.KEY_FIND_BUDDY_MODE);
+                //just go to homeFragment bc why not:
+                listener.toCurrentHomeFragment();
             }
         });
         peopleSentTo = new ArrayList<>();
