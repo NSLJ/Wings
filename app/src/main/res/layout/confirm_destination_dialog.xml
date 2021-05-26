@@ -25,7 +25,7 @@
         android:textSize="24sp" />
 
     <ImageButton
-        android:id="@+id/ibttnAccept"
+        android:id="@+id/ivAccept"
         style="@android:style/Widget.Holo.ImageButton"
         android:layout_width="51dp"
         android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
         app:srcCompat="@drawable/accept_button" />
 
     <ImageButton
-        android:id="@+id/ibttnReject"
+        android:id="@+id/ivReject"
         style="@android:style/Widget.Holo.ImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
         android:layout_marginStart="100dp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="15dp"
-        android:layout_toEndOf="@+id/ibttnAccept"
+        android:layout_toEndOf="@+id/ivAccept"
         app:srcCompat="@drawable/cancel_button" />
 
 </RelativeLayout>

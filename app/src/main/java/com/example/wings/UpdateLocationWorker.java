@@ -18,6 +18,7 @@ import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.example.wings.mainactivity.fragments.BuddyHomeFragment;
 import com.example.wings.models.User;
 import com.example.wings.models.WingsGeoPoint;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -72,6 +73,9 @@ public class UpdateLocationWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+
+
+
        // Log.i(TAG, "in doWork(): Sending data to Server started!");
         result = "";
 

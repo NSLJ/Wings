@@ -25,12 +25,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.wings.CheckProximityWorker;
 import com.example.wings.HandleBuddyRequestsWorker;
 import com.example.wings.R;
 import com.example.wings.UpdateLocationWorker;
+import com.example.wings.mainactivity.fragments.BuddyHomeFragment;
 import com.example.wings.mainactivity.fragments.ChooseBuddyFragment;
 import com.example.wings.commonFragments.EditTrustedContactsFragment;
 import com.example.wings.commonFragments.HelpFragment;
+import com.example.wings.mainactivity.fragments.ConfirmBuddyHomeFragment;
+import com.example.wings.mainactivity.fragments.DefaultHomeFragment;
 import com.example.wings.mainactivity.fragments.HomeFragment;
 import com.example.wings.mainactivity.fragments.OtherProfileFragment;
 import com.example.wings.mainactivity.fragments.PotentialBuddyFragment;
@@ -40,18 +44,12 @@ import com.example.wings.commonFragments.SettingsFragment;
 import com.example.wings.mainactivity.fragments.UserBuddyRequestsFragment;
 import com.example.wings.mainactivity.fragments.UserProfileFragment;
 import com.example.wings.models.Buddy;
-import com.example.wings.models.BuddyRequest;
-import com.example.wings.models.ParcelUser;
 import com.example.wings.models.User;
-import com.example.wings.models.WingsGeoPoint;
 import com.example.wings.startactivity.StartActivity;
-import com.example.wings.startactivity.fragments.RegisterTwoFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.ParseException;
 import com.parse.ParseUser;
-
-import org.parceler.Parcels;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -63,6 +61,18 @@ import java.util.concurrent.TimeUnit;
  */
 public class MainActivity extends AppCompatActivity implements MAFragmentsListener{
     private static final String TAG = "MainActivity";
+    private static final String CHECK_PROXIMITY_WORKER_TAG = "checkProximityWorkers";
+
+    //MainActivity specific constants --> to label which HomeFragment currUser needs to go to/previously have gone to:
+    public static final String DEFAULT_HOME = "DefaultHomeFragment";
+    public static final String BUDDY_HOME_FIND_MODE = "BuddyHomeFragment-mode= find a buddy";
+    public static final String BUDDY_HOME_MEETUP_MODE = "BuddyHomeFragment-mode = meeting a buddy";
+    public static final String BUDDY_HOME_MEETUP_MODE_CLOSE = "BuddyHomeFragment-mode = meeting a buddy - close enough!";
+    public static final String BUDDY_HOME_ONTRIP_MODE = "BuddyHomeFragment-mode= on a trip";
+
+    public static final String CONFIRM_BUDDY_HOME = "ConfirmBuddyHomeFragment";
+
+    //Other constants used to pass data to other frags:
     public static final String KEY_PROFILESETUPFRAG = "ProfileSetupFrag?";          //to get whether or not the current user's profile is set up from the StartActivity
     public static final String KEY_USERID = "potentialBuddyId";
     private static final String KEY_DIALOG = "dialogTypeToShow";
@@ -81,6 +91,15 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     public static final String KEY_RESULTSTRING = "result_string";
     public static final String KEY_GETCOUNTER = "worker_counter";
 
+    //CheckProximityWorker keys:
+    private static final String KEY_PROXIMITY_RESULT = "closeEnough?";
+
+    //----------Class fields begin here-----------------------------------------------
+    private String previousHomeFrag = "";           //to track which HomeFrag + modes need to go back to when navigating frags      //TODO: I actusally don't know if we'll need to track the previous
+    private String currentHomeFrag = "";
+
+    ParseUser currUser = ParseUser.getCurrentUser();
+    Buddy userBuddyInstance;
 
     final FragmentManager fragmentManager = getSupportFragmentManager();
     private BottomNavigationView bottomNavigationView;
@@ -89,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
     //fields for getting current location:
     private boolean keepTracking;                    //whether or not we should continue tracking user's current location
+    private boolean keepCheckingProximity;
     private boolean runRequestHandling = false;
     private int receivedRequestCount;
     private int counter = 0;
@@ -104,38 +124,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         setContentView(R.layout.activity_main);
         bottomNavigationView = findViewById(R.id.bottomNavigation);
         fabBuddyRequests = (FloatingActionButton) findViewById(R.id.fabBuddyRequests);
-
-        //Set up buddy request button (meant to display the UserBuddyRequestFragment when appl.)
-        //Check if the user is currently looking for a buddy (e.g hasBuddy == false)
-        ParseUser currentUser = ParseUser.getCurrentUser();
-
-        if(currentUser.getBoolean(User.KEY_ISBUDDY)) {   //if they are a buddy
-            Buddy buddyInstance = (Buddy) currentUser.getParseObject(User.KEY_BUDDY);
-            try {
-                buddyInstance.fetchIfNeeded();
-
-                if (!buddyInstance.getHasBuddy()) {      //if they don't have a buddy but they want one, we need to show th button
-                    fabBuddyRequests.setVisibility(View.VISIBLE);
-                    //setWatchRequests(true);
-                } else {
-                    fabBuddyRequests.setVisibility(View.INVISIBLE);
-                }
-
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-        else {
-            fabBuddyRequests.setVisibility(View.INVISIBLE);     //automatically invisible until the user wants to be a Buddy
-        }
-
-        fabBuddyRequests.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toUserBuddyRequestFragment();       //the only way to get to this fragment is through this button!
-            }
-        });
-
+        fabBuddyRequests.setVisibility(View.INVISIBLE);             //do by default so other fragments may choose to toggle if they choose, also has no handler by default!
 
         //1.) Find out whether or not need to force ProfileSetupFrag:
         if(getIntent().getBooleanExtra(KEY_PROFILESETUPFRAG, false)){
@@ -147,9 +136,13 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
         //else create bottom nav menu, go to HomeFrag, and begin tracking location:
         else {
-            //1.) Unrestrict the screen --> shows the safety toolkit and bottom nav bar:
+            //1.) Figure out which HomeFrag to start on:
+            currentHomeFrag = findUserBuddyStatus();
+            Log.d(TAG, "onCreate() - currentHomeFrag = " + currentHomeFrag);
+
+            //2.) Unrestrict the screen --> shows the safety toolkit and bottom nav bar:
             restrictUserScreen = false;
-            setRestrictScreen(restrictUserScreen);
+            setRestrictScreen(restrictUserScreen);      //also automatically pulls the HomeFrag corresponding to the currentHomeFrag field onto screen
         }
             //2.) Start tracking current user's location automatically (will ask permission if needed):
                 //2a.) Clear any old location requests:
@@ -173,8 +166,6 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                     startTracking();           //infinitely runs as long as keepTracking = true;
                    // setWatchRequests(true);
                 }
-
-
     }
 
     /**
@@ -290,7 +281,6 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                         ExistingWorkPolicy.REPLACE,         //says, if it does repeat, replace the new request with the old one
                         (OneTimeWorkRequest) request
                 );
-
         //Listen to information from the request
         WorkManager.getInstance(getApplicationContext()).getWorkInfoByIdLiveData(request.getId())      //returns a live data
                 .observe(owner, new Observer<WorkInfo>() {
@@ -368,28 +358,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                                     break;
 
                                 case R.id.action_home:
-                                    Bundle bundle = new Bundle();;
-
-                                    ParseUser currUser = ParseUser.getCurrentUser();
-                                    if(currUser.getBoolean(User.KEY_ISBUDDY)) {
-                                        Buddy buddyInstance = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
-                                        try {
-                                            buddyInstance.fetchIfNeeded();
-                                            if(buddyInstance.getHasBuddy()){
-                                                bundle.putString(KEY_MODE, HomeFragment.KEY_ONTRIP);
-                                            }
-                                            else{
-                                                bundle.putString(KEY_MODE, HomeFragment.KEY_BASIC);
-                                            }
-                                        } catch (ParseException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                    else{
-                                        bundle.putString(KEY_MODE, HomeFragment.KEY_BASIC);
-                                    }
-                                    fragment = new HomeFragment();
-                                    fragment.setArguments(bundle);
+                                    fragment = getCorrespondingFrag(currentHomeFrag);
                                     break;
 
                                 case R.id.action_profile:
@@ -421,6 +390,74 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         Fragment frag = new HomeFragment();
         frag.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
+    }
+    @Override
+    public void toBuddyHomeFragment(String modeKey) {
+        //update HomeFrag history:
+        previousHomeFrag = currentHomeFrag;
+        currentHomeFrag = BUDDY_HOME_FIND_MODE;     //I believe this method would only ever be called with find mode, if not --> will need to error check
+
+        Bundle bundle = new Bundle();;
+        bundle.putString(KEY_MODE, modeKey);
+        Fragment frag = new BuddyHomeFragment();
+        frag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
+    }
+    @Override
+    public void toBuddyHomeFragment(String modeKey, String meetUpId) {
+        //update HomeFrag history:
+        previousHomeFrag = currentHomeFrag;
+        if(meetUpId.equals(BuddyHomeFragment.KEY_MEET_BUDDY_MODE)){
+            currentHomeFrag = BUDDY_HOME_MEETUP_MODE;
+        }
+        else{
+            currentHomeFrag = BUDDY_HOME_ONTRIP_MODE;                   //would need to error check if ever implement more than these three methods for BuddyHomeFrag
+        }
+
+        Bundle bundle = new Bundle();;
+        bundle.putString(KEY_MODE, modeKey);
+        bundle.putString(BuddyHomeFragment.KEY_BUDDYMEETUPID, meetUpId);
+        bundle.putBoolean(BuddyHomeFragment.KEY_CLOSE_ENOUGH, false);           //automatic as this will ONLY ever be true when invoked by CheckProximityWorker!
+        Fragment frag = new BuddyHomeFragment();
+        frag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
+    }
+
+    @Override
+    public void toDefaultHomeFragment() {
+        //update HomeFrag history:
+        previousHomeFrag = currentHomeFrag;
+        currentHomeFrag = DEFAULT_HOME;
+
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new DefaultHomeFragment()).commit();
+    }
+
+    @Override
+    public void toConfirmBuddyHomeFragment(String modeKey, String otherUserId) {
+        Bundle bundle = new Bundle();;
+        bundle.putString(KEY_MODE, modeKey);
+        bundle.putString(ConfirmBuddyHomeFragment.KEY_OTHER_USER_ID, otherUserId);
+        Fragment frag = new ConfirmBuddyHomeFragment();
+        frag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
+    }
+
+    @Override
+    public void toConfirmBuddyHomeFragment(String modeKey, String otherUserId, String buddyRequestId) {
+        Bundle bundle = new Bundle();;
+        bundle.putString(KEY_MODE, modeKey);
+        bundle.putString(ConfirmBuddyHomeFragment.KEY_OTHER_USER_ID, otherUserId);
+        bundle.putString(ConfirmBuddyHomeFragment.KEY_BUDDYREQUESTID, buddyRequestId);
+        Fragment frag = new ConfirmBuddyHomeFragment();
+        frag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
+    }
+
+    @Override
+    //Purpose:          navigates to whatever was the last home fragment (= whatever HomeFrag that corresponds to previousHomeFragment class field)
+    public void toCurrentHomeFragment() {
+        Fragment fragment = getCorrespondingFrag(currentHomeFrag);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, fragment).commit();
     }
     public void toProfileSetupFragment(){
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new ProfileSetupFragment()).commit();
@@ -470,6 +507,11 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         else{
             fabBuddyRequests.setVisibility(View.INVISIBLE);
         }
+    }
+
+    @Override
+    public void setBuddyRequestBttnOnClickListener(View.OnClickListener onClickListener) {
+        fabBuddyRequests.setOnClickListener(onClickListener);
     }
 
     @Override
@@ -582,4 +624,176 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                     }
                 });
     }
+
+    //Purpose:      Finds out at which stage the of a BuddyTrip (if any) the current user is at in order to begin on the correct HomeFrag:
+    private String findUserBuddyStatus(){
+        //1.) Is the user even a buddy?
+        if(!currUser.getBoolean(User.KEY_ISBUDDY)) {        //if not --> they belong to DefaultHomeFrag
+            return DEFAULT_HOME;
+        }
+
+        else{
+            //Then get the currUser's buddy instance:
+            userBuddyInstance = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
+            try {
+                userBuddyInstance.fetchIfNeeded();
+
+                //2.) Do they need a buddy?
+                if (!userBuddyInstance.getHasBuddy()) {
+                    return BUDDY_HOME_FIND_MODE;                //--> they need to find a buddy
+                } else {
+                    //3.) Are they current meeting their buddy or already on a BuddyTrip?
+                    if(userBuddyInstance.getOnMeetup() && (!userBuddyInstance.getOnBuddyTrip()))
+                    {
+                        return BUDDY_HOME_MEETUP_MODE;          //--> they need be tracked to meet their buddy
+                    }
+                    else{
+                        return BUDDY_HOME_ONTRIP_MODE;
+                    }
+                }
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return "error - No HomeFrag applicable.";
+    }
+
+    //Purpose:          Returns which HomeFrag instance corresponds to the currentHomeFrag field. Used by bottomNavigationBar to always go back to the correct HomeFrag + mode when the home icon is pushed
+    //TODO: remove this boilerplate code lol
+    private Fragment getCorrespondingFrag(String fragLabel){
+        if(fragLabel.equals(DEFAULT_HOME)){
+            return new DefaultHomeFragment();
+        }
+        else if(fragLabel.equals(BUDDY_HOME_FIND_MODE)){
+            Bundle bundle = new Bundle();;
+            bundle.putString(KEY_MODE, BuddyHomeFragment.KEY_FIND_BUDDY_MODE);
+            Fragment frag = new BuddyHomeFragment();
+            frag.setArguments(bundle);
+            return frag;
+        }
+        else if(fragLabel.equals(BUDDY_HOME_MEETUP_MODE)){
+            //1.) Must find the meetUpId:
+            String meetUpId = userBuddyInstance.getBuddyMeetUpInstance().getObjectId();
+
+            Bundle bundle = new Bundle();;
+            bundle.putString(KEY_MODE, BuddyHomeFragment.KEY_MEET_BUDDY_MODE);
+            bundle.putString(BuddyHomeFragment.KEY_BUDDYMEETUPID, meetUpId);
+            bundle.putBoolean(BuddyHomeFragment.KEY_CLOSE_ENOUGH, false);
+            Fragment frag = new BuddyHomeFragment();
+            frag.setArguments(bundle);
+            return frag;
+        }
+        else if(fragLabel.equals(BUDDY_HOME_MEETUP_MODE_CLOSE)){
+            String meetUpId = userBuddyInstance.getBuddyMeetUpInstance().getObjectId();
+
+            Bundle bundle = new Bundle();
+            bundle.putString(KEY_MODE, BuddyHomeFragment.KEY_MEET_BUDDY_MODE);
+            bundle.putString(BuddyHomeFragment.KEY_BUDDYMEETUPID, meetUpId);
+            bundle.putBoolean(BuddyHomeFragment.KEY_CLOSE_ENOUGH, true);           //automatic as this will ONLY ever be true when invoked by CheckProximityWorker!
+            Fragment frag = new BuddyHomeFragment();
+            frag.setArguments(bundle);
+            return frag;
+        }
+        else if(fragLabel.equals(BUDDY_HOME_ONTRIP_MODE)){
+            //TODO: bc this is not yet implemented, will later need to input extra info
+            Bundle bundle = new Bundle();;
+            bundle.putString(KEY_MODE, BuddyHomeFragment.KEY_ON_TRIP_MODE);
+            Fragment frag = new BuddyHomeFragment();
+            frag.setArguments(bundle);
+            return frag;
+        }
+        else{
+            Log.d(TAG, "getCurrentHomeFrag(): error - currentHomeFrag string doesn't match any of the MainActivity keys?");
+            return null;
+        }
+    }
+
+    @Override
+    //Purpose:      To start checking for proximity this distance away for this meetUpId
+    public void startCheckingProximity(int meters, String meetUpId) {
+        keepCheckingProximity = true;
+        startCheckingProximityWorker(meters, meetUpId);
+    }
+
+    @Override
+    public void stopCheckingProximity() {
+        keepCheckingProximity = false;
+        WorkManager.getInstance(getApplicationContext()).cancelAllWorkByTag(CHECK_PROXIMITY_WORKER_TAG);       //probably will need to refine by Tags so specific requests get canceled
+    }
+
+    /**
+     * Purpose:     Makes a OneTimeWorkRequest on the UpdateLocationWorker class infinitely as long as keepTracking = true. keepTracking may be turned off through the stopAllRequests()
+     */
+    private void startCheckingProximityWorker(int meters, String meetUpId){
+        Log.d(TAG, "startCheckingProximityWorker()");
+        //Package data to send the counter
+        /*Data data = new Data.Builder()
+                .putInt(KEY_SENDCOUNTER, counter)       //send the counter
+                .build();*/
+
+        //Create the request
+        OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(CheckProximityWorker.class)
+                //.setInputData(data)         //send data
+                .addTag(CHECK_PROXIMITY_WORKER_TAG)
+                .setInitialDelay(10, TimeUnit.SECONDS)      //wait 5 seconds before doing it         //TODO: don't hardcode, make this time frame a constant
+                .build();
+
+        //Queue up the request
+        WorkManager.getInstance(getApplicationContext())
+                .enqueueUniqueWork(
+                        "sendDataWorker request",
+                        ExistingWorkPolicy.REPLACE,         //says, if it does repeat, replace the new request with the old one
+                        (OneTimeWorkRequest) request
+                );
+        //Listen to information from the request
+        WorkManager.getInstance(getApplicationContext()).getWorkInfoByIdLiveData(request.getId())      //returns a live data
+                .observe(owner, new Observer<WorkInfo>() {
+
+                    //called every time WorkInfo is changed
+                    public void onChanged(@Nullable WorkInfo workInfo) {
+
+                        //If workInfo is there and it is succeeded --> update the text
+                        if (workInfo != null) {
+                            //Check if finished:
+                            if(workInfo.getState().isFinished()){
+                                if(workInfo.getState() == WorkInfo.State.SUCCEEDED){
+                                    Log.d(TAG, "Request succeeded ");
+                                    //get output:
+                                    Data output = workInfo.getOutputData();
+                                    Log.d(TAG, "startCheckingProximityWorker(): output = " + output.toString());
+
+                                    boolean result = output.getBoolean(KEY_PROXIMITY_RESULT, false);
+                                    Log.d(TAG, "startCheckingProximityWorker(): result=" + result);
+                                    //If user is close enough --> invoke BuddyHomeFrag with it as true:
+                                    if(result){
+
+                                        //Invoke overlay to display if not already doing so:
+                                        if(!currentHomeFrag.equals(BUDDY_HOME_MEETUP_MODE_CLOSE)) {
+                                            currentHomeFrag = BUDDY_HOME_MEETUP_MODE_CLOSE;
+                                            Bundle bundle = new Bundle();
+                                            bundle.putString(KEY_MODE, BuddyHomeFragment.KEY_MEET_BUDDY_MODE);
+                                            bundle.putString(BuddyHomeFragment.KEY_BUDDYMEETUPID, meetUpId);
+                                            bundle.putBoolean(BuddyHomeFragment.KEY_CLOSE_ENOUGH, true);           //automatic as this will ONLY ever be true when invoked by CheckProximityWorker!
+                                            Fragment frag = new BuddyHomeFragment();
+                                            frag.setArguments(bundle);
+                                            fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
+                                            //NOTE: We DO NOT stop this worker here as we only want to stop checking for proximity when the user interacts with the correct overlays!
+                                        }
+                                    }
+
+                                    if(keepCheckingProximity) {
+                                        startCheckingProximityWorker(meters, meetUpId);              //to infinitely do it!
+                                    }
+                                }
+                                else {
+                                    Log.d(TAG, "Request didn't succeed, status=" + workInfo.getState().name());
+                                    startCheckingProximityWorker(meters, meetUpId);
+                                }
+                            }
+                        }
+                    }
+                });
+    }
+
 }

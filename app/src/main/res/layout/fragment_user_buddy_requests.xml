@@ -37,7 +37,8 @@ tools:context=".mainactivity.fragments.UserBuddyRequestsFragment">
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvReceived"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:minHeight="15dp">
 
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -53,7 +54,8 @@ tools:context=".mainactivity.fragments.UserBuddyRequestsFragment">
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:minHeight="15dp">
 
     </androidx.recyclerview.widget.RecyclerView>
 

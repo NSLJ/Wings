@@ -116,7 +116,7 @@ public class UserBuddyRequestsFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 //just go to homeFragment bc why not:
-                listener.toHomeFragment(HomeFragment.KEY_BASIC);
+                listener.toCurrentHomeFragment();
             }
         });
         peopleSentTo = new ArrayList<>();
@@ -139,14 +139,15 @@ public class UserBuddyRequestsFragment extends Fragment{
         ChooseBuddyAdapter.OnClickListener receiverOnClickListener = new ChooseBuddyAdapter.OnClickListener() {
             @Override
             public void onClick(int position) {
+                Log.d(TAG, "chooseBuddyAdapter clicked!");
                 //I think position = corresponds to the indexes in the List<> models but may be backwards or something:
-                Toast.makeText(getContext(), "You clicked on a request, going to PotentialBuddyFragment + some specific dialog to show", Toast.LENGTH_SHORT).show();
                 BuddyRequest requestInQuestion = receivedRequests.get(position);
                 ParseUser thisUser = peopleReceivedFrom.get(position);
                 try {
                     thisUser.fetchIfNeeded();
                     String objectId = thisUser.getObjectId();
-                    listener.toPotentialBuddyFragment(objectId, PotentialBuddyFragment.KEY_SHOW_RESPONDREQUEST, requestInQuestion.getObjectId());
+                    listener.toConfirmBuddyHomeFragment(ConfirmBuddyHomeFragment.KEY_ANSWER_MODE, objectId, requestInQuestion.getObjectId());
+                   // listener.toPotentialBuddyFragment(objectId, PotentialBuddyFragment.KEY_SHOW_RESPONDREQUEST, requestInQuestion.getObjectId());
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }

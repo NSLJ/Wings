@@ -171,7 +171,7 @@ public class WingsMap {
         LatLng foundDestination = null;
 
         List<Address> possibleAddresses = getPossibleAddresses(destinationTxt);
-        if(possibleAddresses == null){
+        if(possibleAddresses == null || possibleAddresses.size() == 0){
             Toast.makeText(context, "No addresses exist!", Toast.LENGTH_SHORT).show();
         }
         else {
@@ -212,7 +212,6 @@ public class WingsMap {
             removeRouteDrawn();
             clearAllRoutes();
         }
-
         this.startLocation = startLocation;
         this.destination = destination;
 
@@ -253,15 +252,16 @@ public class WingsMap {
         chosenRoute = null;
         startLocation = null;
         destination = null;
+        distanceFromCurLocation = 123456789;
         removeRouteDrawn();
     }
 
 
     //All helper methods:
 
-    //hardcode +- 15 meters
-    public boolean isNearEnough(){
-        return (distanceFromCurLocation < 15);
+
+    public boolean isNearEnough(int meters){
+        return (distanceFromCurLocation < meters);
     }
 
 
@@ -332,6 +332,8 @@ public class WingsMap {
             LatLng receivedLocation = new LatLng(location.getLatitude(), location.getLongitude());
             if((!currentLocation.equals(receivedLocation)) && destination != null){
                 Log.d(TAG, "onLocationUpdated(): currentLocation != to location updated --> re-drawing route");
+                ParseGeoPoint curLoc = new ParseGeoPoint(currentLocation.latitude, currentLocation.longitude);
+                distanceFromCurLocation = curLoc.distanceInKilometersTo(new ParseGeoPoint(destination.latitude, destination.longitude))*1000;
                 route(receivedLocation, destination, false);
             }
             currentLocation = receivedLocation;     //to change map display automatically
@@ -433,7 +435,9 @@ public class WingsMap {
     public LatLng getCurrentLocation(){
         return currentLocation;
     }
-
+    public double getDistanceFromCurLocation(){
+        return distanceFromCurLocation;
+    }
 
     //Saving just in case I need it still:
     /*public void getAllRoutes(LatLng startLocation, LatLng destination){

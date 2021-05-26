@@ -97,7 +97,7 @@ public class ChooseBuddyFragment extends Fragment {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.toHomeFragment(HomeFragment.KEY_BASIC);
+                listener.toCurrentHomeFragment();
             }
         });
 
@@ -109,7 +109,8 @@ public class ChooseBuddyFragment extends Fragment {
                 ParseUser userClicked = usersToDisplay.get(position);
                 String objectId = userClicked.getObjectId();
                 Log.d(TAG, "onClick(): position = " + position + "   objectId to send = " + objectId);
-                listener.toPotentialBuddyFragment(objectId, PotentialBuddyFragment.KEY_SHOW_CONFIRMSEND, "none");               //Show a ConfirmSendQuestDialog!!
+
+                listener.toConfirmBuddyHomeFragment(ConfirmBuddyHomeFragment.KEY_SEND_MODE, objectId);
             }
         };
 
