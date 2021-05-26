@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 
 import com.example.wings.R;
 import com.example.wings.adapters.SettingAdapter;
-import com.example.wings.models.Setting;
+import com.example.wings.models.helpers.Setting;
 
 import java.util.ArrayList;
 

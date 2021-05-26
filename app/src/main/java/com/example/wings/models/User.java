@@ -2,16 +2,15 @@ package com.example.wings.models;
 
 import android.util.Log;
 
+import com.example.wings.models.inParseServer.Buddy;
+import com.example.wings.models.inParseServer.TrustedContact;
+import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @ParseClassName("User")

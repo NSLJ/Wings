@@ -24,9 +24,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.wings.R;
-import com.example.wings.models.Buddy;
+import com.example.wings.models.inParseServer.Buddy;
 import com.example.wings.models.User;
-import com.example.wings.models.WingsGeoPoint;
+import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;

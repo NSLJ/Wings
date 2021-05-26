@@ -1,4 +1,4 @@
-package com.example.wings;
+package com.example.wings.models.helpers;
 
 import android.Manifest;
 import android.content.Context;
@@ -7,28 +7,18 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
-import androidx.work.Data;
-import androidx.work.ExistingWorkPolicy;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkInfo;
-import androidx.work.WorkManager;
 
-import com.codepath.asynchttpclient.AsyncHttpClient;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.example.wings.models.User;
-import com.example.wings.models.WingsGeoPoint;
-import com.example.wings.models.WingsRoute;
+import com.example.wings.models.inParseServer.WingsGeoPoint;
+import com.example.wings.network.DataParser;
 import com.example.wings.network.WingsClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -38,7 +28,6 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -54,12 +43,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import okhttp3.Headers;
 
@@ -72,7 +57,7 @@ public class WingsMap {
     private static final String KEY_SEND_LOCATIONS = "wingsMap_locations";
     private static final String KEY_RESULT = "getRoutesWorker_result";
 
-    CountDownLatch latch;
+    CountDownLatch latch;       //TODO: need to delete instances
 
     private ParseUser currentUser;      //B/c we need to make tons of updates to the Parse
     private WingsClient client;

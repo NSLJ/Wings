@@ -8,7 +8,9 @@ import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.example.wings.models.WingsRoute;
+import com.example.wings.models.helpers.WingsMap;
+import com.example.wings.models.helpers.WingsRoute;
+import com.example.wings.network.DataParser;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONException;

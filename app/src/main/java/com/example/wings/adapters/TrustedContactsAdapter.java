@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.example.wings.R;
-import com.example.wings.models.TrustedContact;
+import com.example.wings.models.inParseServer.TrustedContact;
 
 
 import java.util.List;

@@ -1,9 +1,8 @@
-package com.example.wings;
+package com.example.wings.network;
 
-import android.graphics.Color;
 import android.util.Log;
 
-import com.example.wings.models.WingsRoute;
+import com.example.wings.models.helpers.WingsRoute;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -12,11 +11,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import okhttp3.Route;
-
+/**
+ * Purpose:             In charge of parsing the JSONObject returned by the network call to Google Directions API. Finds all of the possible routes and saves them as a List of WingsRoute objects
+ */
 public class DataParser {
     private static final String TAG = "DataParser";
 

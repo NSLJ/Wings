@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -20,12 +21,12 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.wings.R;
-import com.example.wings.WingsMap;
+import com.example.wings.models.helpers.WingsMap;
 import com.example.wings.mainactivity.MAFragmentsListener;
-import com.example.wings.models.Buddy;
-import com.example.wings.models.BuddyMeetUp;
+import com.example.wings.models.inParseServer.Buddy;
+import com.example.wings.models.inParseServer.BuddyMeetUp;
 import com.example.wings.models.User;
-import com.example.wings.models.WingsGeoPoint;
+import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -42,7 +43,7 @@ import java.util.List;
 
 /**
  * BuddyHomeFragment.java
- * Purpose:             This HomeFragment is used once the user has confirmed being a Buddy (i.e. wants to start a BuddyTrip). There are three different modes: (1) Finding a Buddy, (2) Meeting a Buddy, (3) on a BuddyTro[.
+ * Purpose:             (Needs to be edited) This HomeFragment is used once the user has confirmed being a Buddy (i.e. wants to start a BuddyTrip). There are three different modes: (1) Finding a Buddy, (2) Meeting a Buddy, (3) on a BuddyTro[.
  *                      Certain Views and functionalities will be hidden depending on the mode. Due to these different modes, the Context calling this fragment MUST specify which mode is desired to display.
  */
 public class BuddyHomeFragment extends Fragment {
@@ -83,6 +84,7 @@ public class BuddyHomeFragment extends Fragment {
     private TextView tvUserBuddyId;
     private TextView tvOtherBuddyId;
     private EditText etPin;
+    private ImageButton btnExitMeetUp;
     private Button btnConfirmBuddyMeetup;
     private BuddyMeetUp meetUpInstance;
     private ParseUser otherUser;
@@ -192,6 +194,7 @@ public class BuddyHomeFragment extends Fragment {
         tvOtherBuddyId = view.findViewById(R.id.tvOtherBuddyId);
         etPin = view.findViewById(R.id.etPin);
         btnConfirmBuddyMeetup = view.findViewById(R.id.btnConfirmBuddy);
+        btnExitMeetUp = view.findViewById(R.id.btnExit);
 
         //2.) by default, do not show meetUp and safeArrival overlays:              NOTE: needBuddyButtonOverlay may be visible as all modes need the fabCancelBuddy
         confirmMeetingOverlay.setVisibility(View.INVISIBLE);
@@ -249,44 +252,65 @@ public class BuddyHomeFragment extends Fragment {
 
     //Purpose:  In charge of setting up necessary handlers in meeting buddy mode. Watches current location until it become near enough to invoke the confirmMeetUpOverlay. Then, populates data into views. Assumes the user has a Buddy and BuddyMeetUp instantiated.
     private void setMeetBuddyMode(){
-        //Out of the needBuddyButtonOverlay --> ONLY make the cancel button visible:
-        fabGoChooseBuddyFrag.setVisibility(View.INVISIBLE);
-
         Log.d(TAG, "setMeetBuddyMode()");
-        //1.) Setup the confirmMeetUpOverlay --> Query for and instantiate BuddyMeetUp instance and populate views
-        queryBuddyMeetUp();
 
+        //1.) (1) Out of the needBuddyButtonOverlay --> ONLY make the cancel button visible and (2) Show the meetUp overlay but disable the confirm button:
+        fabGoChooseBuddyFrag.setVisibility(View.INVISIBLE);
+        confirmMeetingOverlay.setVisibility(View.VISIBLE);
+        btnConfirmBuddyMeetup.setBackgroundColor(getResources().getColor(R.color.gray, null));
         btnConfirmBuddyMeetup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(etPin.getText().equals("")){
-                    Toast.makeText(getContext(), "You did not enter your PIN # for confirmation!", Toast.LENGTH_LONG).show();
-                }
-                else{
-                    String attemptedPin = etPin.getText().toString();
-
-                    //Get the current user's pin field to check match:
-                    String correctPin = currUser.getString(User.KEY_PIN);
-
-                    if(attemptedPin.equals(correctPin)){
-                        //TODO: start buddytrip here
-                        Toast.makeText(getContext(), "You confirmed Meet up with your buddy!", Toast.LENGTH_LONG).show();
-                        listener.stopCheckingProximity();
-                    }
-                    else{   //pin entered was not correct
-                        Toast.makeText(getContext(), "The pin entered is incorrect!", Toast.LENGTH_LONG).show();
-                    }
-                }
+                Toast.makeText(getContext(), "Cannot confirm yet! You are not close enough to your Buddy!", Toast.LENGTH_LONG).show();
             }
         });
 
-        //2.) Set an onclick listener for the floating buddy request button --> show a fragment that displays the BuddyTrip/Meeting status
+        //2.) Setup the confirmMeetUpOverlay --> Query for and instantiate BuddyMeetUp instance and populate views
+        queryBuddyMeetUp();
+
+        //3.) Set onClick listener for the exit button:
+        btnExitMeetUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirmMeetingOverlay.setVisibility(View.INVISIBLE);
+            }
+        });
 
         //3.) Watch current location
         //If MainActivity told us that the user is close enough --> show the overlay
         if(closeEnough){
-            confirmMeetingOverlay.setVisibility(View.VISIBLE);
+            //3a.) Enable the btnConfirmBuddy + disable the btnExit:
+            //confirmMeetingOverlay.setVisibility(View.VISIBLE);
+            btnExitMeetUp.setVisibility(View.INVISIBLE);                //make it required for the user to confirm the meetUp by not allowing to exit out
+
+            btnConfirmBuddyMeetup.setBackgroundColor(getResources().getColor(R.color.logo_teal, null));
+            btnConfirmBuddyMeetup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(etPin.getText().equals("")){
+                        Toast.makeText(getContext(), "You did not enter your PIN # for confirmation!", Toast.LENGTH_LONG).show();
+                    }
+                    else{
+                        String attemptedPin = etPin.getText().toString();
+                        Log.d(TAG, "setMeetBuddyMode(): attemptedPin = " + attemptedPin);
+
+                        //Get the current user's pin field to check match:
+                        String correctPin = (String) currUser.getString(User.KEY_PIN);
+                        Log.d(TAG, "setMeetBuddyMode(): correct pin = " + correctPin);
+
+                        if(attemptedPin.equals(correctPin)){
+                            //TODO: start buddytrip here
+                            Toast.makeText(getContext(), "You confirmed Meet up with your buddy!", Toast.LENGTH_LONG).show();
+                            listener.stopCheckingProximity();
+                        }
+                        else{   //pin entered was not correct
+                            Toast.makeText(getContext(), "The pin entered is incorrect!", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+            });
         }
+
         else{
             listener.startCheckingProximity(15, meetUpId);
         }
@@ -346,10 +370,12 @@ public class BuddyHomeFragment extends Fragment {
                     Log.d(TAG, "in queryBuddyMeetUp(): success!: response=" + objects.toString());
                     setBuddyMeetUp(objects.get(0));
                     populateMeetUpViews();
+
                 }
             }
         });
     }
+
     private void setBuddyMeetUp(BuddyMeetUp meetUp){
         meetUpInstance = meetUp;
     }
@@ -383,6 +409,16 @@ public class BuddyHomeFragment extends Fragment {
                         } catch (ParseException parseException) {
                             parseException.printStackTrace();
                         }
+
+
+                        //NOTE: This is done here and NOT in setMeetUpMode() to ensure otherUser and BuddyMeetUp instance are initialized
+                        //3.) Set an onclick listener for the floating buddy request button --> show a fragment that displays the BuddyTrip/Meeting status
+                        listener.setBuddyRequestBttnOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                listener.toBuddyTripStatusFragment(otherUser, meetUpInstance);
+                            }
+                        });
                     }
                 }
                 else{

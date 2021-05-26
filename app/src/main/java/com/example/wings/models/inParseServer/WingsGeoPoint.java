@@ -1,8 +1,7 @@
-package com.example.wings.models;
+package com.example.wings.models.inParseServer;
 
 import android.util.Log;
 
-import com.parse.FindCallback;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;

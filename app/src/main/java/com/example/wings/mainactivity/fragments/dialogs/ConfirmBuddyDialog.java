@@ -9,7 +9,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.Gravity;
@@ -20,14 +19,12 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.wings.R;
-import com.example.wings.models.Buddy;
-import com.example.wings.models.BuddyMeetUp;
+import com.example.wings.models.inParseServer.Buddy;
+import com.example.wings.models.inParseServer.BuddyMeetUp;
 import com.example.wings.models.User;
 import com.parse.FindCallback;
 import com.parse.ParseException;

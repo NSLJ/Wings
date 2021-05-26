@@ -1,13 +1,8 @@
-package com.example.wings.models;
+package com.example.wings.models.inParseServer;
 
-import com.parse.Parse;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
-import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
-
-import java.util.ArrayList;
 
 //lJoWkyVJ55
 @ParseClassName("BuddyRequest")

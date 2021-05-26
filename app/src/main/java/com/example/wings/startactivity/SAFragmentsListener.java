@@ -1,6 +1,5 @@
 package com.example.wings.startactivity;
 
-import com.example.wings.models.ParcelUser;
 import com.example.wings.models.User;
 
 public interface SAFragmentsListener {

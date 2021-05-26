@@ -18,7 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wings.R;
-import com.example.wings.models.ParcelUser;
+import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.User;
 import com.example.wings.startactivity.SAFragmentsListener;
 import com.parse.LogInCallback;
@@ -79,7 +79,7 @@ public class RegisterTwoFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            ParcelUser pUser = Parcels.unwrap(getArguments().getParcelable(KEY_GET_USER));
+            ParcelableObject pUser = Parcels.unwrap(getArguments().getParcelable(KEY_GET_USER));
             userToRegister = pUser.getUser();
             Log.d(TAG, "onCreate(): userToRegister = " + userToRegister.getUsername());
         }

@@ -1,4 +1,4 @@
-package com.example.wings.models;
+package com.example.wings.models.helpers;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;

@@ -2,7 +2,7 @@ package com.example.wings.mainactivity;
 
 import android.view.View;
 
-import com.example.wings.models.BuddyRequest;
+import com.example.wings.models.inParseServer.BuddyMeetUp;
 import com.parse.ParseUser;
 
 /**
@@ -28,12 +28,13 @@ public interface MAFragmentsListener {
     public void setBuddyRequestBttnOnClickListener(View.OnClickListener onClickListener);
     public void toUserBuddyRequestFragment();
     public void toPotentialBuddyFragment(String potentialBuddyId, String keyShowDialog, String buddyRequestId);
-    public void toBuddyHomeFragment(String modeKey, String meetUpId);
+    public void toBuddyHomeFragment(String modeKey, String meetUpId, boolean closeEnough);
     public void toBuddyHomeFragment(String modeKey);
     public void toDefaultHomeFragment();
     public void toConfirmBuddyHomeFragment(String modeKey, String otherUserId);
     public void toConfirmBuddyHomeFragment(String modeKey, String otherUserId, String buddyRequestId);
-    public void toCurrentHomeFragment();
+    public void toCurrentHomeFragment();        //used when implementing back buttons from other fragments --> always goes nack to the most current HomeFrag + mode selected
+    public void toBuddyTripStatusFragment(ParseUser otherUser, BuddyMeetUp meetUpInstance);
     public void startCheckingProximity(int meters, String meetUpId);
     public void stopCheckingProximity();
 }
