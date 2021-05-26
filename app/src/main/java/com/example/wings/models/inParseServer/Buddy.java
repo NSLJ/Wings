@@ -1,11 +1,9 @@
-package com.example.wings.models;
+package com.example.wings.models.inParseServer;
 
-import android.nfc.cardemulation.HostApduService;
 import android.util.Log;
 
 import com.parse.ParseClassName;
 import com.parse.ParseException;
-import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;

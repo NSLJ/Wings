@@ -19,13 +19,13 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.wings.R;
-import com.example.wings.WingsMap;
+import com.example.wings.models.helpers.WingsMap;
 import com.example.wings.mainactivity.MAFragmentsListener;
-import com.example.wings.models.Buddy;
-import com.example.wings.models.BuddyMeetUp;
-import com.example.wings.models.BuddyRequest;
+import com.example.wings.models.inParseServer.Buddy;
+import com.example.wings.models.inParseServer.BuddyMeetUp;
+import com.example.wings.models.inParseServer.BuddyRequest;
 import com.example.wings.models.User;
-import com.example.wings.models.WingsGeoPoint;
+import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -333,7 +333,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }*/
-            listener.toBuddyHomeFragment(BuddyHomeFragment.KEY_MEET_BUDDY_MODE, buddyMeetUp.getObjectId());
+            listener.toBuddyHomeFragment(BuddyHomeFragment.KEY_MEET_BUDDY_MODE, buddyMeetUp.getObjectId(), false);
             Toast.makeText(getContext(), "Start meetup with your buddy!", Toast.LENGTH_LONG).show();
 
         } catch (ParseException parseException) {

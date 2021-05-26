@@ -1,4 +1,4 @@
-package com.example.wings.models;
+package com.example.wings.models.inParseServer;
 
 import com.parse.ParseClassName;
 import com.parse.ParseObject;

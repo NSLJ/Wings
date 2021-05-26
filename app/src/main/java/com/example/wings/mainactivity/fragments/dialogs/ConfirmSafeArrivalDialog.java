@@ -8,7 +8,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.Gravity;
@@ -19,8 +18,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.example.wings.R;
-import com.example.wings.models.BuddyMeetUp;
-import com.example.wings.models.BuddyTrip;
+import com.example.wings.models.inParseServer.BuddyTrip;
 
 
 public class ConfirmSafeArrivalDialog extends DialogFragment {

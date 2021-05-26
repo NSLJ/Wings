@@ -3,9 +3,8 @@ package com.example.wings;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.codepath.asynchttpclient.AsyncHttpClient;
-import com.example.wings.mainactivity.fragments.HomeFragment;
-import com.example.wings.models.WingsRoute;
+import com.example.wings.models.helpers.WingsRoute;
+import com.example.wings.network.DataParser;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONException;

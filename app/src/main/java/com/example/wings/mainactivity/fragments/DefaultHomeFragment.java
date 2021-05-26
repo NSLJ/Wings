@@ -19,11 +19,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wings.R;
-import com.example.wings.WingsMap;
+import com.example.wings.models.helpers.WingsMap;
 import com.example.wings.mainactivity.MAFragmentsListener;
-import com.example.wings.models.Buddy;
+import com.example.wings.models.inParseServer.Buddy;
 import com.example.wings.models.User;
-import com.example.wings.models.WingsGeoPoint;
+import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;

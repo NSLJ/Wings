@@ -1,16 +1,11 @@
 package com.example.wings.network;
 
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.codepath.asynchttpclient.AsyncHttpClient;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
-import com.example.wings.DataParser;
-import com.example.wings.mainactivity.fragments.HomeFragment;
-import com.example.wings.models.WingsRoute;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,13 +16,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
-
-import okhttp3.Headers;
 
 //To make API calls separately on async task
 public class WingsClient {

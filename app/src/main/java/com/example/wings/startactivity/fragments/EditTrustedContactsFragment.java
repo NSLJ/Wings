@@ -15,7 +15,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.wings.R;
 import com.example.wings.adapters.TrustedContactsAdapter;
-import com.example.wings.models.TrustedContact;
+import com.example.wings.models.inParseServer.TrustedContact;
 import com.example.wings.startactivity.SAFragmentsListener;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.example.wings.models;
+package com.example.wings.models.helpers;
 
 public class Setting {
     //item for setting rv

@@ -10,9 +10,8 @@ import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.example.wings.mainactivity.MainActivity;
-import com.example.wings.models.Buddy;
-import com.example.wings.models.BuddyRequest;
+import com.example.wings.models.inParseServer.Buddy;
+import com.example.wings.models.inParseServer.BuddyRequest;
 import com.example.wings.models.User;
 import com.parse.ParseException;
 import com.parse.ParseUser;

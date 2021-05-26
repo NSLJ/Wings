@@ -1,46 +1,35 @@
-package com.example.wings.models;
+package com.example.wings.models.inParseServer;
 
 import android.util.Log;
 
 import com.parse.ParseClassName;
 import com.parse.ParseException;
-import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 
-@ParseClassName("BuddyTrip")
-public class BuddyTrip extends ParseObject {
+@ParseClassName("BuddyMeetUp")
+public class BuddyMeetUp extends ParseObject {
     private static final String TAG = "BuddyMeetUp";
 
     private static final String KEY_SENDERBUDDY = "senderBuddy";
     private static final String KEY_SENDERBUDDYID = "senderBuddyId";
     private static final String KEY_RECEIVERBUDDYID = "receiverBuddyId";
     private static final String KEY_RECEIVERBUDDY = "receiverBuddy";
+    private static final String KEY_SENDERCONFIRMATION = "senderGaveConfirmation";
+    private static final String KEY_RECEIVERCONFIRMATION = "receiverGaveConfirmation";
 
-    private static final String KEY_NEAREACHOTHER = "nearEachOther";        //are they near enouogh to each to show d
+    private static final String KEY_NEAREACHOTHER = "nearEachOther";        //are they near enouogh to each to show dialog/ask them to start confirming?
 
-    public static final String KEY_STARTLOCATION = "startLocation";
-    public static final String KEY_DESTINATION = "destination";
-    public static final String KEY_EST = "est";
-    public static final String KEY_TIMEELAPSED = "timeElapsed";
+    public BuddyMeetUp(){}
 
-    public BuddyTrip(){}
-
-    public BuddyTrip(Buddy senderBuddy, Buddy receiverBuddy){
+    public BuddyMeetUp(Buddy senderBuddy, Buddy receiverBuddy){
         setSenderBuddy(senderBuddy);
         setSenderBuddyId(senderBuddy.getObjectId());
         setReceiverBuddy(receiverBuddy);
         setReceiverBuddyId(receiverBuddy.getObjectId());
-
+        setSenderGaveConfirmation(false);
+        setReceiverGaveConfirmation(false);
         setNearEachOther(false);
-
-        setStartLocation(new WingsGeoPoint());
-        setDestination(new WingsGeoPoint());
-        setEst(1111);
-        setTimeElapsed(0);
     }
-
-
 
     public void setSenderBuddy(Buddy sender){
         put(KEY_SENDERBUDDY, sender);
@@ -82,6 +71,19 @@ public class BuddyTrip extends ParseObject {
         return receiver;
     }
 
+    public boolean getSenderGaveConfirmation(){
+        return getBoolean(KEY_SENDERCONFIRMATION);
+    }
+    public void setSenderGaveConfirmation(boolean answer){
+        put(KEY_SENDERCONFIRMATION, answer);
+    }
+    public boolean getReceiverGaveConfirmation(){
+        return getBoolean(KEY_RECEIVERCONFIRMATION);
+    }
+    public void setReceiverGaveConfirmation(boolean answer){
+        put(KEY_RECEIVERCONFIRMATION, answer);
+    }
+
     public boolean getNearEachOther(){
         return getBoolean(KEY_NEAREACHOTHER);
     }
@@ -89,40 +91,5 @@ public class BuddyTrip extends ParseObject {
         put(KEY_NEAREACHOTHER, answer);
     }
 
-    public void setStartLocation(WingsGeoPoint point){
-        put(KEY_STARTLOCATION, point);
-    }
-    public WingsGeoPoint getStartLocation(){
-        WingsGeoPoint start = (WingsGeoPoint) getParseObject(KEY_STARTLOCATION);
-        try {
-            start.fetchIfNeeded();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return start;
-    }
-    public void setDestination(WingsGeoPoint point){
-        put(KEY_DESTINATION, point);
-    }
-    public WingsGeoPoint getDestination(){
-        WingsGeoPoint destination = (WingsGeoPoint) getParseObject(KEY_DESTINATION);
-        try {
-            destination.fetchIfNeeded();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return destination;
-    }
-    public long getEst(){
-        return getLong(KEY_EST);
-    }
-    public void setEst(long newEst){
-        put(KEY_EST, newEst);
-    }
-    public long getTimeElapsed(){
-        return getLong(KEY_TIMEELAPSED);
-    }
-    public void setTimeElapsed(long newTime){
-        put(KEY_TIMEELAPSED, newTime);
-    }
+
 }

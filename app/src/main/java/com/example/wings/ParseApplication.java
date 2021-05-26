@@ -2,15 +2,14 @@ package com.example.wings;
 
 import android.app.Application;
 
-import com.example.wings.models.Buddy;
-import com.example.wings.models.BuddyMeetUp;
-import com.example.wings.models.BuddyRequest;
-import com.example.wings.models.BuddyTrip;
-import com.example.wings.models.TrustedContact;
+import com.example.wings.models.inParseServer.Buddy;
+import com.example.wings.models.inParseServer.BuddyMeetUp;
+import com.example.wings.models.inParseServer.BuddyRequest;
+import com.example.wings.models.inParseServer.BuddyTrip;
+import com.example.wings.models.inParseServer.TrustedContact;
 import com.example.wings.models.User;
-import com.example.wings.models.WingsGeoPoint;
+import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.parse.Parse;
-import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
