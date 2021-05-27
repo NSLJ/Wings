@@ -16,7 +16,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.example.wings.mainactivity.fragments.dialogs.ConfirmBuddyDialog;
+import com.example.wings.mainactivity.fragments.dialogs.SendRequestStepsDialog;
 import com.example.wings.mainactivity.fragments.dialogs.ConfirmDestinationDialog;
 import com.example.wings.R;
 import com.example.wings.models.helpers.WingsMap;
@@ -49,7 +49,7 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
  *
  */
 
-public class HomeFragment extends Fragment implements ConfirmDestinationDialog.ResultListener, ConfirmSafeArrivalDialog.ResultListener, ConfirmBuddyDialog.ResultListener{
+public class HomeFragment extends Fragment implements ConfirmDestinationDialog.ResultListener, ConfirmSafeArrivalDialog.ResultListener{
     private static final String TAG = "HomeFragment";
     private static final String KEY_MODE = "whatMode?";
     public static final String KEY_BASIC = "basicMode";         //not on a trip mode -> able to search for destination, for buddies, e.g. everything before a confirmation of buddy
@@ -200,7 +200,7 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
 
     private void tripLoadMap(GoogleMap map) {
         Log.d(TAG, "in basicLoadMap():");
-        wingsMap = new WingsMap(map, getContext(), getViewLifecycleOwner());   //automatically constantly shows current location
+        wingsMap = new WingsMap(map, getContext(), getViewLifecycleOwner(), false);   //automatically constantly shows current location
 
         //Figure out what we routing to and from:
         //BuddyMeetUp or BuddyTrip?
@@ -366,7 +366,7 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
     //Purpose:          Initializes our "map" field, starts continuously checking for location updates
     protected void basicLoadMap(GoogleMap map) {
         Log.d(TAG, "in basicLoadMap():");
-        wingsMap = new WingsMap(map, getContext(), getViewLifecycleOwner());   //automatically constantly shows current location
+        wingsMap = new WingsMap(map, getContext(), getViewLifecycleOwner(), false);   //automatically constantly shows current location
 
         //Check who we are: should we check queriedDestination or intendedDestination?
         //1.) Are we a Buddy? --> map the intendedDestination
@@ -457,9 +457,9 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
     }
 
     public void makeConfirmBuddyDialog(){
-        ConfirmBuddyDialog dialog = ConfirmBuddyDialog.newInstance(meetUpInstance.getObjectId());
+  /*      SendRequestStepsDialog dialog = SendRequestStepsDialog.newInstance(meetUpInstance.getObjectId());
         dialog.setTargetFragment(HomeFragment.this, 1);
-        dialog.show(getFragmentManager(), "ConfirmBuddyDialogTag");
+        dialog.show(getFragmentManager(), "ConfirmBuddyDialogTag");*/
     }
 
     @Override
@@ -502,10 +502,6 @@ public class HomeFragment extends Fragment implements ConfirmDestinationDialog.R
         //listener.toChooseBuddyFragment();
     }
 
-    @Override
-    public void onConfirm() {
-
-    }
 
     @Override
     public void onSafe() {

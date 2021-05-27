@@ -1,6 +1,7 @@
 package com.example.wings.mainactivity.fragments;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,11 +15,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.wings.R;
+import com.example.wings.mainactivity.fragments.dialogs.ConfirmDestinationDialog;
+import com.example.wings.mainactivity.fragments.dialogs.SendRequestStepsDialog;
 import com.example.wings.models.helpers.WingsMap;
 import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.inParseServer.Buddy;
@@ -37,6 +41,7 @@ import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +68,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
     ParseUser currUser = ParseUser.getCurrentUser();
     ParseUser otherUser;
     Buddy otherBuddyInstance;
+    BuddyRequest buddyRequestInstance;
 
 
     //Fields for mapping:
@@ -71,17 +77,20 @@ public class ConfirmBuddyHomeFragment extends Fragment {
     private LatLng otherCurrLocation;
 
     //Views:
+    public static RelativeLayout requestOverlay;
     private SupportMapFragment mapFragment;
     private ImageView ivProfilePic;
     private TextView tvName;
     private TextView tvEmail;
     private TextView tvDistance;
     private RatingBar ratingBar;
-    private Button btnSendRequest;
+    public static Button btnSendRequest;
     private Button btnBack;
     private ImageView ivAcceptRequest;
     private ImageView ivRejectRequest;
+    public static TextView tvTripDestination;
 
+    public static Resources resource;
     public ConfirmBuddyHomeFragment() {}
 
     @Override
@@ -132,7 +141,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
-                    wingsMap = new WingsMap(googleMap, getContext(), getViewLifecycleOwner());        //automatically constantly shows current location
+                    wingsMap = new WingsMap(googleMap, getContext(), getViewLifecycleOwner(), true);        //automatically constantly shows current location
                 }
             });
         }
@@ -144,6 +153,8 @@ public class ConfirmBuddyHomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        resource = getResources();
+        requestOverlay = view.findViewById(R.id.buddyRequestOverlay);
         ivProfilePic = view.findViewById(R.id.ivSendRequestPic);
         tvName = view.findViewById(R.id.tvSendRequestName);
         tvEmail = view.findViewById(R.id.tvSendRequestEmail);
@@ -153,11 +164,12 @@ public class ConfirmBuddyHomeFragment extends Fragment {
         ivAcceptRequest = view.findViewById(R.id.ivAccept);
         ivRejectRequest = view.findViewById(R.id.ivReject);
         btnBack = view.findViewById(R.id.btnBack);
+        tvTripDestination = view.findViewById(R.id.tvTripDestination);
 
         btnBack.setOnClickListener(new View.OnClickListener() {         //TODO: I think we should keep a history of fragment passing in MainActivity to just go to some "previous" fragment instead
             @Override
             public void onClick(View v) {
-                listener.toBuddyHomeFragment(BuddyHomeFragment.KEY_FIND_BUDDY_MODE);
+                listener.toCurrentHomeFragment();
             }
         });
 
@@ -178,7 +190,12 @@ public class ConfirmBuddyHomeFragment extends Fragment {
                     Log.d(TAG, "in queryPotentialBuddy(): success!: response=" + objects.toString());
                     setOtherUser(objects.get(0));
                     drawOtherRoute();
-                    setUp();
+                    if(mode.equals(KEY_ANSWER_MODE)) {
+                        queryBuddyRequest();        //obtains the BuddyRequest inquestion, then populates all views
+                    }
+                    else{
+                        setUp();
+                    }
                 }
                 else{
                     Log.d(TAG, "queryPotentialBuddy(): error=" + e.getLocalizedMessage());
@@ -206,6 +223,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
                 otherCurrLocationGeoPoint.fetchIfNeeded();
                 otherCurrLocation = new LatLng(otherCurrLocationGeoPoint.getLatitude(), otherCurrLocationGeoPoint.getLongitude());
 
+                Log.d(TAG, "drawOtherRoute(): otherCurrLocation=" + otherCurrLocation.toString());
                 //Map the other user's route:
                 wingsMap.setMarker(otherCurrLocation, BitmapDescriptorFactory.HUE_BLUE, true);
                 wingsMap.route(otherCurrLocation, otherDestination, true);
@@ -216,7 +234,26 @@ public class ConfirmBuddyHomeFragment extends Fragment {
             }
     }
 
-    //Purpose:      Populate views and handle visibility depending on mode field! Implements corresponding onclick listeners. Assumes otherUser and otherCurrLocation is already initalized!
+    private void queryBuddyRequest(){
+        //Set the TripDestination textview:
+        ParseQuery<BuddyRequest> query = ParseQuery.getQuery(BuddyRequest.class);
+        query.whereEqualTo(BuddyRequest.KEY_OBJECT_ID, buddyRequestId);
+        query.findInBackground(new FindCallback<BuddyRequest>() {
+            @Override
+            public void done(List<BuddyRequest> objects, ParseException e) {
+                if (e == null) {
+                    BuddyRequest requestInQuestion = objects.get(0);
+                    setBuddyRequestInstance(requestInQuestion);
+                    setUp();
+                }
+            }
+        });
+    }
+    private void setBuddyRequestInstance(BuddyRequest buddyRequest){
+        buddyRequestInstance = buddyRequest;
+    }
+
+    //Purpose:      Populate views and handle visibility depending on mode field! Implements corresponding onclick listeners. Assumes otherUser, otherCurrLocation, and buddyRequestInstance is already initalized!
     private void setUp(){
         if(otherUser != null && otherCurrLocation != null) {
             //1.) Populate the views shared by both modes:
@@ -246,21 +283,37 @@ public class ConfirmBuddyHomeFragment extends Fragment {
                 e.printStackTrace();
             }
 
-
             //2.) Special handlers depending on modes:
             if (mode.equals(KEY_SEND_MODE)) {           //check if in send request mode
+                //Display Instructions through a dialog:
+                SendRequestStepsDialog dialog = SendRequestStepsDialog.newInstance();
+                dialog.setTargetFragment(ConfirmBuddyHomeFragment.this, 1);
+                dialog.show(getFragmentManager(), "SendRequestStepsDialogTag");
+
                 ivAcceptRequest.setVisibility(View.INVISIBLE);
                 ivRejectRequest.setVisibility(View.INVISIBLE);
+                btnSendRequest.setBackgroundColor(getResources().getColor(R.color.gray, null));     //disabled color of button
+
                 btnSendRequest.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        sendRequest(otherBuddyInstance);                //Creates a BuddyRequest, navigates back to ChooseBuddyFragment
+                        //Check if user has placed a marker on the map:
+                        LatLng targetDestination = wingsMap.getClickedTargetDestination();
+                        if(targetDestination.latitude == 0 && targetDestination.longitude == 0){            //default value
+                            Toast.makeText(getContext(), "You have not placed a trip destination!", Toast.LENGTH_LONG).show();
+                        }
+                        else {
+                            sendRequest(otherBuddyInstance, targetDestination);                //Creates a BuddyRequest, navigates back to ChooseBuddyFragment
+                        }
                     }
                 });
             }
 
             else {                                  //in answer request mode
                 btnSendRequest.setVisibility(View.INVISIBLE);
+                WingsGeoPoint tripDestination = buddyRequestInstance.getDestination();
+                tvTripDestination.setText("Trip Destination:  ("+ Math.round(tripDestination.getLatitude()*100.0)/100.0 +", " + Math.round(tripDestination.getLongitude()*100.0)/100.0+")");
+
                 ivRejectRequest.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -273,7 +326,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         Log.d(TAG, "bttnAccept - onClick():");
-                        onAccept(otherBuddyInstance, buddyRequestId);             //Create a BuddyMeetUp, update both Buddy instances --> go to BuddyHomeFragment w/meetUp mode
+                        onAccept(otherBuddyInstance, buddyRequestId, tripDestination);             //Create a BuddyMeetUp, update both Buddy instances --> go to BuddyHomeFragment w/meetUp mode
                     }
                 });
             }
@@ -281,63 +334,30 @@ public class ConfirmBuddyHomeFragment extends Fragment {
     }
 
     //Purpose:      Handlers for when in answer request mode. If accept the request --> make a BuddyMeetUp, update BuddyRequest
-    public void onAccept(Buddy confirmedBuddy, String buddyRequestId) {     //given the Buddy we just confirmed with
+    public void onAccept(Buddy confirmedBuddy, String buddyRequestId, WingsGeoPoint tripDestination) {     //given the Buddy we just confirmed with
         Log.d(TAG, "onAccept(), mode= answering request");
         CountDownLatch waitForSaving = new CountDownLatch(4);           //so we wait for all Parse saving before navigating to next fragment at end of method
 
-        //1.) Create a BuddyMeetUp:
         try {
+            //1.) Create a BuddyMeetUp:
             Buddy currBuddy = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
             currBuddy.fetchIfNeeded();
-            BuddyMeetUp buddyMeetUp = new BuddyMeetUp(confirmedBuddy, currBuddy);       //other buddy is the sender, and current user is the receiver
-            buddyMeetUp.save();/*InBackground(new SaveCallback() { //TODO: technically should be saving in background, but doing this way ensures main thread will not move forward prematurely
-                @Override
-                public void done(ParseException e) {
-                    if(e == null){
-                        Log.d(TAG, "we saved the buddyMeetUp instance ok!");
-                        waitForSaving.countDown();
-                    }
-                    else{
-                        Log.d(TAG, "error saving the buddyMeetUp, error=" +e.getMessage());
-                    }
-                }
-            });*/
+            BuddyMeetUp buddyMeetUp = new BuddyMeetUp(confirmedBuddy, currBuddy, tripDestination);       //other buddy is the sender, and current user is the receiver
+            buddyMeetUp.save();
 
             //2.) Change the Buddy fields:
             //2a.) for current user's buddy instance:
             updateHaveBuddy(currBuddy, buddyMeetUp, waitForSaving);
             updateHaveBuddy(confirmedBuddy, buddyMeetUp, waitForSaving);
 
+            //3.) Delete this BuddyRequest and go to BuddyHomeFrag:
+            deleteRequestFromLists(buddyRequestId);
+            buddyRequestInstance.delete();
 
-            //3.) Delete the entire BuddyRequest:
-            ParseQuery<BuddyRequest> query = ParseQuery.getQuery(BuddyRequest.class);
-            query.whereEqualTo(BuddyRequest.KEY_OBJECT_ID, buddyRequestId);
-            query.find();/*InBackground(new FindCallback<BuddyRequest>() {
-                @Override
-                public void done(List<BuddyRequest> objects, ParseException e) {
-                    BuddyRequest requestInQuestion =  objects.get(0);
-                    try {
-                        requestInQuestion.delete();
-                        waitForSaving.countDown();
-                    } catch (ParseException parseException) {
-                        parseException.printStackTrace();
-                    }
-                }
-            });*/
-
-
-            //Directly go to BuddyHomeFragment to start the BuddyMeetUp!
-           /* try {
-                Log.d(TAG, "onAccept(): MAListener waiting for all database saving to finish before moving on!");
-                waitForSaving.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }*/
             listener.toBuddyHomeFragment(BuddyHomeFragment.KEY_MEET_BUDDY_MODE, buddyMeetUp.getObjectId(), false);
             Toast.makeText(getContext(), "Start meetup with your buddy!", Toast.LENGTH_LONG).show();
-
-        } catch (ParseException parseException) {
-            parseException.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
     }
 
@@ -360,56 +380,39 @@ public class ConfirmBuddyHomeFragment extends Fragment {
         Log.d(TAG, "onReject():  remove the request from the list and delete the entire request!");
 
             //1.) Remove the BuddyRequest from the current user's list of ReceivedRequests:
-            Buddy currBuddy = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
-            try {
-                currBuddy.fetchIfNeeded();
-                List<BuddyRequest> receivedRequests = currBuddy.getReceivedRequests();
-                for(int i = 0; i < receivedRequests.size(); i++){
-                    BuddyRequest currRequest = receivedRequests.get(i);
-                    if(currRequest.getObjectId().equals(buddyRequestId)){
-                        receivedRequests.remove(i);
-                        break;
-                    }
-                }
+            deleteRequestFromLists(buddyRequestId);
 
-                currBuddy.setReceivedRequests(receivedRequests);
-                currBuddy.save();
-
-
-                //2.) Remove the BuddyRequest from the other user's list of SentRequests:
-                List<BuddyRequest> otherSentRequests = otherBuddyInstance.getSentRequests();
-                for(int i = 0; i < otherSentRequests.size(); i++){
-                    BuddyRequest currRequest = otherSentRequests.get(i);
-                    if(currRequest.getObjectId().equals(buddyRequestId)){
-                        otherSentRequests.remove(i);
-                        break;
-                    }
-                }
-                otherBuddyInstance.setSentRequests(otherSentRequests);
-                otherBuddyInstance.save();
-            }catch(ParseException e){
-                Log.d(TAG, "onReject() after RespondBuddyRequestDialog");
-            }
-
-
-            //2.) Get rid of the BuddyRequest instance entirely:
+            //2.) Get rid of the BuddyRequest instance entirely, then navigate back:
             ParseQuery<BuddyRequest> query = ParseQuery.getQuery(BuddyRequest.class);
             query.whereEqualTo(BuddyRequest.KEY_OBJECT_ID, buddyRequestId);
-        try {
-            query.find();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+            query.findInBackground(new FindCallback<BuddyRequest>() {
+            @Override
+                public void done(List<BuddyRequest> objects, ParseException e) {
+                    if(e == null) {
+                        BuddyRequest requestInQuestion = objects.get(0);
+                        try {
+                            requestInQuestion.delete();
+                            listener.toCurrentHomeFragment();
+                        } catch (ParseException parseException) {
+                            parseException.printStackTrace();
+                        }
+                    }
+                    else{
+                        Log.d(TAG, "onReject(): error getting BuddyRequest(), error="+e.getLocalizedMessage());
+                    }
+                }
+            });
 
-        //3.) Go back to Home page w/ mode = finding buddies:
-        listener.toBuddyHomeFragment(BuddyHomeFragment.KEY_FIND_BUDDY_MODE);
+
     }
 
 
     //Purpose:      Handler for mode = sending request. This is called when the btnSendRequest button is clicked. Creates a BuddyRequest where current user is the sender, other user is the receiver, goes back to ChooseBuddyFragment, increment the BuddyRequest in UserBuddyRequestsFragment
-    public void sendRequest(Buddy potentialBuddy) {
+    public void sendRequest(Buddy potentialBuddy, LatLng tripDestination) {
         Log.d(TAG, "onAccept()");
         //CountDownLatch waitForSaving = new CountDownLatch(3);
+
+        WingsGeoPoint tripDestinationGeoPoint = new WingsGeoPoint(currUser, tripDestination.latitude, tripDestination.longitude);
 
         //1.) Get current user's buddy instance:
         Buddy buddyInstance = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
@@ -417,7 +420,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
             buddyInstance.fetchIfNeeded();
 
             //2.) Create and save BuddyRequest:
-            BuddyRequest request = new BuddyRequest(buddyInstance, potentialBuddy);
+            BuddyRequest request = new BuddyRequest(buddyInstance, potentialBuddy, tripDestinationGeoPoint);
             request.save();
 
             //3.) Get buddyInstance's list of sentBuddyRequests:
@@ -463,5 +466,45 @@ public class ConfirmBuddyHomeFragment extends Fragment {
         }
     }
 
+    //Purpose:      Removes this buddyrequestId from both the receivedRequests and sentRequests field from currUser/otherUser
+    private void deleteRequestFromLists(String buddyRequestId){
+        //1.) Remove the BuddyRequest from the current user's list of ReceivedRequests:
+        Buddy currBuddy = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
+        try {
+            currBuddy.fetchIfNeeded();
+            List<BuddyRequest> receivedRequests = currBuddy.getReceivedRequests();
+            for(int i = 0; i < receivedRequests.size(); i++){
+                BuddyRequest currRequest = receivedRequests.get(i);
+                if(currRequest.getObjectId().equals(buddyRequestId)){
+                    receivedRequests.remove(i);
+                    break;
+                }
+            }
+
+            currBuddy.setReceivedRequests(receivedRequests);
+            currBuddy.save();
+
+            //2.) Remove the BuddyRequest from the other user's list of SentRequests:
+            List<BuddyRequest> otherSentRequests = otherBuddyInstance.getSentRequests();
+            for(int i = 0; i < otherSentRequests.size(); i++){
+                BuddyRequest currRequest = otherSentRequests.get(i);
+                if(currRequest.getObjectId().equals(buddyRequestId)){
+                    otherSentRequests.remove(i);
+                    break;
+                }
+            }
+            otherBuddyInstance.setSentRequests(otherSentRequests);
+            otherBuddyInstance.save();
+        }catch(ParseException e){
+            Log.d(TAG, "onReject() after RespondBuddyRequestDialog");
+        }
+    }
+
+    public static void enableSendOverlay(LatLng targetDestination){
+        Log.d(TAG, "enableSendOverlay()");
+        btnSendRequest.setBackgroundColor(resource.getColor(R.color.logo_teal, null));        //enabled color
+        tvTripDestination.setText("Trip Destination:  ("+ Math.round(targetDestination.latitude*100.0)/100.0 +", " + Math.round(targetDestination.longitude*100.0)/100.0+")");
+        requestOverlay.setVisibility(View.VISIBLE);
+    }
 
 }

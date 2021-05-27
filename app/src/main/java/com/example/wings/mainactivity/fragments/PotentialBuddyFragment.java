@@ -220,7 +220,7 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmSendReque
     }
 
     private void loadMap(GoogleMap map){
-        wingsMap = new WingsMap(map, getContext(), getViewLifecycleOwner());   //automatically constantly shows current location
+        wingsMap = new WingsMap(map, getContext(), getViewLifecycleOwner(), false);   //automatically constantly shows current location
 
     }
 
@@ -245,12 +245,12 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmSendReque
         //Accept the request -->
         //Make BuddyMeetUp
         //Get buddyInstance
-        ParseUser currentUser = ParseUser.getCurrentUser();
+       /* ParseUser currentUser = ParseUser.getCurrentUser();
         Buddy currBuddy = (Buddy) currentUser.getParseObject(User.KEY_BUDDY);
         try {
             currBuddy.fetchIfNeeded();
 
-            BuddyMeetUp buddyMeetUp = new BuddyMeetUp(confirmedBuddy, currBuddy);
+            BuddyMeetUp buddyMeetUp = new BuddyMeetUp(confirmedBuddy, currBuddy, );
             buddyMeetUp.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
@@ -325,7 +325,7 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmSendReque
 
         //Directly go to HomeFragment to start the BuddyMeetUp!
         listener.toHomeFragment(HomeFragment.KEY_ONTRIP);
-        Toast.makeText(getContext(), "Start meetup with your buddy!", Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), "Start meetup with your buddy!", Toast.LENGTH_LONG).show();*/
     }
 
     @Override
@@ -379,7 +379,7 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmSendReque
     @Override
     //Purpose:      Create a BuddyRequest where current user is the sender, other user is the receiver, go back to ChooseBuddyFragment, increment the BuddyRequest in UserBuddyRequestsFragment
     public void onAccept(Buddy potentialBuddy) {
-        Log.d(TAG, "onAccept()");
+        /*Log.d(TAG, "onAccept()");
 
         //TODO: Should technically check if we've already sent a request to this Buddy
         //1.) Get current user's buddy instance:
@@ -410,7 +410,7 @@ public class PotentialBuddyFragment extends Fragment implements ConfirmSendReque
         } catch (ParseException e) {
             Log.d(TAG, "onAccept: error getting buddy request I think, error=" + e.getMessage());
             e.printStackTrace();
-        }
+        }*/
 
     }
 

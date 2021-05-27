@@ -16,6 +16,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
+import com.example.wings.mainactivity.fragments.ConfirmBuddyHomeFragment;
 import com.example.wings.models.User;
 import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.example.wings.network.DataParser;
@@ -32,6 +33,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -78,16 +80,15 @@ public class WingsMap {
     private List<WingsRoute> allRoutes;
     private boolean hasRoutes;           //bc maps may not always be used just for routing
     private WingsRoute chosenRoute;     //the route constantly tracking and animating
+    private LatLng clickedTargetDestination = new LatLng(0,0);
 
     //Drawing stuff
-    private ArrayList<LatLng> markerPoints;
-    private MarkerOptions startMarker;
-    private MarkerOptions endMarker;
+    private Marker targetDestinationMarker;
 
     private double distanceFromCurLocation;
     public boolean isReady;
 
-    public WingsMap(GoogleMap map, Context context, LifecycleOwner fragLifecycleOwner){
+    public WingsMap(GoogleMap map, Context context, LifecycleOwner fragLifecycleOwner, boolean isConfirmBuddyFrag){
         this.map = map;
         this.context = context;
         lifecycleOwner = fragLifecycleOwner;
@@ -101,6 +102,25 @@ public class WingsMap {
 
         isReady = true;
         openAppSetUp();
+
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng clickedLocation) {
+                //Remove the marker if its already on the map, otherwise show the current marker
+                if(targetDestinationMarker == null){
+                    initializeTargetDestinationMarker(clickedLocation);
+                    setClickedTargetDestination(clickedLocation);
+                }else{
+                    targetDestinationMarker.remove();
+                    initializeTargetDestinationMarker(clickedLocation);
+                }
+
+                if(isConfirmBuddyFrag) {
+                    //update the overlay in confirmBuddyHomeFragment
+                    ConfirmBuddyHomeFragment.enableSendOverlay(clickedLocation);
+                }
+            }
+        });
     }
 
     //Purpose:     The setup used when to automatically track and draw current location Set up all map's settings of interaction, look, zoom, etc. Just do things by default
@@ -315,7 +335,7 @@ public class WingsMap {
     public void onLocationUpdated(@NonNull Location location) {
         if (location != null) {
             LatLng receivedLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            if((!currentLocation.equals(receivedLocation)) && destination != null){
+            if((!currentLocation.equals(receivedLocation)) && destination != null && startLocation.equals(currentLocation)){
                 Log.d(TAG, "onLocationUpdated(): currentLocation != to location updated --> re-drawing route");
                 ParseGeoPoint curLoc = new ParseGeoPoint(currentLocation.latitude, currentLocation.longitude);
                 distanceFromCurLocation = curLoc.distanceInKilometersTo(new ParseGeoPoint(destination.latitude, destination.longitude))*1000;
@@ -410,13 +430,50 @@ public class WingsMap {
         }
     }
 
+    private void initializeTargetDestinationMarker(LatLng clickedLocation){
+        //Create a stylized marker, able to be dragged--> set clickedTargetDestination
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(clickedLocation);
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+        markerOptions.title("("+clickedLocation.latitude + ", " + clickedLocation.longitude + ")");
+        markerOptions.draggable(true);
+        map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {}
+            @Override
+            public void onMarkerDrag(Marker marker) {}
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                marker.showInfoWindow();
+                setClickedTargetDestination(marker.getPosition());
+            }
+        });
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                marker.remove();
+                setClickedTargetDestination(null);
+                return false;
+            }
+        });
+
+        targetDestinationMarker = map.addMarker(markerOptions);
+        targetDestinationMarker.showInfoWindow();
+        Log.d(TAG, "initalizeTargetDestinationMarker(): targetDestinationMarker.isDraggable()= " + targetDestinationMarker.isDraggable());
+    }
     //Save the destination in Parse Database, technically should be doing this here
     private void setUserDestinationString(String destinationTxt){
         Log.d(TAG, "setUserDestinationString()");
         currentUser.put(User.KEY_DESTINATIONSTR, destinationTxt);
         currentUser.saveInBackground();
     }
-
+    public void setClickedTargetDestination(LatLng location){
+        clickedTargetDestination = location;
+    }
+    public LatLng getClickedTargetDestination(){
+        return clickedTargetDestination;
+    }
     public LatLng getCurrentLocation(){
         return currentLocation;
     }

@@ -93,7 +93,7 @@ public class DefaultHomeFragment extends Fragment {
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
-                    wingsMap = new WingsMap(googleMap, getContext(), getViewLifecycleOwner());   //automatically constantly shows current location
+                    wingsMap = new WingsMap(googleMap, getContext(), getViewLifecycleOwner(), false);   //automatically constantly shows current location
                 }
             });
         }

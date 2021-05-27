@@ -180,6 +180,7 @@
                 android:background="@drawable/btn_rounded_corners_style"
                 android:fontFamily="@font/lato"
                 android:hint="Enter PIN #"
+                android:password="true"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="15sp" />

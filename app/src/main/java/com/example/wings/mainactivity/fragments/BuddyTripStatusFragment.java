@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.wings.R;
@@ -37,6 +38,7 @@ import org.parceler.Parcels;
  *
  *
  * */
+//TODO: make the layout scrollable, and add a cancel button to cancel the trip
 public class BuddyTripStatusFragment extends Fragment {
     private static final String TAG = "BuddyTripStatusFragment";
     public static final String KEY_DATA = "parcelableObjectGiven";
@@ -113,6 +115,12 @@ public class BuddyTripStatusFragment extends Fragment {
             }
         });
 
+        listener.setBuddyRequestBttnOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "You are already on this screen!", Toast.LENGTH_SHORT).show();
+            }
+        });
         otherBuddy.getObjectId();
         Buddy userBuddyInstance = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
         try {
@@ -123,7 +131,8 @@ public class BuddyTripStatusFragment extends Fragment {
             tvUserBuddyId.setText("Your ID:  " + userBuddyInstance.getObjectId());
             tvOtherBuddyId.setText("Their ID:  " + otherBuddy.getObjectId());
             tvUserDestination.setText("Your intended destination:  " + currUser.getString(User.KEY_DESTINATIONSTR));         //TODO: input destinationStr field into Buddy class and destination field into BuddyMeetUp class
-            tvCommonDestination.setText("Trip destination:  " );
+            WingsGeoPoint tripDestination = meetUpInstance.getDestination();
+            tvCommonDestination.setText("Trip destination:  "+ Math.round(tripDestination.getLatitude()*100.0)/100.0 +", " + Math.round(tripDestination.getLongitude()*100.0)/100.0+")");
 
             //2.) Populate otherUser information:
             otherUser = otherBuddy.getUser();

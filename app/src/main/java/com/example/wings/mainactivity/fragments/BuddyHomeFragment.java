@@ -158,7 +158,7 @@ public class BuddyHomeFragment extends Fragment {
     //Purpose:          Initializes our "map" field, starts continuously checking for location updates
     private void loadMap(GoogleMap map) {
         Log.d(TAG, "in loadMap():");
-        wingsMap = new WingsMap(map, getContext(), getViewLifecycleOwner());        //automatically constantly shows current location
+        wingsMap = new WingsMap(map, getContext(), getViewLifecycleOwner(), false);        //automatically constantly shows current location
 
         //Ensures to set everyone once map is done loading:
         if(mode.equals(KEY_FIND_BUDDY_MODE)){
@@ -295,7 +295,7 @@ public class BuddyHomeFragment extends Fragment {
                         Log.d(TAG, "setMeetBuddyMode(): attemptedPin = " + attemptedPin);
 
                         //Get the current user's pin field to check match:
-                        String correctPin = (String) currUser.getString(User.KEY_PIN);
+                        String correctPin = currUser.getString(User.KEY_PIN).toString();
                         Log.d(TAG, "setMeetBuddyMode(): correct pin = " + correctPin);
 
                         if(attemptedPin.equals(correctPin)){
@@ -388,38 +388,43 @@ public class BuddyHomeFragment extends Fragment {
             public void done(List<Buddy> objects, ParseException e) {
                 if (e == null) {
                     Log.d(TAG, "in queryPotentialBuddy(): success!: response=" + objects.toString());
-                    Buddy otherBuddyInstance = (Buddy) objects.get(0);
+                    if(objects.get(0) != null) {
+                        Buddy otherBuddyInstance = (Buddy) objects.get(0);
 
-                    setOtherUser(otherBuddyInstance.getUser());
-                    if(otherUser != null){
-                        ParseFile imageFile = otherUser.getParseFile(User.KEY_PROFILEPICTURE);
-                        if (imageFile != null) {
+                        setOtherUser(otherBuddyInstance.getUser());
+                        if (otherUser != null) {
+                            ParseFile imageFile = otherUser.getParseFile(User.KEY_PROFILEPICTURE);
+                            if (imageFile != null) {
+                                try {
+                                    Glide.with(getContext()).load(imageFile.getFile()).into(ivProfilePic);
+                                } catch (ParseException error) {
+                                    error.printStackTrace();
+                                }
+                            }
+                            tvName.setText(otherUser.getString(User.KEY_FIRSTNAME));
+
+                            //Draw map from current user's current location --> other User's current location:
+                            WingsGeoPoint otherCurrLocationGeoPoint = (WingsGeoPoint) otherUser.getParseObject(User.KEY_CURRENTLOCATION);
                             try {
-                                Glide.with(getContext()).load(imageFile.getFile()).into(ivProfilePic);
-                            } catch (ParseException error) {
-                                error.printStackTrace();
+                                otherCurrLocationGeoPoint.fetchIfNeeded();
+                                wingsMap.routeFromCurrentLocation(new LatLng(otherCurrLocationGeoPoint.getLatitude(), otherCurrLocationGeoPoint.getLongitude()), true);
+                            } catch (ParseException parseException) {
+                                parseException.printStackTrace();
                             }
+
+
+                            //NOTE: This is done here and NOT in setMeetUpMode() to ensure otherUser and BuddyMeetUp instance are initialized
+                            //3.) Set an onclick listener for the floating buddy request button --> show a fragment that displays the BuddyTrip/Meeting status
+                            listener.setBuddyRequestBttnOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    listener.toBuddyTripStatusFragment(otherBuddyInstance, meetUpInstance, KEY_MEET_BUDDY_MODE);
+                                }
+                            });
                         }
-                        tvName.setText(otherUser.getString(User.KEY_FIRSTNAME));
-
-                        //Draw map from current user's current location --> other User's current location:
-                        WingsGeoPoint otherCurrLocationGeoPoint = (WingsGeoPoint) otherUser.getParseObject(User.KEY_CURRENTLOCATION);
-                        try {
-                            otherCurrLocationGeoPoint.fetchIfNeeded();
-                            wingsMap.routeFromCurrentLocation(new LatLng(otherCurrLocationGeoPoint.getLatitude(), otherCurrLocationGeoPoint.getLongitude()), true);
-                        } catch (ParseException parseException) {
-                            parseException.printStackTrace();
-                        }
-
-
-                        //NOTE: This is done here and NOT in setMeetUpMode() to ensure otherUser and BuddyMeetUp instance are initialized
-                        //3.) Set an onclick listener for the floating buddy request button --> show a fragment that displays the BuddyTrip/Meeting status
-                        listener.setBuddyRequestBttnOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                listener.toBuddyTripStatusFragment(otherBuddyInstance, meetUpInstance, KEY_MEET_BUDDY_MODE);
-                            }
-                        });
+                    }
+                    else{
+                        Log.d(TAG, "queryOtherBuddy:  queried Buddy List was null");
                     }
                 }
                 else{

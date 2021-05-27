@@ -78,13 +78,13 @@ public class ConfirmSafeArrivalDialog extends DialogFragment {
         dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 // layout to display
-        dialog.setContentView(R.layout.fragment_confirm_safe_arrival_dialog);
+        dialog.setContentView(R.layout.fragment_send_request_steps_dialog);
 
 // set color transpartent
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
 
-        View view =  inflater.inflate(R.layout.fragment_confirm_safe_arrival_dialog, container, false);
+        View view =  inflater.inflate(R.layout.fragment_send_request_steps_dialog, container, false);
         return view;
 
 
