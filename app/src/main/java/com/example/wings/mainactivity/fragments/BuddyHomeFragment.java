@@ -186,10 +186,10 @@ public class BuddyHomeFragment extends Fragment {
         fabGoChooseBuddyFrag = view.findViewById(R.id.fabChooseBuddy);
         fabCancelBuddy = view.findViewById(R.id.fabCancelBuddy);
 
-        confirmMeetingOverlay = view.findViewById(R.id.confirmMeetingOverlay);
+        confirmMeetingOverlay = view.findViewById(R.id.confirmMeetupOverlay);
         //views in this overlay:
-        ivProfilePic = view.findViewById(R.id.ivConfirmMeetingPic);
-        tvName = view.findViewById(R.id.tvConfirmMeetingName);
+        ivProfilePic = view.findViewById(R.id.ivProfilePic);
+        tvName = view.findViewById(R.id.tvName);
         tvUserBuddyId = view.findViewById(R.id.tvUserBuddyId);
         tvOtherBuddyId = view.findViewById(R.id.tvOtherBuddyId);
         etPin = view.findViewById(R.id.etPin);
@@ -389,6 +389,7 @@ public class BuddyHomeFragment extends Fragment {
                 if (e == null) {
                     Log.d(TAG, "in queryPotentialBuddy(): success!: response=" + objects.toString());
                     Buddy otherBuddyInstance = (Buddy) objects.get(0);
+
                     setOtherUser(otherBuddyInstance.getUser());
                     if(otherUser != null){
                         ParseFile imageFile = otherUser.getParseFile(User.KEY_PROFILEPICTURE);
@@ -416,7 +417,7 @@ public class BuddyHomeFragment extends Fragment {
                         listener.setBuddyRequestBttnOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                listener.toBuddyTripStatusFragment(otherUser, meetUpInstance);
+                                listener.toBuddyTripStatusFragment(otherBuddyInstance, meetUpInstance, KEY_MEET_BUDDY_MODE);
                             }
                         });
                     }
@@ -440,35 +441,23 @@ public class BuddyHomeFragment extends Fragment {
             try {
                 currBuddyInstance.fetchIfNeeded();
                 String currBuddyId = currBuddyInstance.getObjectId();
-                tvUserBuddyId.setText(currBuddyId);
+                tvUserBuddyId.setText("Your ID:  " + currBuddyId);
 
                 //See if other user is classified as the "senderBuddy" or "receiverBuddy":
                 String senderBuddyId = meetUpInstance.getSenderBuddyId();
                 if(senderBuddyId.equals(currBuddyId)){
                     //Then otherUser = the receiverBuddy
                     otherUserId = meetUpInstance.getReceiverBuddyId();
-                    tvOtherBuddyId.setText(otherUserId);
+                    tvOtherBuddyId.setText("Their ID:  " + otherUserId);
                 }
                 else{
                     //Then otherUser = the senderBuddy
                     otherUserId = meetUpInstance.getSenderBuddyId();
-                    tvOtherBuddyId.setText(otherUserId);
+                    tvOtherBuddyId.setText("Their ID:  " + otherUserId);
                 }
 
                 //2.) Populate other views relying on otherUser:
                 queryOtherBuddy(otherUserId);                            //instantiates otherUser
-                /*if(otherUser != null){
-                    ParseFile imageFile = otherUser.getParseFile(User.KEY_PROFILEPICTURE);
-                    if (imageFile != null) {
-                        try {
-                            Glide.with(getContext()).load(imageFile.getFile()).into(ivProfilePic);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    tvName.setText(otherUser.getString(User.KEY_FIRSTNAME));
-                }*/
-
             } catch (ParseException e) {
                 e.printStackTrace();
             }

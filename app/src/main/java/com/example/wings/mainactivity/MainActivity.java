@@ -470,11 +470,12 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     }
 
     @Override
-    public void toBuddyTripStatusFragment(ParseUser otherUser, BuddyMeetUp meetUpInstance) {
+    public void toBuddyTripStatusFragment(Buddy otherBuddy, BuddyMeetUp meetUpInstance, String mode) {
         //1.) Package ParseObjects into a ParcelableObject to send as a Parcelable:
         ParcelableObject sendData = new ParcelableObject();
-        sendData.setParseUser(otherUser);
+        sendData.setBuddy(otherBuddy);
         sendData.setBuddyMeetUp(meetUpInstance);
+        sendData.setString(mode);
 
         //2.) Bundle it and send:
         Bundle bundle = new Bundle();;

@@ -29,6 +29,7 @@ public class ParcelableObject {
     LatLng someLocation;
     TrustedContact trustedContact;
     BuddyRequest buddyRequest;
+    String someString;
 
     public ParcelableObject(){}
 
@@ -55,6 +56,13 @@ public class ParcelableObject {
     }
     public void setTrustedContact(TrustedContact trustedContact) {
         this.trustedContact = trustedContact;
+    }
+
+    public void setString(String string){
+        someString = string;
+    }
+    public String getString(){
+        return someString;
     }
 
     public LatLng getLocation() {
