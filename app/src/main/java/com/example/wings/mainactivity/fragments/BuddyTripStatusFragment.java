@@ -24,7 +24,6 @@ import com.example.wings.models.User;
 import com.example.wings.models.inParseServer.Buddy;
 import com.example.wings.models.inParseServer.BuddyMeetUp;
 import com.example.wings.models.inParseServer.WingsGeoPoint;
-import com.google.android.gms.maps.model.LatLng;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
@@ -100,10 +99,10 @@ public class BuddyTripStatusFragment extends Fragment {
 
         btnBack = view.findViewById(R.id.btnBack);
         ivProfilePic = view.findViewById(R.id.ivProfilePic);
-        tvName = view.findViewById(R.id.tvName);
+        tvName = view.findViewById(R.id.tvTitle);
         tvTripStatus = view.findViewById(R.id.tvTripStatus);
         tvUserBuddyId = view.findViewById(R.id.tvUserBuddyId);
-        tvOtherBuddyId = view.findViewById(R.id.tvOtherBuddyId);
+        tvOtherBuddyId = view.findViewById(R.id.tvTripDestination);
         tvUserDestination = view.findViewById(R.id.tvUserDestination);
         tvCommonDestination = view.findViewById(R.id.tvCommonDestination);
 
@@ -132,7 +131,7 @@ public class BuddyTripStatusFragment extends Fragment {
             tvOtherBuddyId.setText("Their ID:  " + otherBuddy.getObjectId());
             tvUserDestination.setText("Your intended destination:  " + currUser.getString(User.KEY_DESTINATIONSTR));         //TODO: input destinationStr field into Buddy class and destination field into BuddyMeetUp class
             WingsGeoPoint tripDestination = meetUpInstance.getDestination();
-            tvCommonDestination.setText("Trip destination:  "+ Math.round(tripDestination.getLatitude()*100.0)/100.0 +", " + Math.round(tripDestination.getLongitude()*100.0)/100.0+")");
+            tvCommonDestination.setText("Trip destination:  "+ Math.round(tripDestination.getLatitude()*1000.0)/1000.0 +", " + Math.round(tripDestination.getLongitude()*1000.0)/1000.0+")");
 
             //2.) Populate otherUser information:
             otherUser = otherBuddy.getUser();

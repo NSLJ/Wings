@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -52,7 +53,7 @@ public class DefaultHomeFragment extends Fragment {
     //Views:
     private SupportMapFragment mapFragment;
     private EditText etSearchBar;
-    private Button btnSearch;
+    private ImageButton btnSearch;
     private RelativeLayout confirmDestinationOverlay;
 
     private TextView displayDestination;

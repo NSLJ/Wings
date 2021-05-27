@@ -354,10 +354,16 @@ public class WingsMap {
 
         //default settings to style polyline, can change later:
         lineOptions.width(8);
-        lineOptions.color(Color.BLUE);
+        lineOptions.color(0xFF6EB2B7);        //color the route our logo color
+
         lineOptions.geodesic(true);
 
-        setMarker(destination, BitmapDescriptorFactory.HUE_RED, animateMap);
+        if(!startLocation.equals(currentLocation)) {            //Did we map the route from currUser's current location? if not --> this must be the otherUser's destination
+            setMarker(destination, BitmapDescriptorFactory.HUE_RED, animateMap, "Their Destination:  (" + Math.round(destination.latitude * 1000.0) / 1000.0 + ", " + Math.round(destination.longitude * 1000.0) / 1000.0 + ")");
+        }
+        else{
+            setMarker(destination, BitmapDescriptorFactory.HUE_RED, animateMap, "Your Destination:  (" + Math.round(destination.latitude * 1000.0) / 1000.0 + ", " + Math.round(destination.longitude * 1000.0) / 1000.0 + ")");
+        }
         routeDrawn = true;
         polylineDrawn = map.addPolyline(lineOptions);
         isReady = true;
@@ -366,12 +372,14 @@ public class WingsMap {
     public boolean getIsReady(){
         return isReady;
     }
-    public void setMarker(LatLng destination, float color, boolean animateMap){
+    public void setMarker(LatLng destination, float color, boolean animateMap, String title){
         Log.d(TAG, "setMaker()");
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(destination);
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(color));
-        map.addMarker(markerOptions);
+        markerOptions.title(title);
+        map.addMarker(markerOptions).showInfoWindow();
+
        // map.animateCamera(CameraUpdateFactory.newLatLng(destination));
       //  map.animateCamera(CameraUpdateFactory.zoomTo(9));
         if(animateMap) {

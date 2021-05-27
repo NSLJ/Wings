@@ -177,8 +177,6 @@ public class ConfirmBuddyHomeFragment extends Fragment {
 
     }
 
-
-
     private void queryOtherUser(String id) {
         Log.d(TAG, "in queryOtherUser(): otherUserId=" + id);
         ParseQuery<ParseUser> query = ParseUser.getQuery();
@@ -225,9 +223,13 @@ public class ConfirmBuddyHomeFragment extends Fragment {
 
                 Log.d(TAG, "drawOtherRoute(): otherCurrLocation=" + otherCurrLocation.toString());
                 //Map the other user's route:
-                wingsMap.setMarker(otherCurrLocation, BitmapDescriptorFactory.HUE_BLUE, true);
+                wingsMap.setMarker(otherCurrLocation, BitmapDescriptorFactory.HUE_BLUE, true, "Their current location");
                 wingsMap.route(otherCurrLocation, otherDestination, true);
 
+                Buddy userBuddyInstance = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
+                userBuddyInstance.fetchIfNeeded();
+                WingsGeoPoint currUserDestination = userBuddyInstance.getDestination();
+                wingsMap.setMarker(new LatLng(currUserDestination.getLatitude(), currUserDestination.getLongitude()), BitmapDescriptorFactory.HUE_BLUE, true, "Your Destination");
             } catch (ParseException e) {
                 Log.d(TAG, "onViewCreated(): error fetching buddy instance");
                 e.printStackTrace();
@@ -312,7 +314,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
             else {                                  //in answer request mode
                 btnSendRequest.setVisibility(View.INVISIBLE);
                 WingsGeoPoint tripDestination = buddyRequestInstance.getDestination();
-                tvTripDestination.setText("Trip Destination:  ("+ Math.round(tripDestination.getLatitude()*100.0)/100.0 +", " + Math.round(tripDestination.getLongitude()*100.0)/100.0+")");
+                tvTripDestination.setText("Trip Destination:  ("+ Math.round(tripDestination.getLatitude()*1000.0)/1000.0 +", " + Math.round(tripDestination.getLongitude()*1000.0)/1000.0+")");
 
                 ivRejectRequest.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -503,7 +505,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
     public static void enableSendOverlay(LatLng targetDestination){
         Log.d(TAG, "enableSendOverlay()");
         btnSendRequest.setBackgroundColor(resource.getColor(R.color.logo_teal, null));        //enabled color
-        tvTripDestination.setText("Trip Destination:  ("+ Math.round(targetDestination.latitude*100.0)/100.0 +", " + Math.round(targetDestination.longitude*100.0)/100.0+")");
+        tvTripDestination.setText("Trip Destination:  ("+ Math.round(targetDestination.latitude*1000.0)/1000.0 +", " + Math.round(targetDestination.longitude*1000.0)/1000.0+")");
         requestOverlay.setVisibility(View.VISIBLE);
     }
 

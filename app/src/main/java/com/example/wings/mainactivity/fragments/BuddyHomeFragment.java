@@ -189,9 +189,9 @@ public class BuddyHomeFragment extends Fragment {
         confirmMeetingOverlay = view.findViewById(R.id.confirmMeetupOverlay);
         //views in this overlay:
         ivProfilePic = view.findViewById(R.id.ivProfilePic);
-        tvName = view.findViewById(R.id.tvName);
+        tvName = view.findViewById(R.id.tvTitle);
         tvUserBuddyId = view.findViewById(R.id.tvUserBuddyId);
-        tvOtherBuddyId = view.findViewById(R.id.tvOtherBuddyId);
+        tvOtherBuddyId = view.findViewById(R.id.tvTripDestination);
         etPin = view.findViewById(R.id.etPin);
         btnConfirmBuddyMeetup = view.findViewById(R.id.btnConfirmBuddy);
         btnExitMeetUp = view.findViewById(R.id.btnExit);
