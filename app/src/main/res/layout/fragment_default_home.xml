@@ -6,35 +6,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#28C4C4C4"
+    android:background="@color/gray_background"
     android:orientation="vertical"
-    tools:context=".mainactivity.fragments.HomeFragment">
+    tools:context=".mainactivity.fragments.home.HomeFragment">
 
     <RelativeLayout
         android:id="@+id/rlSearchBar"
-        android:layout_width="match_parent"
-        android:layout_height="40dp">
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:background="@drawable/btn_rounded_corners_style">
 
         <EditText
             android:id="@+id/etSearchBar"
-            android:layout_width="300dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="10dp"
+            android:layout_toStartOf="@+id/btnSearch"
             android:ems="10"
             android:fontFamily="@font/lato"
             android:gravity="center"
             android:hint="Search for a destination"
             android:inputType="textPersonName"
-            android:textAlignment="textStart" />
+            android:textAlignment="textStart"
+            android:textColor="@color/gray"
+            android:textColorHint="@color/gray" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btnSearch"
-            android:layout_width="15dp"
+            android:layout_width="45dp"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginStart="-35dp"
-            android:layout_toEndOf="@+id/etSearchBar"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/btn_circle"
+            android:backgroundTint="@color/logo_teal"
+            android:src="@android:drawable/ic_menu_search"
             android:text="search" />
 
     </RelativeLayout>
@@ -42,7 +49,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/gray_100">
 
 
         <!-- confirm the destination intended overlay (used when user just entered a location/drew route in map, and app asks if this is the correct destination)-->
@@ -58,7 +66,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="352dp"
+            android:layout_marginTop="357dp"
             android:background="#121212"
             android:orientation="horizontal">
 
@@ -73,27 +81,27 @@
                 android:text="Start Buddy Trip?"
                 android:textAlignment="center"
                 android:textColor="#FFFFFF"
-                android:textSize="24sp" />
+                android:textSize="30sp" />
 
 
             <TextView
                 android:id="@+id/tvDestination"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="300dp"
+                android:layout_height="32dp"
                 android:layout_below="@+id/tvTitle"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/most_opaque_rounded"
                 android:fontFamily="@font/lato"
-                android:paddingLeft="70dp"
+                android:paddingLeft="3dp"
                 android:paddingTop="7dp"
-                android:paddingRight="70dp"
+                android:paddingRight="3dp"
                 android:paddingBottom="7dp"
                 android:textAlignment="center"
                 android:textColor="@color/gray"
                 android:textColorHint="@color/gray"
                 android:textSize="16sp"
-                tools:text="Some location here" />
+                tools:text="Destination:  (123.123, 123.123) " />
 
             <RelativeLayout
                 android:layout_width="wrap_content"

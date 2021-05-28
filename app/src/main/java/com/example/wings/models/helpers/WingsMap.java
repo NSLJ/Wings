@@ -3,7 +3,6 @@ package com.example.wings.models.helpers;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -16,6 +15,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
+import com.example.wings.mainactivity.fragments.home.BuddyHomeFragment;
+import com.example.wings.mainactivity.fragments.home.ConfirmBuddyHomeFragment;
 import com.example.wings.models.User;
 import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.example.wings.network.DataParser;
@@ -32,6 +33,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -78,16 +80,16 @@ public class WingsMap {
     private List<WingsRoute> allRoutes;
     private boolean hasRoutes;           //bc maps may not always be used just for routing
     private WingsRoute chosenRoute;     //the route constantly tracking and animating
+    private LatLng clickedTargetDestination = new LatLng(0,0);
 
     //Drawing stuff
-    private ArrayList<LatLng> markerPoints;
-    private MarkerOptions startMarker;
-    private MarkerOptions endMarker;
+    private Marker targetDestinationMarker;
 
     private double distanceFromCurLocation;
     public boolean isReady;
+    private boolean trackOtherUser;
 
-    public WingsMap(GoogleMap map, Context context, LifecycleOwner fragLifecycleOwner){
+    public WingsMap(GoogleMap map, Context context, LifecycleOwner fragLifecycleOwner, boolean isConfirmBuddyFrag, boolean trackOtherUser){
         this.map = map;
         this.context = context;
         lifecycleOwner = fragLifecycleOwner;
@@ -98,9 +100,29 @@ public class WingsMap {
         allRoutes = new ArrayList<>();
         hasRoutes = false;
         routeDrawn = false;
-
+        this.trackOtherUser = trackOtherUser;                   //used specifically when mode = onTrip from BuddyHomeFrag
         isReady = true;
         openAppSetUp();
+
+        if(isConfirmBuddyFrag) {            //only need to click on map if sending a request
+            map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng clickedLocation) {
+                    //Remove the marker if its already on the map, otherwise show the current marker
+                    if (targetDestinationMarker == null) {
+                        initializeTargetDestinationMarker(clickedLocation);
+                    } else {
+                        targetDestinationMarker.remove();
+                        initializeTargetDestinationMarker(clickedLocation);
+                    }
+
+                    //if (isConfirmBuddyFrag) {
+                        //update the overlay in confirmBuddyHomeFragment
+                        ConfirmBuddyHomeFragment.enableSendOverlay(clickedLocation);
+                  //  }
+                }
+            });
+        }
     }
 
     //Purpose:     The setup used when to automatically track and draw current location Set up all map's settings of interaction, look, zoom, etc. Just do things by default
@@ -315,13 +337,18 @@ public class WingsMap {
     public void onLocationUpdated(@NonNull Location location) {
         if (location != null) {
             LatLng receivedLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            if((!currentLocation.equals(receivedLocation)) && destination != null){
+            Log.d(TAG, "onLocationUpdated():  receivedLocation = " + receivedLocation.toString());
+            //If we are not in the same spot, there is a destination, and we ARE routing from our current location --> re-route
+            if((!currentLocation.equals(receivedLocation)) && destination != null && startLocation.equals(currentLocation)){
                 Log.d(TAG, "onLocationUpdated(): currentLocation != to location updated --> re-drawing route");
+                currentLocation = receivedLocation;
                 ParseGeoPoint curLoc = new ParseGeoPoint(currentLocation.latitude, currentLocation.longitude);
                 distanceFromCurLocation = curLoc.distanceInKilometersTo(new ParseGeoPoint(destination.latitude, destination.longitude))*1000;
+                Log.d(TAG, "onLocationUpdated(): distanceFromCurrLocation changed = " + distanceFromCurLocation);
+                Log.d(TAG, "onLocationUpdated(): currLocation = " + currentLocation.toString() + "    destination=" + destination.toString());
                 route(receivedLocation, destination, false);
             }
-            currentLocation = receivedLocation;     //to change map display automatically
+            //currentLocation = receivedLocation;     //to change map display automatically
         }
     }
 
@@ -334,10 +361,20 @@ public class WingsMap {
 
         //default settings to style polyline, can change later:
         lineOptions.width(8);
-        lineOptions.color(Color.BLUE);
+        lineOptions.color(0xFF6EB2B7);        //color the route our logo color
+
         lineOptions.geodesic(true);
 
-        setMarker(destination, BitmapDescriptorFactory.HUE_RED, animateMap);
+        if(!startLocation.equals(currentLocation)) {            //Did we map the route from currUser's current location? if not --> this must be the otherUser's destination
+            setMarker(destination, BitmapDescriptorFactory.HUE_RED, animateMap, "Their Destination:  (" + Math.round(destination.latitude * 1000.0) / 1000.0 + ", " + Math.round(destination.longitude * 1000.0) / 1000.0 + ")");
+        }
+        else{
+            setMarker(destination, BitmapDescriptorFactory.HUE_RED, animateMap, "Your Destination:  (" + Math.round(destination.latitude * 1000.0) / 1000.0 + ", " + Math.round(destination.longitude * 1000.0) / 1000.0 + ")");
+        }
+
+        if(trackOtherUser){             //if wingsMap instance was called by a mode=onTrip BuddyHomeFrag --> must also show marker for otherUser's currentLocation
+            BuddyHomeFragment.setOtherUserLocationMarker();
+        }
         routeDrawn = true;
         polylineDrawn = map.addPolyline(lineOptions);
         isReady = true;
@@ -346,12 +383,14 @@ public class WingsMap {
     public boolean getIsReady(){
         return isReady;
     }
-    public void setMarker(LatLng destination, float color, boolean animateMap){
+    public void setMarker(LatLng destination, float color, boolean animateMap, String title){
         Log.d(TAG, "setMaker()");
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(destination);
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(color));
-        map.addMarker(markerOptions);
+        markerOptions.title(title);
+        map.addMarker(markerOptions).showInfoWindow();
+
        // map.animateCamera(CameraUpdateFactory.newLatLng(destination));
       //  map.animateCamera(CameraUpdateFactory.zoomTo(9));
         if(animateMap) {
@@ -410,13 +449,50 @@ public class WingsMap {
         }
     }
 
+    private void initializeTargetDestinationMarker(LatLng clickedLocation){
+        //Create a stylized marker, able to be dragged--> set clickedTargetDestination
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(clickedLocation);
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+        markerOptions.title("("+clickedLocation.latitude + ", " + clickedLocation.longitude + ")");
+        markerOptions.draggable(true);
+        map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {}
+            @Override
+            public void onMarkerDrag(Marker marker) {}
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                marker.showInfoWindow();
+                setClickedTargetDestination(marker.getPosition());
+            }
+        });
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                marker.remove();
+                setClickedTargetDestination(new LatLng(0, 0));
+                return false;
+            }
+        });
+        setClickedTargetDestination(clickedLocation);
+        targetDestinationMarker = map.addMarker(markerOptions);
+        targetDestinationMarker.showInfoWindow();
+        Log.d(TAG, "initalizeTargetDestinationMarker(): targetDestinationMarker.isDraggable()= " + targetDestinationMarker.isDraggable());
+    }
     //Save the destination in Parse Database, technically should be doing this here
     private void setUserDestinationString(String destinationTxt){
         Log.d(TAG, "setUserDestinationString()");
         currentUser.put(User.KEY_DESTINATIONSTR, destinationTxt);
         currentUser.saveInBackground();
     }
-
+    public void setClickedTargetDestination(LatLng location){
+        clickedTargetDestination = location;
+    }
+    public LatLng getClickedTargetDestination(){
+        return clickedTargetDestination;
+    }
     public LatLng getCurrentLocation(){
         return currentLocation;
     }

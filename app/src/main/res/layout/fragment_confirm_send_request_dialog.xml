@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".mainactivity.fragments.dialogs.ConfirmSendRequestDialog">
 
+    <!--
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -87,6 +88,231 @@
             android:layout_marginTop="14dp"
             android:backgroundTint="@color/logo_teal"
             android:text="Send Buddy Request" />
-    </RelativeLayout>
+    </RelativeLayout> -->
 
+    <!--
+    <RelativeLayout
+        android:id="@+id/buddyTripInfoOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="372dp"
+        android:background="@color/gray_background"
+        android:paddingBottom="10dp">
+
+        <ImageButton
+            android:id="@+id/btnExit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="15dp"
+            android:background="@drawable/btn_circle"
+            android:backgroundTint="#E2FF0000"
+            android:src="@android:drawable/ic_menu_close_clear_cancel" />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/satisfy"
+            android:text="Buddy Trip Information:"
+            android:textColor="@color/gray"
+            android:textSize="28sp" />
+
+        <TextView
+            android:id="@+id/tvTripStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvTitle"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="32dp"
+            android:layout_toEndOf="@+id/ivProfilePic"
+            android:fontFamily="@font/lato"
+            android:text="Trip Status: On trip"
+            android:textColor="@color/logo_teal"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvTripStatus"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="7dp"
+            android:layout_toRightOf="@id/ivProfilePic"
+            android:fontFamily="@font/lato"
+            android:text="Your Buddy:  Annie"
+            android:textColor="@color/gray"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvOtherUserId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvName"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="7dp"
+            android:layout_toRightOf="@id/ivProfilePic"
+            android:fontFamily="@font/lato"
+            android:text="Their ID:  KOKOKOKOKO"
+            android:textColor="@color/gray"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvTripDestination"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvOtherUserId"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="7dp"
+            android:layout_toRightOf="@id/ivProfilePic"
+            android:background="@drawable/et_rounded_corners_style"
+            android:fontFamily="@font/lato"
+            android:paddingLeft="5dp"
+            android:paddingTop="5dp"
+            android:paddingRight="5dp"
+            android:paddingBottom="5dp"
+            android:text="Trip Destination:  (111.111, 111.111)"
+            android:textColor="@color/gray"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/ivProfilePic"
+            android:layout_width="84dp"
+            android:layout_height="81dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="17dp"
+            android:layout_marginTop="60dp"
+            android:layout_marginBottom="15dp"
+            tools:src="@tools:sample/avatars" />
+    </RelativeLayout> -->
+
+    <RelativeLayout
+        android:id="@+id/confirmArrivalOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="372dp"
+        android:background="@color/gray_background"
+        android:paddingBottom="10dp">
+
+        <EditText
+            android:id="@+id/etPin"
+            android:layout_width="120dp"
+            android:layout_height="22dp"
+
+            android:layout_below="@+id/ivProfilePic"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="false"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/btn_rounded_corners_style"
+            android:fontFamily="@font/lato"
+            android:hint="Enter PIN #"
+            android:password="true"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textColorHint="@color/gray"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btnConfirmArrival"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvTripDestination"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="42dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginBottom="10dp"
+            android:layout_toEndOf="@+id/etPin"
+            android:backgroundTint="@color/logo_teal"
+            android:fontFamily="@font/lato"
+            android:text="Confirm Arrival"
+            android:textColor="@color/white"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/satisfy"
+            android:text="Confirm Safe Arrival"
+            android:textColor="@color/gray"
+            android:textSize="28sp" />
+
+        <TextView
+            android:id="@+id/tvTripStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvTitle"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="32dp"
+            android:layout_toEndOf="@+id/ivProfilePic"
+            android:fontFamily="@font/lato"
+            android:text="Trip Status: On trip"
+            android:textColor="@color/logo_teal"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvTripStatus"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="7dp"
+            android:layout_toRightOf="@id/ivProfilePic"
+            android:fontFamily="@font/lato"
+            android:text="Your Buddy:  Annie"
+            android:textColor="@color/gray"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvOtherUserId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvName"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="7dp"
+            android:layout_toRightOf="@id/ivProfilePic"
+            android:fontFamily="@font/lato"
+            android:text="Their ID:  KOKOKOKOKO"
+            android:textColor="@color/gray"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvTripDestination"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvOtherUserId"
+            android:layout_marginStart="11dp"
+            android:layout_marginTop="5dp"
+            android:layout_toRightOf="@id/ivProfilePic"
+            android:fontFamily="@font/lato"
+            android:paddingLeft="5dp"
+            android:paddingTop="5dp"
+            android:paddingRight="5dp"
+            android:paddingBottom="5dp"
+            android:text="Trip Destination:  (111.111, 111.111)"
+            android:textColor="@color/gray"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/ivProfilePic"
+            android:layout_width="84dp"
+            android:layout_height="81dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="17dp"
+            android:layout_marginTop="60dp"
+            tools:src="@tools:sample/avatars" />
+
+    </RelativeLayout>
 </RelativeLayout>

@@ -16,12 +16,12 @@ public class BuddyMeetUp extends ParseObject {
     private static final String KEY_RECEIVERBUDDY = "receiverBuddy";
     private static final String KEY_SENDERCONFIRMATION = "senderGaveConfirmation";
     private static final String KEY_RECEIVERCONFIRMATION = "receiverGaveConfirmation";
-
+    private static final String KEY_TRIPDESTINATION = "tripDestination";
     private static final String KEY_NEAREACHOTHER = "nearEachOther";        //are they near enouogh to each to show dialog/ask them to start confirming?
 
     public BuddyMeetUp(){}
 
-    public BuddyMeetUp(Buddy senderBuddy, Buddy receiverBuddy){
+    public BuddyMeetUp(Buddy senderBuddy, Buddy receiverBuddy, WingsGeoPoint tripDestination){
         setSenderBuddy(senderBuddy);
         setSenderBuddyId(senderBuddy.getObjectId());
         setReceiverBuddy(receiverBuddy);
@@ -29,6 +29,7 @@ public class BuddyMeetUp extends ParseObject {
         setSenderGaveConfirmation(false);
         setReceiverGaveConfirmation(false);
         setNearEachOther(false);
+        setDestination(tripDestination);
     }
 
     public void setSenderBuddy(Buddy sender){
@@ -91,5 +92,16 @@ public class BuddyMeetUp extends ParseObject {
         put(KEY_NEAREACHOTHER, answer);
     }
 
-
+    public void setDestination(WingsGeoPoint point){
+        put(KEY_TRIPDESTINATION, point);
+    }
+    public WingsGeoPoint getDestination(){
+        WingsGeoPoint destination = (WingsGeoPoint) getParseObject(KEY_TRIPDESTINATION);
+        try {
+            destination.fetchIfNeeded();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return destination;
+    }
 }

@@ -1,14 +1,264 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/gray_background"
+    android:orientation="vertical"
     tools:context=".mainactivity.fragments.BuddyTripStatusFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/satisfy"
+        android:text="Buddy Information"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="36sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray_background"
+        android:isScrollContainer="true"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:scrollbars="vertical">
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/logo_teal"
+            android:fontFamily="@font/lato"
+            android:text="Back" />
+
+        <RelativeLayout
+            android:id="@+id/confirmMeetupOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-10dp"
+            android:background="@color/gray_background"
+            android:paddingBottom="10dp">
+
+            <ImageView
+                android:id="@+id/ivProfilePic"
+                android:layout_width="112dp"
+                android:layout_height="142dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="8dp"
+                tools:src="@tools:sample/avatars" />
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginStart="45dp"
+                android:layout_marginTop="8dp"
+                android:layout_toEndOf="@+id/ivProfilePic"
+                android:fontFamily="@font/satisfy"
+                android:text="Annie"
+                android:textColor="@color/white"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/tvTripStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvTitle"
+                android:layout_centerHorizontal="true"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="-5dp"
+                android:layout_toEndOf="@+id/ivProfilePic"
+                android:fontFamily="@font/lato"
+                android:text="Trip Status:  On meeting up"
+                android:textColor="@color/logo_teal"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvUserBuddyId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="162dp"
+                android:layout_marginTop="75dp"
+                android:layout_marginEnd="-79dp"
+                android:background="@drawable/et_rounded_corners_style"
+                android:fontFamily="@font/lato"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="5dp"
+                android:text="Your ID: "
+                android:textAlignment="center"
+                android:textColor="@color/gray"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvTripDestination"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvUserBuddyId"
+
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="162dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/et_rounded_corners_style"
+                android:fontFamily="@font/lato"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="5dp"
+                android:text="Their ID: "
+                android:textAlignment="center"
+                android:textColor="@color/gray"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvUserDestination"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="145dp"
+                android:background="@drawable/et_rounded_corners_style"
+                android:fontFamily="@font/lato"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="5dp"
+                android:text="Your destination:   San Jose"
+                android:textAlignment="center"
+                android:textColor="@color/gray"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvCommonDestination"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="183dp"
+                android:background="@drawable/et_rounded_corners_style"
+                android:fontFamily="@font/lato"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="5dp"
+                android:text="Trip destination:   (101.2342, 123.53234)"
+                android:textAlignment="center"
+                android:textColor="@color/gray"
+                android:textSize="16sp" />
+
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tvStepsTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/satisfy"
+            android:paddingStart="20dp"
+            android:text="Steps:"
+            android:textAlignment="textStart"
+            android:textColor="@color/white"
+            android:textSize="33sp" />
+
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvStepOne"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/lato"
+                android:paddingStart="30dp"
+                android:text="1. Meet with your buddy:"
+                android:textColor="@color/white"
+                android:textSize="22sp" />
+            <!--
+            <TextView
+                android:id="@+id/tvStepOneTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvStepOne"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="35dp"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/lato"
+                android:paddingStart="30dp"
+                android:text="How to confirm meetup:"
+                android:textAlignment="textStart"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+            <!-Both of you are mapped towards each other so you may meet up somewhere in the middle! Both of you must confirm successful meetup before contnuing.-->
+            <TextView
+                android:id="@+id/tvStepOneA"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvStepOne"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/lato"
+                android:paddingStart="30dp"
+                android:text="1. State your buddy's ID number so they may confirm your identity"
+                android:textAlignment="textStart"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvStepOneB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvStepOneA"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/lato"
+                android:paddingStart="30dp"
+                android:text="2. Listen to your buddy state your ID number to confirm their identity. Then enter the PIN linked to your account."
+                android:textAlignment="textStart"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvStepTwo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvStepOneB"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/lato"
+                android:paddingStart="30dp"
+                android:text="2. Walk together to the destination:"
+                android:textColor="@color/white"
+                android:textSize="22sp" />
+
+            <TextView
+                android:id="@+id/tvStepTwoA"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvStepTwo"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/lato"
+                android:paddingStart="30dp"
+                android:text="Confirm your safe arrival by entering the PIN linked to your account."
+                android:textAlignment="textStart"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

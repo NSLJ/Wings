@@ -10,13 +10,14 @@ public class BuddyRequest extends ParseObject {
     public static final String KEY_RECEIVER = "receiver";
     public static final String KEY_SENDER = "sender";
     public static final String KEY_ISCONFIRMED = "isConfirmed";
-
+    public static final String KEY_TRIPDESTINATION = "tripDestination";
     public BuddyRequest() {}
 
-    public BuddyRequest(Buddy sender, Buddy receiver){
+    public BuddyRequest(Buddy sender, Buddy receiver, WingsGeoPoint destination){
         setSender(sender);
         setReceiver(receiver);
         setIsConfirmed(false);
+        setDestination(destination);
     }
 
     public Buddy getSender(){
@@ -52,5 +53,17 @@ public class BuddyRequest extends ParseObject {
         put(KEY_ISCONFIRMED, confirm);
     }
 
+    public void setDestination(WingsGeoPoint point){
+        put(KEY_TRIPDESTINATION, point);
+    }
+    public WingsGeoPoint getDestination(){
+        WingsGeoPoint destination = (WingsGeoPoint) getParseObject(KEY_TRIPDESTINATION);
+        try {
+            destination.fetchIfNeeded();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return destination;
+    }
 
 }

@@ -37,7 +37,7 @@ import com.parse.ParseUser;
 
 import java.util.List;
 
-//Purpose:      To display a Dialog Box to confirm a buddy request with a specific user!
+//Purpose:      NOT in use, was implemented as hypothetical but no longer needed. Being kept around for as a good template for future Dialogs
 public class ConfirmSendRequestDialog extends DialogFragment {
     private static final String TAG = "ConfirmSendRequestDialog";
     public static final String KEY_USERID = "buddyId";
@@ -119,7 +119,7 @@ public class ConfirmSendRequestDialog extends DialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+/*
         //Initialize Views:
         ivProfile = view.findViewById(R.id.ivOtherPic);
         tvName = view.findViewById(R.id.tvFirstName);
@@ -136,7 +136,7 @@ public class ConfirmSendRequestDialog extends DialogFragment {
         }
         else{
             Log.d(TAG, "potentialBuddyId = null");
-        }
+        }*/
     }
 
     private void queryPotentialBuddy(){

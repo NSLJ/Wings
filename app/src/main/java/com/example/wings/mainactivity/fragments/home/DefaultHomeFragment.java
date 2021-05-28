@@ -1,4 +1,4 @@
-package com.example.wings.mainactivity.fragments;
+package com.example.wings.mainactivity.fragments.home;
 
 import android.content.Context;
 import android.location.Address;
@@ -11,14 +11,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wings.R;
+import com.example.wings.mainactivity.fragments.home.BuddyHomeFragment;
+import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.helpers.WingsMap;
 import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.inParseServer.Buddy;
@@ -52,7 +54,7 @@ public class DefaultHomeFragment extends Fragment {
     //Views:
     private SupportMapFragment mapFragment;
     private EditText etSearchBar;
-    private Button btnSearch;
+    private ImageButton btnSearch;
     private RelativeLayout confirmDestinationOverlay;
 
     private TextView displayDestination;
@@ -93,7 +95,7 @@ public class DefaultHomeFragment extends Fragment {
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
-                    wingsMap = new WingsMap(googleMap, getContext(), getViewLifecycleOwner());   //automatically constantly shows current location
+                    wingsMap = new WingsMap(googleMap, getContext(), getViewLifecycleOwner(), false, false);   //automatically constantly shows current location
                 }
             });
         }
@@ -138,7 +140,7 @@ public class DefaultHomeFragment extends Fragment {
                         Log.d(TAG, "queriedDestination successfully initialized");
 
                         //2.) Display the confirmDestinationOverlay:
-                        displayDestination.setText("Intended destination: " + destinationTxt);
+                        displayDestination.setText("Destination: " + destinationTxt);
                         confirmDestinationOverlay.setVisibility(View.VISIBLE);
                     }
                     else{
@@ -185,7 +187,8 @@ public class DefaultHomeFragment extends Fragment {
                 });
 
                 //2.) Go to BuddyHomeFrag:
-                listener.toBuddyHomeFragment(BuddyHomeFragment.KEY_FIND_BUDDY_MODE);
+                ParcelableObject sendData = new ParcelableObject(BuddyHomeFragment.KEY_FIND_BUDDY_MODE);
+                listener.toBuddyHomeFragment(sendData);
             }
         });
 

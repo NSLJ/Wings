@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.example.wings.R;
 import com.example.wings.adapters.ChooseBuddyAdapter;
 import com.example.wings.mainactivity.MAFragmentsListener;
+import com.example.wings.mainactivity.fragments.home.ConfirmBuddyHomeFragment;
 import com.example.wings.models.inParseServer.Buddy;
 import com.example.wings.models.User;
 import com.example.wings.models.inParseServer.WingsGeoPoint;
