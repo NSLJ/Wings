@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
             toProfileSetupFragment();
         }
 
-        //else create bottom nav menu, go to HomeFrag, and begin tracking location:
+        //else create bottom nav menu, go to correct HomeFrag, and begin tracking location:
         else {
             //2.) Unrestrict the screen --> shows the safety toolkit and bottom nav bar:
             restrictUserScreen = false;
@@ -422,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         //String contextFrom = data.getContextFrom();
         boolean closeEnough = data.getBoolean();            //returns false by default if "data" did not specifically initalize it
 
-        if(!mode.equals("")){// && !contextFrom.equals("")) {
+        if(!mode.equals("")){
             previousHomeFrag = currentHomeFrag;
             if (mode.equals(BuddyHomeFragment.KEY_FIND_BUDDY_MODE)) {
                 currentHomeFrag = BUDDY_HOME_FIND_MODE;
@@ -781,55 +781,13 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
             frag.setArguments(bundle);
             return frag;
         }
-
         else if(fragLabel.equals(BUDDY_HOME_MEETUP_MODE)){
-            //1.) Get the necessary info
             BuddyMeetUp meetUpInstance = userBuddyInstance.getBuddyMeetUpInstance();
-            Buddy otherBuddy;
-            if(meetUpInstance.getSenderBuddyId().equals(userBuddyInstance.getObjectId())){
-                otherBuddy = meetUpInstance.getReceiverBuddy();
-            }
-            else{
-                otherBuddy = meetUpInstance.getSenderBuddy();               //not actually good --> will also go here if error
-            }
-            ParseUser otherUser = otherBuddy.getUser();
-
-            //Fill in data into the Parcelable Object:
-            sendData.setMode(BuddyHomeFragment.KEY_MEET_BUDDY_MODE);
-            sendData.setBuddyMeetUp(meetUpInstance);
-            sendData.setOtherBuddy(otherBuddy);
-            sendData.setOtherParseUser(otherUser);
-            sendData.setCurrBuddy(userBuddyInstance);
-
-            //Package the Parcelable Object into the Bundle
-            bundle.putParcelable(BuddyHomeFragment.KEY_DATA, Parcels.wrap(sendData));
-            frag.setArguments(bundle);
-            return frag;
+            return makeBuddyHomeFragmentMeetUp(meetUpInstance, false);
         }
         else if(fragLabel.equals(BUDDY_HOME_MEETUP_MODE_CLOSE)){
-            //Get the necessary info:
             BuddyMeetUp meetUpInstance = userBuddyInstance.getBuddyMeetUpInstance();
-            Buddy otherBuddy;
-            if(meetUpInstance.getSenderBuddyId().equals(userBuddyInstance.getObjectId())){
-                otherBuddy = meetUpInstance.getReceiverBuddy();
-            }
-            else{
-                otherBuddy = meetUpInstance.getSenderBuddy();               //not actually good --> will also go here if error
-            }
-            ParseUser otherUser = otherBuddy.getUser();
-
-            //Fill in data into the Parcelable Object:
-            sendData.setMode(BuddyHomeFragment.KEY_MEET_BUDDY_MODE_NEAR);
-            sendData.setBuddyMeetUp(meetUpInstance);
-            sendData.setOtherBuddy(otherBuddy);
-            sendData.setOtherParseUser(otherUser);
-            sendData.setCurrBuddy(userBuddyInstance);
-            sendData.setBoolean(true);
-
-            //Package the Parcelable Object into the Bundle
-            bundle.putParcelable(BuddyHomeFragment.KEY_DATA, Parcels.wrap(sendData));
-            frag.setArguments(bundle);
-            return frag;
+            return makeBuddyHomeFragmentMeetUp(meetUpInstance, true);
         }
         else if(fragLabel.equals(BUDDY_HOME_ONTRIP_MODE)){
             //Get the necessary info:
@@ -862,9 +820,9 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
     @Override
     //Purpose:      To start checking for proximity this distance away for this meetUpId
-    public void startCheckingProximity(int meters, String meetUpId) {
+    public void startCheckingProximity(int meters, BuddyMeetUp meetUpInstance) {
         keepCheckingProximity = true;
-        startCheckingProximityWorker(meters, meetUpId);
+        startCheckingProximityWorker(meters, meetUpInstance);
     }
 
     @Override
@@ -876,7 +834,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     /**
      * Purpose:     Makes a OneTimeWorkRequest on the UpdateLocationWorker class infinitely as long as keepTracking = true. keepTracking may be turned off through the stopAllRequests()
      */
-    private void startCheckingProximityWorker(int meters, String meetUpId){
+    private void startCheckingProximityWorker(int meters, BuddyMeetUp meetUpInstance){
         Log.d(TAG, "startCheckingProximityWorker()");
         //Package data to send the counter
         /*Data data = new Data.Builder()
@@ -910,7 +868,8 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                             if(workInfo.getState().isFinished()){
                                 if(workInfo.getState() == WorkInfo.State.SUCCEEDED){
                                     Log.d(TAG, "Request succeeded ");
-                                    //get output:
+
+                                    //1.) get output:
                                     Data output = workInfo.getOutputData();
                                     Log.d(TAG, "startCheckingProximityWorker(): output = " + output.toString());
 
@@ -921,30 +880,66 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
                                         //Tell BuddyHomeFrag to invoke overlay (bc we are close enough now) to display if not already doing so:
                                         if(!currentHomeFrag.equals(BUDDY_HOME_MEETUP_MODE_CLOSE)) {
-                                           //TODO: make it so we just statically call a method to make the meetUp overlay visible again instead of calling an entire new frag
+                                            setCurrentHomeFragment(BUDDY_HOME_MEETUP_MODE_CLOSE);
+                                            bottomNavigationView.setSelectedItemId(R.id.action_home);           //invokes the currentHomeFrag
                                             //toBuddyHomeFragment(BuddyHomeFragment.KEY_MEET_BUDDY_MODE, meetUpId, true);
                                             //NOTE: We DO NOT stop this worker here as we only want to stop checking for proximity when the user interacts with the correct overlays!
                                         }
                                     }
                                     else{   //if user was close enough, but now is not --> go back to meetUp mode w/o being close enough
                                         if(currentHomeFrag.equals(BUDDY_HOME_MEETUP_MODE_CLOSE)){
+                                            setCurrentHomeFragment(BUDDY_HOME_MEETUP_MODE);
+                                            bottomNavigationView.setSelectedItemId(R.id.action_home);
                                            // toBuddyHomeFragment(BuddyHomeFragment.KEY_MEET_BUDDY_MODE, meetUpId, false);
                                         }
                                     }
 
                                     //Should we keep running the CheckProximityWorker?
                                     if(keepCheckingProximity) {
-                                        startCheckingProximityWorker(meters, meetUpId);              //to infinitely do it!
+                                        startCheckingProximityWorker(meters, meetUpInstance);              //to infinitely do it!
                                     }
                                 }
                                 else {
                                     Log.d(TAG, "Request didn't succeed, status=" + workInfo.getState().name());
-                                    startCheckingProximityWorker(meters, meetUpId);
+                                    startCheckingProximityWorker(meters, meetUpInstance);
                                 }
                             }
                         }
                     }
                 });
+    }
+
+    private Fragment makeBuddyHomeFragmentMeetUp(BuddyMeetUp meetUpInstance, boolean closeEnough){
+        ParcelableObject sendData = new ParcelableObject();
+        Bundle bundle = new Bundle();
+        Fragment frag = new BuddyHomeFragment();
+
+        //Get the necessary info:
+        Buddy otherBuddy;
+        if(meetUpInstance.getSenderBuddyId().equals(userBuddyInstance.getObjectId())){
+            otherBuddy = meetUpInstance.getReceiverBuddy();
+        }
+        else{
+            otherBuddy = meetUpInstance.getSenderBuddy();               //not actually good --> will also go here if error
+        }
+        ParseUser otherUser = otherBuddy.getUser();
+
+        //Fill in data into the Parcelable Object:
+        sendData.setMode(BuddyHomeFragment.KEY_MEET_BUDDY_MODE);
+        sendData.setBuddyMeetUp(meetUpInstance);
+        sendData.setOtherBuddy(otherBuddy);
+        sendData.setOtherParseUser(otherUser);
+        sendData.setCurrBuddy(userBuddyInstance);
+        sendData.setBoolean(closeEnough);
+
+        //Package the Parcelable Object into the Bundle
+        bundle.putParcelable(BuddyHomeFragment.KEY_DATA, Parcels.wrap(sendData));
+        frag.setArguments(bundle);
+        return frag;
+
+    }
+    private void setCurrentHomeFragment(String key){
+        currentHomeFrag = key;          //assuming the key is one of the main activity's constants --> needs error checking
     }
 
 }

@@ -21,7 +21,7 @@ public interface MAFragmentsListener {
     void setRestrictScreen(boolean answer);
     void setBuddyRequestBttn(boolean answer);
     void setBuddyRequestBttnOnClickListener(View.OnClickListener onClickListener);
-    void startCheckingProximity(int meters, String meetUpId);
+    void startCheckingProximity(int meters, BuddyMeetUp meetUpInstance);
     void stopCheckingProximity();
 
     //Navigating to fragments:

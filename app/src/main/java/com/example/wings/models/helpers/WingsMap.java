@@ -334,13 +334,18 @@ public class WingsMap {
     public void onLocationUpdated(@NonNull Location location) {
         if (location != null) {
             LatLng receivedLocation = new LatLng(location.getLatitude(), location.getLongitude());
+            Log.d(TAG, "onLocationUpdated():  receivedLocation = " + receivedLocation.toString());
+            //If we are not in the same spot, there is a destination, and we ARE routing from our current location --> re-route
             if((!currentLocation.equals(receivedLocation)) && destination != null && startLocation.equals(currentLocation)){
                 Log.d(TAG, "onLocationUpdated(): currentLocation != to location updated --> re-drawing route");
+                currentLocation = receivedLocation;
                 ParseGeoPoint curLoc = new ParseGeoPoint(currentLocation.latitude, currentLocation.longitude);
                 distanceFromCurLocation = curLoc.distanceInKilometersTo(new ParseGeoPoint(destination.latitude, destination.longitude))*1000;
+                Log.d(TAG, "onLocationUpdated(): distanceFromCurrLocation changed = " + distanceFromCurLocation);
+                Log.d(TAG, "onLocationUpdated(): currLocation = " + currentLocation.toString() + "    destination=" + destination.toString());
                 route(receivedLocation, destination, false);
             }
-            currentLocation = receivedLocation;     //to change map display automatically
+            //currentLocation = receivedLocation;     //to change map display automatically
         }
     }
 

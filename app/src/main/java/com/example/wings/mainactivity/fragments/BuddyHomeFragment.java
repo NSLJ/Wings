@@ -1,6 +1,7 @@
 package com.example.wings.mainactivity.fragments;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -60,28 +61,31 @@ public class BuddyHomeFragment extends Fragment {
     //Three possible modes, one of these choices must be passed in by the Context calling it in order for this fragment to function
     public static final String KEY_FIND_BUDDY_MODE = "modeFindBuddy";
     public static final String KEY_MEET_BUDDY_MODE = "modeMeetBuddy";
-    public static final String KEY_MEET_BUDDY_MODE_NEAR = "modeMeetBuddy - near enough";            //TODO: fix so don't need this
+    //public static final String KEY_MEET_BUDDY_MODE_NEAR = "modeMeetBuddy - near enough";            //TODO: fix so don't need this
     public static final String KEY_ON_TRIP_MODE = "modeOnTrip";
     public static final String CONTEXT_MAIN_ACTIVITY = "fromMainActivity";          //We NEED to know who called this fragment --> different parameters are packaged into the Parcelable Object received
 
-    private MAFragmentsListener listener;
+    private static MAFragmentsListener listener;
     //Fields to hold the data passed in:
-    private String mode;
-    private String otherUserId;
-    private String meetUpId;
-    private boolean closeEnough;
+    private static String mode;
+    private static String otherUserId;
+    private static String meetUpId;
+    private boolean closeEnough = false;
 
     //General fields:
-    ParseUser currUser = ParseUser.getCurrentUser();
-    ParseUser otherUser;
-    Buddy otherBuddyInstance;
-    Buddy curBuddyInstance;
-    Buddy senderBuddy;
-    Buddy receiverBuddy;                    //used to create a BuddyTrip instance when needed
+    static ParseUser currUser = ParseUser.getCurrentUser();
+    static ParseUser otherUser;
+    static Buddy otherBuddyInstance;
+    static Buddy curBuddyInstance;
+    static Buddy senderBuddy;
+    static Buddy receiverBuddy;                    //used to create a BuddyTrip instance when needed
+
+    public static Resources resources;
+    public static Context context;
 
     //For mapping:
     public static WingsMap wingsMap;
-    private LatLng destination;
+    private static LatLng destination;
 
     //Views:
     private SupportMapFragment mapFragment;
@@ -92,7 +96,7 @@ public class BuddyHomeFragment extends Fragment {
     private ExtendedFloatingActionButton fabCancelBuddy;
 
     //Fields used for meetUp mode:
-    private BuddyMeetUp meetUpInstance;
+    private static BuddyMeetUp meetUpInstance;
 
     //Views:
     public static RelativeLayout confirmMeetingOverlay;
@@ -100,9 +104,10 @@ public class BuddyHomeFragment extends Fragment {
     private TextView tvName;
     private TextView tvUserBuddyId;
     private TextView tvOtherBuddyId;
-    private EditText etPin;
-    private ImageButton btnExitMeetUp;
-    private Button btnConfirmBuddyMeetup;
+    private static EditText etPin;
+    private static ImageButton btnExitMeetUp;
+    private static Button btnConfirmBuddyMeetup;
+    static boolean meetUpOverlayEnabled;
 
 
 
@@ -158,25 +163,20 @@ public class BuddyHomeFragment extends Fragment {
 
             if(!mode.equals("")) {
 
-                //If on meet buddy mode --> expect to receive extra data (buddyMeetUpId)
                 if(mode.equals(KEY_FIND_BUDDY_MODE)){}      //nothing needs to be done as no data is passed in this mode
 
                 else if(mode.equals(KEY_MEET_BUDDY_MODE)) {
+                    Log.d(TAG, "onCreate(): mode= meetUp not near");
                     meetUpInstance = dataReceived.getBuddyMeetUp();
                     otherBuddyInstance = dataReceived.getOtherBuddy();
                     otherUser = dataReceived.getOtherParseUser();
                     curBuddyInstance = dataReceived.getCurrBuddy();
-                    //closeEnough = getArguments().getBoolean(KEY_CLOSE_ENOUGH);
-                }
-                else if(mode.equals(KEY_MEET_BUDDY_MODE_NEAR)){
-                        meetUpInstance = dataReceived.getBuddyMeetUp();
-                        otherBuddyInstance = dataReceived.getOtherBuddy();
-                        otherUser = dataReceived.getOtherParseUser();
-                        curBuddyInstance = dataReceived.getCurrBuddy();
-                        closeEnough = getArguments().getBoolean(KEY_CLOSE_ENOUGH);
+                    closeEnough = dataReceived.getBoolean();
+                    Log.d(TAG, "onCreate(): mode= meetUp IS near, closeEnough=" + closeEnough);
                 }
                 //Must do same for buddyTrip
                 else if(mode.equals(KEY_ON_TRIP_MODE)) {
+                    Log.d(TAG, "onCreate(): mode= onTrip");
                     buddyTripInstance = dataReceived.getBuddyTrip();
                     otherBuddyInstance = dataReceived.getOtherBuddy();
                     otherUser = dataReceived.getOtherParseUser();
@@ -237,6 +237,8 @@ public class BuddyHomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         listener.setBuddyRequestBttn(true);     //to display constant floating buddy btn from MainActivity--> displays the current buddy info: current requests, current Buddy partner, etc
+        resources = getResources();
+        context = getContext();
 
         //1.) connect views:
         needBuddyButtonOverlay = view.findViewById(R.id.needBuddyButtonOverlay);
@@ -337,17 +339,11 @@ public class BuddyHomeFragment extends Fragment {
         //1.) (1) Out of the needBuddyButtonOverlay --> ONLY make the cancel button visible and (2) Show the meetUp overlay but disable the confirm button:
         fabGoChooseBuddyFrag.setVisibility(View.INVISIBLE);
         confirmMeetingOverlay.setVisibility(View.VISIBLE);
-        btnConfirmBuddyMeetup.setBackgroundColor(getResources().getColor(R.color.gray, null));
-        btnConfirmBuddyMeetup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "Cannot confirm yet! You are not close enough to your Buddy!", Toast.LENGTH_LONG).show();
-            }
-        });
+        disableMeetUpOverlay();
 
         //2.) Setup the confirmMeetUpOverlay --> Query for and instantiate BuddyMeetUp instance and populate views
         //queryAndPopulateMeetBuddyMode();
-        populateMeetUpViews();
+        populateMeetUpViews();              //new edit: assume all fields are instantiated as they should now be passed in
 
         //3.) Set onClick listener for the exit button:
         btnExitMeetUp.setOnClickListener(new View.OnClickListener() {
@@ -360,39 +356,10 @@ public class BuddyHomeFragment extends Fragment {
         //3.) Watch current location
         //If MainActivity told us that the user is close enough --> show the overlay
         if(closeEnough){
-            //3a.) Enable the btnConfirmBuddy + disable the btnExit:
-            btnTripInfoExit.setVisibility(View.INVISIBLE);                //make it required for the user to confirm the meetUp by not allowing to exit out
-
-            btnConfirmBuddyMeetup.setBackgroundColor(getResources().getColor(R.color.logo_teal, null));
-            btnConfirmBuddyMeetup.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(etPin.getText().equals("") || etPin.getText().toString().length() != 4){     //technically don't need the first conditional
-                        Toast.makeText(getContext(), "You did not enter your PIN # for confirmation!", Toast.LENGTH_LONG).show();
-                    }
-                    else{
-                        String attemptedPin = etPin.getText().toString();
-                        Log.d(TAG, "setMeetBuddyMode(): attemptedPin = " + attemptedPin);
-
-                        //Get the current user's pin field to check match:
-                        String correctPin = currUser.getString(User.KEY_PIN).toString();
-                        Log.d(TAG, "setMeetBuddyMode(): correct pin = " + correctPin);
-
-                        if(attemptedPin.equals(correctPin)){
-                            //Create a BuddyTrip:
-                            onConfirmMeetUp();
-
-                        }
-                        else{   //pin entered was not correct
-                            Toast.makeText(getContext(), "The pin entered is incorrect!", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                }
-            });
+            enableMeetUpOverlay();
         }
-
         else{
-            listener.startCheckingProximity(15, meetUpId);
+            listener.startCheckingProximity(15, meetUpInstance);
         }
 
     }
@@ -615,8 +582,8 @@ public class BuddyHomeFragment extends Fragment {
     }
 
     //---------------------------------------------------------end all meetUp mode helper methods-----------------------------------------------------------
-    private void onConfirmMeetUp(){
-        Toast.makeText(getContext(), "You confirmed Meet up with your buddy!", Toast.LENGTH_LONG).show();
+    private static void onConfirmMeetUp(){
+        Toast.makeText(context, "You confirmed Meet up with your buddy!", Toast.LENGTH_LONG).show();
         listener.stopCheckingProximity();
 
         WingsGeoPoint currLocation = (WingsGeoPoint) currUser.getParseObject(User.KEY_CURRENTLOCATION);
@@ -637,10 +604,60 @@ public class BuddyHomeFragment extends Fragment {
             e.printStackTrace();
         }
     }
+
+    public static void enableMeetUpOverlay(){
+        meetUpOverlayEnabled = true;
+        btnExitMeetUp.setVisibility(View.INVISIBLE);                //make it required for the user to confirm the meetUp by not allowing to exit out
+
+        btnConfirmBuddyMeetup.setBackgroundColor(resources.getColor(R.color.logo_teal, null));
+        btnConfirmBuddyMeetup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(etPin.getText().toString().length() != 4){
+                    Toast.makeText(context, "You did not enter your PIN # for confirmation!", Toast.LENGTH_LONG).show();
+                }
+                else{
+                    String attemptedPin = etPin.getText().toString();
+                    Log.d(TAG, "setMeetBuddyMode(): attemptedPin = " + attemptedPin);
+
+                    //Get the current user's pin field to check match:
+                    String correctPin = currUser.getString(User.KEY_PIN);
+
+                    Log.d(TAG, "setMeetBuddyMode(): correct pin = " + correctPin);
+                    Log.d(TAG, "enableMeetUpOverlay():  compare pins: " + attemptedPin.compareTo(correctPin));
+                    if(attemptedPin.equals(correctPin)){            //this won't work for some reason --> correctPin = "####" and attemptedPin = #### ?
+                        //Create a BuddyTrip:
+                        onConfirmMeetUp();
+                    }
+                    else{   //pin entered was not correct
+                        Toast.makeText(context, "The pin entered is incorrect!", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
+    }
+    public static void disableMeetUpOverlay(){
+        meetUpOverlayEnabled = false;
+        btnExitMeetUp.setVisibility(View.VISIBLE);
+        btnConfirmBuddyMeetup.setBackgroundColor(resources.getColor(R.color.gray, null));
+        btnConfirmBuddyMeetup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context, "Cannot confirm yet! You are not close enough to your Buddy!", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
     public static boolean checkNearEnough(){
         Log.d(TAG, "checkNearEnough(), distanceFromCurrLocation = " + wingsMap.getDistanceFromCurLocation());
         boolean result = wingsMap.isNearEnough(100);           //unsure if wingsMap will continue to update is all
-        Log.d(TAG, "checkNearEnough(), result = " + result);
+        Log.d(TAG, "checkNearEnough(), result = " + result );//+ "      meetUpOverlayEnabled =" + meetUpOverlayEnabled);
+
+        /*if(result && !meetUpOverlayEnabled){        //if we are close enough and overlay is not yet enabled --> enable it
+            enableMeetUpOverlay();
+        }
+        else if(!result && meetUpOverlayEnabled){
+            disableMeetUpOverlay();
+        }*/
         return result;
     }
 }
