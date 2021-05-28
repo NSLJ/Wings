@@ -3,7 +3,6 @@ package com.example.wings.models.helpers;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -16,7 +15,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
-import com.example.wings.mainactivity.fragments.ConfirmBuddyHomeFragment;
+import com.example.wings.mainactivity.fragments.home.BuddyHomeFragment;
+import com.example.wings.mainactivity.fragments.home.ConfirmBuddyHomeFragment;
 import com.example.wings.models.User;
 import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.example.wings.network.DataParser;
@@ -87,8 +87,9 @@ public class WingsMap {
 
     private double distanceFromCurLocation;
     public boolean isReady;
+    private boolean trackOtherUser;
 
-    public WingsMap(GoogleMap map, Context context, LifecycleOwner fragLifecycleOwner, boolean isConfirmBuddyFrag){
+    public WingsMap(GoogleMap map, Context context, LifecycleOwner fragLifecycleOwner, boolean isConfirmBuddyFrag, boolean trackOtherUser){
         this.map = map;
         this.context = context;
         lifecycleOwner = fragLifecycleOwner;
@@ -99,27 +100,29 @@ public class WingsMap {
         allRoutes = new ArrayList<>();
         hasRoutes = false;
         routeDrawn = false;
-
+        this.trackOtherUser = trackOtherUser;                   //used specifically when mode = onTrip from BuddyHomeFrag
         isReady = true;
         openAppSetUp();
 
-        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng clickedLocation) {
-                //Remove the marker if its already on the map, otherwise show the current marker
-                if(targetDestinationMarker == null){
-                    initializeTargetDestinationMarker(clickedLocation);
-                }else{
-                    targetDestinationMarker.remove();
-                    initializeTargetDestinationMarker(clickedLocation);
-                }
+        if(isConfirmBuddyFrag) {            //only need to click on map if sending a request
+            map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng clickedLocation) {
+                    //Remove the marker if its already on the map, otherwise show the current marker
+                    if (targetDestinationMarker == null) {
+                        initializeTargetDestinationMarker(clickedLocation);
+                    } else {
+                        targetDestinationMarker.remove();
+                        initializeTargetDestinationMarker(clickedLocation);
+                    }
 
-                if(isConfirmBuddyFrag) {
-                    //update the overlay in confirmBuddyHomeFragment
-                    ConfirmBuddyHomeFragment.enableSendOverlay(clickedLocation);
+                    //if (isConfirmBuddyFrag) {
+                        //update the overlay in confirmBuddyHomeFragment
+                        ConfirmBuddyHomeFragment.enableSendOverlay(clickedLocation);
+                  //  }
                 }
-            }
-        });
+            });
+        }
     }
 
     //Purpose:     The setup used when to automatically track and draw current location Set up all map's settings of interaction, look, zoom, etc. Just do things by default
@@ -367,6 +370,10 @@ public class WingsMap {
         }
         else{
             setMarker(destination, BitmapDescriptorFactory.HUE_RED, animateMap, "Your Destination:  (" + Math.round(destination.latitude * 1000.0) / 1000.0 + ", " + Math.round(destination.longitude * 1000.0) / 1000.0 + ")");
+        }
+
+        if(trackOtherUser){             //if wingsMap instance was called by a mode=onTrip BuddyHomeFrag --> must also show marker for otherUser's currentLocation
+            BuddyHomeFragment.setOtherUserLocationMarker();
         }
         routeDrawn = true;
         polylineDrawn = map.addPolyline(lineOptions);

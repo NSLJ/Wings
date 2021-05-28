@@ -6,6 +6,7 @@ import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.inParseServer.Buddy;
 import com.example.wings.models.inParseServer.BuddyMeetUp;
 import com.example.wings.models.inParseServer.BuddyTrip;
+import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.parse.ParseUser;
 
 /**
@@ -31,16 +32,10 @@ public interface MAFragmentsListener {
 
    // void toBuddyHomeFragment(String mode);                                                //intended for mode = default
     void toBuddyHomeFragment(ParcelableObject data);
-
-
-    void toBuddyHomeFragment(String mode, BuddyMeetUp meetUpInstance, Buddy otherBuddyInstance, ParseUser otherUser, Buddy currUserBuddyInstance, boolean closeEnough);          //intended for mode = meetUp
-    void toBuddyHomeFragment(String mode, BuddyTrip buddyTripInstance, ParseUser otherUser, Buddy otherBuddyInstance);           //intended for mode = onTrip
-
     void toConfirmBuddyHomeFragment(String modeKey, String otherUserId);
     void toConfirmBuddyHomeFragment(String modeKey, String otherUserId, String buddyRequestId);
 
-    void toBuddyTripStatusFragment(Buddy otherBuddy, BuddyMeetUp meetUpInstance, String mode);
-
+    void toBuddyTripStatusFragment(String mode, Buddy otherBuddy, WingsGeoPoint tripDestination);
 
 
     //Other frags:
@@ -54,7 +49,6 @@ public interface MAFragmentsListener {
     void toEditTrustedContactsFragment();
     void toHelpFragment();
     void toUserBuddyRequestFragment();
-    void toPotentialBuddyFragment(String potentialBuddyId, String keyShowDialog, String buddyRequestId);
 
 
 

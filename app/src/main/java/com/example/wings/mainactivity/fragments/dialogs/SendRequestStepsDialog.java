@@ -55,27 +55,9 @@ public class SendRequestStepsDialog extends DialogFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
-      /*  Dialog dialog = getDialog();
-        dialog.getWindow().setGravity(Gravity.TOP| Gravity.LEFT);
-        WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
-        params.x = 110;
-        params.y = 1190;
-        dialog.getWindow().setAttributes(params);
-        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-// layout to display
-        dialog.setContentView(R.layout.fragment_confirm_buddy_dialog);
-
-// set color transpartent
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.show();
-*/
-        View view = inflater.inflate(R.layout.fragment_send_request_steps_dialog, container, false);
-        return view;
+        return inflater.inflate(R.layout.fragment_send_request_steps_dialog, container, false);
     }
 
     @Override

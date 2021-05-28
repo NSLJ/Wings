@@ -1,4 +1,4 @@
-package com.example.wings.mainactivity.fragments;
+package com.example.wings.mainactivity.fragments.home;
 
 import android.content.Context;
 import android.location.Address;
@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -20,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wings.R;
+import com.example.wings.mainactivity.fragments.home.BuddyHomeFragment;
 import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.helpers.WingsMap;
 import com.example.wings.mainactivity.MAFragmentsListener;
@@ -95,7 +95,7 @@ public class DefaultHomeFragment extends Fragment {
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
-                    wingsMap = new WingsMap(googleMap, getContext(), getViewLifecycleOwner(), false);   //automatically constantly shows current location
+                    wingsMap = new WingsMap(googleMap, getContext(), getViewLifecycleOwner(), false, false);   //automatically constantly shows current location
                 }
             });
         }

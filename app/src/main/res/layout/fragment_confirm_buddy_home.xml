@@ -9,7 +9,7 @@
     android:layout_height="match_parent"
     android:background="#28C4C4C4"
     android:orientation="vertical"
-    tools:context=".mainactivity.fragments.HomeFragment">
+    tools:context=".mainactivity.fragments.home.HomeFragment">
 
     <!-- Must toggle the visibility between option 1 or 2 denoted below!-->
 

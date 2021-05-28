@@ -8,7 +8,7 @@ import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.example.wings.mainactivity.fragments.BuddyHomeFragment;
+import com.example.wings.mainactivity.fragments.home.BuddyHomeFragment;
 
 public class CheckProximityWorker extends Worker {
     private static final String TAG = "CheckProximityWorker";

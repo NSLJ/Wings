@@ -1,4 +1,4 @@
-package com.example.wings.mainactivity.fragments;
+package com.example.wings.mainactivity.fragments.home;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -21,7 +21,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.wings.R;
-import com.example.wings.mainactivity.fragments.dialogs.ConfirmDestinationDialog;
 import com.example.wings.mainactivity.fragments.dialogs.SendRequestStepsDialog;
 import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.helpers.WingsMap;
@@ -42,7 +41,6 @@ import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -142,7 +140,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
-                    wingsMap = new WingsMap(googleMap, getContext(), getViewLifecycleOwner(), true);        //automatically constantly shows current location
+                    wingsMap = new WingsMap(googleMap, getContext(), getViewLifecycleOwner(), true, false);        //automatically constantly shows current location
                 }
             });
         }

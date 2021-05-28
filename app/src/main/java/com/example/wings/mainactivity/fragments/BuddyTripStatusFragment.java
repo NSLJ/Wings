@@ -19,10 +19,12 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.wings.R;
 import com.example.wings.mainactivity.MAFragmentsListener;
+import com.example.wings.mainactivity.fragments.home.BuddyHomeFragment;
 import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.User;
 import com.example.wings.models.inParseServer.Buddy;
 import com.example.wings.models.inParseServer.BuddyMeetUp;
+import com.example.wings.models.inParseServer.BuddyTrip;
 import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -41,12 +43,16 @@ import org.parceler.Parcels;
 public class BuddyTripStatusFragment extends Fragment {
     private static final String TAG = "BuddyTripStatusFragment";
     public static final String KEY_DATA = "parcelableObjectGiven";
+    public static final String MEET_BUDDY_MODE = "we are given a BuddyMeetUp";
+    public static final String ON_TRIP_MODE = "we are given a BuddyTrip";
 
     private MAFragmentsListener listener;
     ParseUser currUser = ParseUser.getCurrentUser();
     ParseUser otherUser;
     Buddy otherBuddy;
-    BuddyMeetUp meetUpInstance;
+   // BuddyMeetUp meetUpInstance;
+   // BuddyTrip buddyTripInstance;
+    WingsGeoPoint tripDestination;
     String mode;
 
     //Views:
@@ -80,9 +86,9 @@ public class BuddyTripStatusFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             ParcelableObject dataReceived = Parcels.unwrap(getArguments().getParcelable(KEY_DATA));
-            otherBuddy = dataReceived.getOtherBuddy();
-            meetUpInstance = dataReceived.getBuddyMeetUp();
             mode = dataReceived.getMode();
+            tripDestination = dataReceived.getWingsGeoPoint();
+            otherBuddy = dataReceived.getOtherBuddy();
         }
     }
 
@@ -130,7 +136,6 @@ public class BuddyTripStatusFragment extends Fragment {
             tvUserBuddyId.setText("Your ID:  " + userBuddyInstance.getObjectId());
             tvOtherBuddyId.setText("Their ID:  " + otherBuddy.getObjectId());
             tvUserDestination.setText("Your intended destination:  " + currUser.getString(User.KEY_DESTINATIONSTR));         //TODO: input destinationStr field into Buddy class and destination field into BuddyMeetUp class
-            WingsGeoPoint tripDestination = meetUpInstance.getDestination();
             tvCommonDestination.setText("Trip destination:  "+ Math.round(tripDestination.getLatitude()*1000.0)/1000.0 +", " + Math.round(tripDestination.getLongitude()*1000.0)/1000.0+")");
 
             //2.) Populate otherUser information:
@@ -148,10 +153,10 @@ public class BuddyTripStatusFragment extends Fragment {
             }
 
             //3.) Update trip status to whatever context this was called from (either meetup mode or ontrip mode):
-            if(mode.equals(BuddyHomeFragment.KEY_MEET_BUDDY_MODE)){
+            if(mode.equals(MEET_BUDDY_MODE)){
                 tvTripStatus.setText("Trip Status:  On meeting up");
             }
-            else if(mode.equals(BuddyHomeFragment.KEY_ON_TRIP_MODE)){
+            else if(mode.equals(ON_TRIP_MODE)){
                 tvTripStatus.setText("Trip Status:  On trip walking to destination");
             }
             else{
