@@ -248,7 +248,7 @@
                 android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/tvName"
+                android:id="@+id/tvTripInfoName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tvTripInfoTripStatus"
@@ -261,7 +261,7 @@
                 android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/tvOtherUserId"
+                android:id="@+id/tvTripInfoOtherUserId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tvName"
@@ -274,10 +274,10 @@
                 android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/tvConfirmArrivalTripDestination"
+                android:id="@+id/tvTripInfoTripDestination"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/tvOtherUserId"
+                android:layout_below="@id/tvTripInfoOtherUserId"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="7dp"
                 android:layout_toRightOf="@id/ivTripInfoProfilePic"
@@ -365,7 +365,7 @@
                 android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/tvconfirmArrivalTripDestination"
+                android:id="@+id/tvConfirmArrivalTripDestination"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tvConfirmArrivalOtherUserId"
@@ -414,7 +414,7 @@
                 android:id="@+id/btnConfirmArrival"
                 android:layout_width="120dp"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tvconfirmArrivalTripDestination"
+                android:layout_below="@+id/tvConfirmArrivalTripDestination"
                 android:layout_alignParentEnd="true"
                 android:layout_marginStart="42dp"
                 android:layout_marginTop="3dp"

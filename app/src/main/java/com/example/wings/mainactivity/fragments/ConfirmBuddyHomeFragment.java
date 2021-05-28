@@ -23,6 +23,7 @@ import com.bumptech.glide.Glide;
 import com.example.wings.R;
 import com.example.wings.mainactivity.fragments.dialogs.ConfirmDestinationDialog;
 import com.example.wings.mainactivity.fragments.dialogs.SendRequestStepsDialog;
+import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.helpers.WingsMap;
 import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.inParseServer.Buddy;
@@ -301,7 +302,8 @@ public class ConfirmBuddyHomeFragment extends Fragment {
                     public void onClick(View v) {
                         //Check if user has placed a marker on the map:
                         LatLng targetDestination = wingsMap.getClickedTargetDestination();
-                        if(targetDestination.latitude == 0 && targetDestination.longitude == 0){            //default value
+                        Log.d(TAG, "btnSendRequest is clicked: targetDestination = " + targetDestination.toString());
+                        if(targetDestination != null && targetDestination.latitude == 0 && targetDestination.longitude == 0){            //default value
                             Toast.makeText(getContext(), "You have not placed a trip destination!", Toast.LENGTH_LONG).show();
                         }
                         else {
@@ -356,7 +358,17 @@ public class ConfirmBuddyHomeFragment extends Fragment {
             deleteRequestFromLists(buddyRequestId);
             buddyRequestInstance.delete();
 
-            listener.toBuddyHomeFragment(BuddyHomeFragment.KEY_MEET_BUDDY_MODE, buddyMeetUp.getObjectId(), false);
+            //4.) Package all necessary data:
+            //1.) Package ParseObjects into a ParcelableObject to send as a Parcelable:
+            ParcelableObject sendData = new ParcelableObject();
+            sendData.setMode(BuddyHomeFragment.KEY_MEET_BUDDY_MODE);
+           // sendData.setContextFrom("any string bc this is not MainActivity");
+            sendData.setBuddyMeetUp(buddyMeetUp);
+            sendData.setOtherBuddy(otherBuddyInstance);
+            sendData.setOtherParseUser(otherUser);
+            sendData.setCurrBuddy(currBuddy);
+
+            listener.toBuddyHomeFragment(sendData);
             Toast.makeText(getContext(), "Start meetup with your buddy!", Toast.LENGTH_LONG).show();
         } catch (ParseException e) {
             e.printStackTrace();

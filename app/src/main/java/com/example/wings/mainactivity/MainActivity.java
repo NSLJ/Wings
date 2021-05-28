@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.example.wings.mainactivity.fragments.BuddyTripStatusFragment;
 import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.inParseServer.BuddyMeetUp;
+import com.example.wings.models.inParseServer.BuddyTrip;
 import com.example.wings.workers.CheckProximityWorker;
 import com.example.wings.HandleBuddyRequestsWorker;
 import com.example.wings.R;
@@ -397,7 +398,10 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         frag.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
     }
-    @Override
+
+
+  /*  @Override
+    //Purpose:          called when going to BuddyHomeFrag for default mode
     public void toBuddyHomeFragment(String modeKey) {
         //update HomeFrag history:
         previousHomeFrag = currentHomeFrag;
@@ -408,25 +412,96 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         Fragment frag = new BuddyHomeFragment();
         frag.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
-    }
+    }*/
+
     @Override
-    public void toBuddyHomeFragment(String modeKey, String meetUpId, boolean closeEnough) {
-        //update HomeFrag history:
-        previousHomeFrag = currentHomeFrag;
-        if(modeKey.equals(BuddyHomeFragment.KEY_MEET_BUDDY_MODE) && !closeEnough){          //if meetup mode and user is not close enough to destination
-            currentHomeFrag = BUDDY_HOME_MEETUP_MODE;
-        }
-        else if(modeKey.equals(BuddyHomeFragment.KEY_MEET_BUDDY_MODE) && closeEnough){        //if meetup mode and user IS close enough to destination
-            currentHomeFrag = BUDDY_HOME_MEETUP_MODE_CLOSE;
+    public void toBuddyHomeFragment(ParcelableObject data) {
+        Log.d(TAG, "toBuddyHomeFrag(ParcelableObject");
+        //1.) update HomeFrag history:
+        String mode = data.getMode();
+        //String contextFrom = data.getContextFrom();
+        boolean closeEnough = data.getBoolean();            //returns false by default if "data" did not specifically initalize it
+
+        if(!mode.equals("")){// && !contextFrom.equals("")) {
+            previousHomeFrag = currentHomeFrag;
+            if (mode.equals(BuddyHomeFragment.KEY_FIND_BUDDY_MODE)) {
+                currentHomeFrag = BUDDY_HOME_FIND_MODE;
+            } else if (mode.equals(BuddyHomeFragment.KEY_MEET_BUDDY_MODE) && !closeEnough) {          //if meetup mode and user is not close enough to destination
+                currentHomeFrag = BUDDY_HOME_MEETUP_MODE;
+            } else if (mode.equals(BuddyHomeFragment.KEY_MEET_BUDDY_MODE) && closeEnough) {        //if meetup mode and user IS close enough to destination
+                currentHomeFrag = BUDDY_HOME_MEETUP_MODE_CLOSE;
+            } else if (mode.equals(BuddyHomeFragment.KEY_ON_TRIP_MODE)) {
+                currentHomeFrag = BUDDY_HOME_ONTRIP_MODE;
+            } else {//TODO: come back to revise this bc it needs to be done better
+                Log.d(TAG, "toBuddyHomeFragment(): error, mode did not match any of the modes: mode=" + mode);
+            }
+
+            //2.) Bundle it and send:
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(BuddyHomeFragment.KEY_DATA, Parcels.wrap(data));
+            Fragment frag = new BuddyHomeFragment();
+            frag.setArguments(bundle);
+            fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
         }
         else{
-            currentHomeFrag = BUDDY_HOME_ONTRIP_MODE;                   //would need to error check if ever implement more than these three methods for BuddyHomeFrag
+            Log.d(TAG, "toBuddyHomeFrag(): mode or contextFrom was null");
+        }
+    }
+
+
+    @Override
+    //Purpose:          called when going to BuddyHomeFrag for meetUp mode --> passing in needed info to populate the overlay correctly
+    public void toBuddyHomeFragment(String mode, BuddyMeetUp meetUpInstance, Buddy otherBuddyInstance, ParseUser otherUser, Buddy currUserBuddyInstance, boolean closeEnough) {
+        //update HomeFrag history:
+        previousHomeFrag = currentHomeFrag;
+        if(mode.equals(BuddyHomeFragment.KEY_MEET_BUDDY_MODE) && !closeEnough){          //if meetup mode and user is not close enough to destination
+            currentHomeFrag = BUDDY_HOME_MEETUP_MODE;
+        }
+        else if(mode.equals(BuddyHomeFragment.KEY_MEET_BUDDY_MODE) && closeEnough){        //if meetup mode and user IS close enough to destination
+            currentHomeFrag = BUDDY_HOME_MEETUP_MODE_CLOSE;
+        }
+        else{//TODO: come back to revise this bc it needs to be done better
+            Log.d(TAG, "toBuddyHomeFragment(): mode=" +mode);
         }
 
+        //1.) Package ParseObjects into a ParcelableObject to send as a Parcelable:
+        ParcelableObject sendData = new ParcelableObject();
+        sendData.setMode(mode);
+        sendData.setBuddyMeetUp(meetUpInstance);
+        sendData.setOtherBuddy(otherBuddyInstance);
+        sendData.setOtherParseUser(otherUser);
+        sendData.setCurrBuddy(currUserBuddyInstance);
+        sendData.setBoolean(closeEnough);
+
+
+        //2.) Bundle it and send:
         Bundle bundle = new Bundle();;
-        bundle.putString(KEY_MODE, modeKey);
-        bundle.putString(BuddyHomeFragment.KEY_BUDDYMEETUPID, meetUpId);
-        bundle.putBoolean(BuddyHomeFragment.KEY_CLOSE_ENOUGH, closeEnough);
+        bundle.putParcelable(BuddyHomeFragment.KEY_DATA, Parcels.wrap(sendData));
+        Fragment frag = new BuddyHomeFragment();
+        frag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
+
+    }
+
+    @Override
+    //Purpose:          called when going to BuddyHomeFrag for onTrip mode --> passing in needed info to populate the overlay correctly
+    public void toBuddyHomeFragment(String mode, BuddyTrip buddyTripInstance, ParseUser otherUser, Buddy otherBuddyInstance) {
+        //update HomeFrag history:
+        previousHomeFrag = currentHomeFrag;
+        if(mode.equals(BuddyHomeFragment.KEY_ON_TRIP_MODE)){ //&& !closeEnough){          //if meetup mode and user is not close enough to destination
+            currentHomeFrag = BUDDY_HOME_ONTRIP_MODE;
+        }
+
+        //1.) Package ParseObjects into a ParcelableObject to send as a Parcelable:
+        ParcelableObject sendData = new ParcelableObject();
+        sendData.setBuddyTrip(buddyTripInstance);
+        sendData.setOtherParseUser(otherUser);
+        sendData.setOtherBuddy(otherBuddyInstance);
+        sendData.setMode(mode);
+
+        //2.) Bundle it and send:
+        Bundle bundle = new Bundle();;
+        bundle.putParcelable(BuddyHomeFragment.KEY_DATA, Parcels.wrap(sendData));
         Fragment frag = new BuddyHomeFragment();
         frag.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
@@ -442,6 +517,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     }
 
     @Override
+    //Because ConfirmBuddyHomeFragment are explicitly one time use --> do NOT save it in history (e.g. change currentHomeFrag)
     public void toConfirmBuddyHomeFragment(String modeKey, String otherUserId) {
         Bundle bundle = new Bundle();;
         bundle.putString(KEY_MODE, modeKey);
@@ -473,9 +549,9 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     public void toBuddyTripStatusFragment(Buddy otherBuddy, BuddyMeetUp meetUpInstance, String mode) {
         //1.) Package ParseObjects into a ParcelableObject to send as a Parcelable:
         ParcelableObject sendData = new ParcelableObject();
-        sendData.setBuddy(otherBuddy);
+        sendData.setOtherBuddy(otherBuddy);
         sendData.setBuddyMeetUp(meetUpInstance);
-        sendData.setString(mode);
+        sendData.setMode(mode);
 
         //2.) Bundle it and send:
         Bundle bundle = new Bundle();;
@@ -484,6 +560,8 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         frag.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
     }
+
+
 
     public void toProfileSetupFragment(){
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new ProfileSetupFragment()).commit();
@@ -690,44 +768,89 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     //Purpose:          Returns which HomeFrag instance corresponds to the currentHomeFrag field. Used by bottomNavigationBar to always go back to the correct HomeFrag + mode when the home icon is pushed
     //TODO: remove this boilerplate code lol
     private Fragment getCorrespondingFrag(String fragLabel){
+        ParcelableObject sendData = new ParcelableObject();
+        Bundle bundle = new Bundle();
+        Fragment frag = new BuddyHomeFragment();
+
         if(fragLabel.equals(DEFAULT_HOME)){
             return new DefaultHomeFragment();
         }
         else if(fragLabel.equals(BUDDY_HOME_FIND_MODE)){
-            Bundle bundle = new Bundle();;
-            bundle.putString(KEY_MODE, BuddyHomeFragment.KEY_FIND_BUDDY_MODE);
-            Fragment frag = new BuddyHomeFragment();
+            sendData.setMode(BuddyHomeFragment.KEY_FIND_BUDDY_MODE);
+            bundle.putParcelable(BuddyHomeFragment.KEY_DATA, Parcels.wrap(sendData));
             frag.setArguments(bundle);
             return frag;
         }
-        else if(fragLabel.equals(BUDDY_HOME_MEETUP_MODE)){
-            //1.) Must find the meetUpId:
-            String meetUpId = userBuddyInstance.getBuddyMeetUpInstance().getObjectId();
 
-            Bundle bundle = new Bundle();;
-            bundle.putString(KEY_MODE, BuddyHomeFragment.KEY_MEET_BUDDY_MODE);
-            bundle.putString(BuddyHomeFragment.KEY_BUDDYMEETUPID, meetUpId);
-            bundle.putBoolean(BuddyHomeFragment.KEY_CLOSE_ENOUGH, false);
-            Fragment frag = new BuddyHomeFragment();
+        else if(fragLabel.equals(BUDDY_HOME_MEETUP_MODE)){
+            //1.) Get the necessary info
+            BuddyMeetUp meetUpInstance = userBuddyInstance.getBuddyMeetUpInstance();
+            Buddy otherBuddy;
+            if(meetUpInstance.getSenderBuddyId().equals(userBuddyInstance.getObjectId())){
+                otherBuddy = meetUpInstance.getReceiverBuddy();
+            }
+            else{
+                otherBuddy = meetUpInstance.getSenderBuddy();               //not actually good --> will also go here if error
+            }
+            ParseUser otherUser = otherBuddy.getUser();
+
+            //Fill in data into the Parcelable Object:
+            sendData.setMode(BuddyHomeFragment.KEY_MEET_BUDDY_MODE);
+            sendData.setBuddyMeetUp(meetUpInstance);
+            sendData.setOtherBuddy(otherBuddy);
+            sendData.setOtherParseUser(otherUser);
+            sendData.setCurrBuddy(userBuddyInstance);
+
+            //Package the Parcelable Object into the Bundle
+            bundle.putParcelable(BuddyHomeFragment.KEY_DATA, Parcels.wrap(sendData));
             frag.setArguments(bundle);
             return frag;
         }
         else if(fragLabel.equals(BUDDY_HOME_MEETUP_MODE_CLOSE)){
-            String meetUpId = userBuddyInstance.getBuddyMeetUpInstance().getObjectId();
+            //Get the necessary info:
+            BuddyMeetUp meetUpInstance = userBuddyInstance.getBuddyMeetUpInstance();
+            Buddy otherBuddy;
+            if(meetUpInstance.getSenderBuddyId().equals(userBuddyInstance.getObjectId())){
+                otherBuddy = meetUpInstance.getReceiverBuddy();
+            }
+            else{
+                otherBuddy = meetUpInstance.getSenderBuddy();               //not actually good --> will also go here if error
+            }
+            ParseUser otherUser = otherBuddy.getUser();
 
-            Bundle bundle = new Bundle();
-            bundle.putString(KEY_MODE, BuddyHomeFragment.KEY_MEET_BUDDY_MODE);
-            bundle.putString(BuddyHomeFragment.KEY_BUDDYMEETUPID, meetUpId);
-            bundle.putBoolean(BuddyHomeFragment.KEY_CLOSE_ENOUGH, true);           //automatic as this will ONLY ever be true when invoked by CheckProximityWorker!
-            Fragment frag = new BuddyHomeFragment();
+            //Fill in data into the Parcelable Object:
+            sendData.setMode(BuddyHomeFragment.KEY_MEET_BUDDY_MODE_NEAR);
+            sendData.setBuddyMeetUp(meetUpInstance);
+            sendData.setOtherBuddy(otherBuddy);
+            sendData.setOtherParseUser(otherUser);
+            sendData.setCurrBuddy(userBuddyInstance);
+            sendData.setBoolean(true);
+
+            //Package the Parcelable Object into the Bundle
+            bundle.putParcelable(BuddyHomeFragment.KEY_DATA, Parcels.wrap(sendData));
             frag.setArguments(bundle);
             return frag;
         }
         else if(fragLabel.equals(BUDDY_HOME_ONTRIP_MODE)){
-            //TODO: bc this is not yet implemented, will later need to input extra info
-            Bundle bundle = new Bundle();;
-            bundle.putString(KEY_MODE, BuddyHomeFragment.KEY_ON_TRIP_MODE);
-            Fragment frag = new BuddyHomeFragment();
+            //Get the necessary info:
+            BuddyTrip buddyTripInstance = userBuddyInstance.getBuddyTripInstance();
+            Buddy otherBuddy;
+            if(buddyTripInstance.getSenderBuddyId().equals(userBuddyInstance.getObjectId())){
+                otherBuddy = buddyTripInstance.getReceiverBuddy();
+            }
+            else{
+                otherBuddy = buddyTripInstance.getSenderBuddy();               //not actually good --> will also go here if error
+            }
+            ParseUser otherUser = otherBuddy.getUser();
+
+            //Fill in data into the Parcelable Object:
+            sendData.setMode(BuddyHomeFragment.KEY_ON_TRIP_MODE);
+            sendData.setBuddyTrip(buddyTripInstance);
+            sendData.setOtherBuddy(otherBuddy);
+            sendData.setOtherParseUser(otherUser);
+
+            //Package the Parcelable Object into the Bundle
+            bundle.putParcelable(BuddyHomeFragment.KEY_DATA, Parcels.wrap(sendData));
             frag.setArguments(bundle);
             return frag;
         }
@@ -798,13 +921,14 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
                                         //Tell BuddyHomeFrag to invoke overlay (bc we are close enough now) to display if not already doing so:
                                         if(!currentHomeFrag.equals(BUDDY_HOME_MEETUP_MODE_CLOSE)) {
-                                            toBuddyHomeFragment(BuddyHomeFragment.KEY_MEET_BUDDY_MODE, meetUpId, true);
+                                           //TODO: make it so we just statically call a method to make the meetUp overlay visible again instead of calling an entire new frag
+                                            //toBuddyHomeFragment(BuddyHomeFragment.KEY_MEET_BUDDY_MODE, meetUpId, true);
                                             //NOTE: We DO NOT stop this worker here as we only want to stop checking for proximity when the user interacts with the correct overlays!
                                         }
                                     }
                                     else{   //if user was close enough, but now is not --> go back to meetUp mode w/o being close enough
                                         if(currentHomeFrag.equals(BUDDY_HOME_MEETUP_MODE_CLOSE)){
-                                            toBuddyHomeFragment(BuddyHomeFragment.KEY_MEET_BUDDY_MODE, meetUpId, false);
+                                           // toBuddyHomeFragment(BuddyHomeFragment.KEY_MEET_BUDDY_MODE, meetUpId, false);
                                         }
                                     }
 

@@ -21,20 +21,28 @@ import java.util.List;
 @Parcel
 public class ParcelableObject {
     User user;
-    ParseUser parseUser;
-    Buddy buddy;
+    ParseUser currParseUser;
+    ParseUser otherParseUser;
+    Buddy userBuddy;
+    Buddy otherBuddy;
     BuddyMeetUp buddyMeetUp;
     BuddyTrip buddyTrip;
     WingsGeoPoint wingsGeoPoint;
     LatLng someLocation;
     TrustedContact trustedContact;
     BuddyRequest buddyRequest;
-    String someString;
+    String mode = "";
+    String contextFrom = "";
+    String meetUpId = "";
+    boolean someBoolean = false;
 
     public ParcelableObject(){}
 
     public ParcelableObject(User user){
         this.user = user;
+    }
+    public ParcelableObject(String mode){
+        this.mode = mode;
     }
 
     public User getUser(){
@@ -58,11 +66,23 @@ public class ParcelableObject {
         this.trustedContact = trustedContact;
     }
 
-    public void setString(String string){
-        someString = string;
+    public void setMode(String string){
+        mode = string;
     }
-    public String getString(){
-        return someString;
+    public String getMode(){
+        return mode;
+    }
+    public void setContextFrom(String string){
+        contextFrom = string;
+    }
+    public String getContextFrom(){
+        return contextFrom;
+    }
+    public void setMeetUpId(String string){
+        meetUpId = string;
+    }
+    public String getMeetUpId(){
+        return meetUpId;
     }
 
     public LatLng getLocation() {
@@ -95,19 +115,37 @@ public class ParcelableObject {
         this.buddyMeetUp = buddyMeetUp;
     }
 
-    public Buddy getBuddy() {
-        return buddy;
+    public Buddy getCurrBuddy() {
+        return userBuddy;
+    }
+    public void setCurrBuddy(Buddy buddy) {
+        userBuddy = buddy;
     }
 
-    public void setBuddy(Buddy buddy) {
-        this.buddy = buddy;
+    public Buddy getOtherBuddy() {
+        return otherBuddy;
+    }
+    public void setOtherBuddy(Buddy buddy) {
+        otherBuddy = buddy;
     }
 
-    public ParseUser getParseUser() {
-        return parseUser;
+    public ParseUser getCurrParseUser() {
+        return currParseUser;
+    }
+    public void setCurrParseUser(ParseUser parseUser) {
+        currParseUser = parseUser;
+    }
+    public ParseUser getOtherParseUser() {
+        return otherParseUser;
+    }
+    public void setOtherParseUser(ParseUser parseUser) {
+        otherParseUser = parseUser;
+    }
+    public boolean getBoolean(){
+        return someBoolean;
+    }
+    public void setBoolean(boolean bool){
+        someBoolean = bool;
     }
 
-    public void setParseUser(ParseUser parseUser) {
-        this.parseUser = parseUser;
-    }
 }

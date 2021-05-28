@@ -109,7 +109,6 @@ public class WingsMap {
                 //Remove the marker if its already on the map, otherwise show the current marker
                 if(targetDestinationMarker == null){
                     initializeTargetDestinationMarker(clickedLocation);
-                    setClickedTargetDestination(clickedLocation);
                 }else{
                     targetDestinationMarker.remove();
                     initializeTargetDestinationMarker(clickedLocation);
@@ -461,11 +460,11 @@ public class WingsMap {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 marker.remove();
-                setClickedTargetDestination(null);
+                setClickedTargetDestination(new LatLng(0, 0));
                 return false;
             }
         });
-
+        setClickedTargetDestination(clickedLocation);
         targetDestinationMarker = map.addMarker(markerOptions);
         targetDestinationMarker.showInfoWindow();
         Log.d(TAG, "initalizeTargetDestinationMarker(): targetDestinationMarker.isDraggable()= " + targetDestinationMarker.isDraggable());

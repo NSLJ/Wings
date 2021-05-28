@@ -24,7 +24,7 @@ public class BuddyTrip extends ParseObject {
 
     public BuddyTrip(){}
 
-    public BuddyTrip(Buddy senderBuddy, Buddy receiverBuddy){
+    public BuddyTrip(Buddy senderBuddy, Buddy receiverBuddy, WingsGeoPoint startLocation, WingsGeoPoint tripDestination){
         setSenderBuddy(senderBuddy);
         setSenderBuddyId(senderBuddy.getObjectId());
         setReceiverBuddy(receiverBuddy);
@@ -32,8 +32,8 @@ public class BuddyTrip extends ParseObject {
 
         setNearEachOther(false);
 
-        setStartLocation(new WingsGeoPoint());
-        setDestination(new WingsGeoPoint());
+        setStartLocation(startLocation);
+        setDestination(tripDestination);
         setEst(1111);
         setTimeElapsed(0);
     }

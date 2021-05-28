@@ -80,9 +80,9 @@ public class BuddyTripStatusFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             ParcelableObject dataReceived = Parcels.unwrap(getArguments().getParcelable(KEY_DATA));
-            otherBuddy = dataReceived.getBuddy();
+            otherBuddy = dataReceived.getOtherBuddy();
             meetUpInstance = dataReceived.getBuddyMeetUp();
-            mode = dataReceived.getString();
+            mode = dataReceived.getMode();
         }
     }
 

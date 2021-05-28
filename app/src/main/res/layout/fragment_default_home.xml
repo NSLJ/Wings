@@ -28,9 +28,9 @@
             android:gravity="center"
             android:hint="Search for a destination"
             android:inputType="textPersonName"
-            android:text="Test destination"
             android:textAlignment="textStart"
-            android:textColor="@color/gray" />
+            android:textColor="@color/gray"
+            android:textColorHint="@color/gray" />
 
         <ImageButton
             android:id="@+id/btnSearch"
@@ -81,27 +81,27 @@
                 android:text="Start Buddy Trip?"
                 android:textAlignment="center"
                 android:textColor="#FFFFFF"
-                android:textSize="24sp" />
+                android:textSize="30sp" />
 
 
             <TextView
                 android:id="@+id/tvDestination"
-                android:layout_width="200dp"
+                android:layout_width="300dp"
                 android:layout_height="32dp"
                 android:layout_below="@+id/tvTitle"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/most_opaque_rounded"
                 android:fontFamily="@font/lato"
-                android:paddingLeft="5dp"
+                android:paddingLeft="3dp"
                 android:paddingTop="7dp"
-                android:paddingRight="5dp"
+                android:paddingRight="3dp"
                 android:paddingBottom="7dp"
                 android:textAlignment="center"
                 android:textColor="@color/gray"
                 android:textColorHint="@color/gray"
                 android:textSize="16sp"
-                tools:text="Some location here" />
+                tools:text="Destination:  (123.123, 123.123) " />
 
             <RelativeLayout
                 android:layout_width="wrap_content"
