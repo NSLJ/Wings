@@ -54,7 +54,7 @@
                 tools:src="@tools:sample/avatars" />
 
             <TextView
-                android:id="@+id/tvTitle"
+                android:id="@+id/tvName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
@@ -71,7 +71,7 @@
                 android:id="@+id/tvTripStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tvTitle"
+                android:layout_below="@+id/tvName"
                 android:layout_centerHorizontal="true"
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="-5dp"
@@ -102,7 +102,7 @@
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/tvTripDestination"
+                android:id="@+id/tvOtherBuddyId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tvUserBuddyId"

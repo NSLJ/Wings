@@ -60,9 +60,13 @@
                 android:layout_marginTop="4dp"
                 android:layout_toEndOf="@+id/ivSendRequestPic"
                 android:fontFamily="@font/satisfy"
+                android:paddingLeft="5dp"
+                android:paddingTop="3dp"
+                android:paddingRight="3dp"
+                android:paddingBottom="3dp"
                 android:text="Annie"
                 android:textColor="@color/logo_teal"
-                android:textSize="25sp" />
+                android:textSize="36sp" />
 
             <TextView
                 android:id="@+id/tvSendRequestEmail"
@@ -74,7 +78,6 @@
                 android:layout_marginTop="-5dp"
                 android:layout_toEndOf="@+id/ivSendRequestPic"
                 android:fontFamily="@font/lato"
-                android:text="annie@cpp.edu"
                 android:textColor="@color/gray_100"
                 android:textSize="12sp" />
 
@@ -84,9 +87,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                android:layout_below="@+id/tvSendRequestEmail"
+                android:layout_below="@+id/tvSendRequestName"
                 android:layout_centerHorizontal="true"
                 android:layout_marginStart="27dp"
+                android:layout_marginTop="-11dp"
                 android:layout_toEndOf="@+id/ivSendRequestPic"
                 android:isIndicator="true"
                 android:numStars="5"
@@ -100,7 +104,7 @@
                 android:layout_below="@+id/ivSendRequestPic"
                 android:layout_centerHorizontal="false"
                 android:layout_marginLeft="120dp"
-                android:layout_marginTop="-10dp"
+                android:layout_marginTop="-8dp"
                 android:fontFamily="@font/lato"
                 android:text="0.2m away from your destination"
                 android:textColor="@color/gray"
@@ -111,7 +115,7 @@
                 android:id="@+id/btnSendRequest"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tvTripDestination"
+                android:layout_below="@+id/tvOtherBuddyId"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="13dp"
                 android:backgroundTint="@color/logo_teal"
@@ -121,8 +125,8 @@
             <!-- Option 2: visible when responding to a request -->
             <ImageView
                 android:id="@+id/ivAccept"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="55dp"
@@ -133,8 +137,8 @@
 
             <ImageView
                 android:id="@+id/ivReject"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="145dp"
@@ -144,13 +148,13 @@
                 tools:src="@drawable/cancel_button" />
 
             <TextView
-                android:id="@+id/tvTripDestination"
+                android:id="@+id/tvOtherBuddyId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tvSendRequestDistance"
                 android:layout_alignParentStart="true"
                 android:layout_marginStart="100dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="15dp"
                 android:fontFamily="@font/lato"
                 android:text="Trip Destination:  None specified"
                 android:textColor="@color/gray" />

@@ -38,14 +38,8 @@ import java.util.List;
 public class SendRequestStepsDialog extends DialogFragment {
     private static final String TAG = "SendRequestStepsDialog";
 
-    private ParseUser currentUser = ParseUser.getCurrentUser();
-
-    private String meetUpId;
-    private BuddyMeetUp meetUpInstance;
-
     //Views:
     Button btnOk;
-
 
     public SendRequestStepsDialog() {}
 

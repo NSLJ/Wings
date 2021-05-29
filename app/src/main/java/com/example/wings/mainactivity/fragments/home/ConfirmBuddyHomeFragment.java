@@ -163,12 +163,12 @@ public class ConfirmBuddyHomeFragment extends Fragment {
         ivAcceptRequest = view.findViewById(R.id.ivAccept);
         ivRejectRequest = view.findViewById(R.id.ivReject);
         btnBack = view.findViewById(R.id.btnBack);
-        tvTripDestination = view.findViewById(R.id.tvTripDestination);
+        tvTripDestination = view.findViewById(R.id.tvOtherBuddyId);
 
         btnBack.setOnClickListener(new View.OnClickListener() {         //TODO: I think we should keep a history of fragment passing in MainActivity to just go to some "previous" fragment instead
             @Override
             public void onClick(View v) {
-                listener.toCurrentHomeFragment();
+                listener.toChooseBuddyFragment();
             }
         });
 
@@ -223,12 +223,15 @@ public class ConfirmBuddyHomeFragment extends Fragment {
                 Log.d(TAG, "drawOtherRoute(): otherCurrLocation=" + otherCurrLocation.toString());
                 //Map the other user's route:
                 wingsMap.setMarker(otherCurrLocation, BitmapDescriptorFactory.HUE_BLUE, true, "Their current location");
-                wingsMap.route(otherCurrLocation, otherDestination, true);
+                wingsMap.route(otherCurrLocation, otherDestination, true, "Their destination");
+                if(mode.equals(KEY_ANSWER_MODE)){
+                    wingsMap.setMarker(otherCurrLocation, BitmapDescriptorFactory.HUE_GREEN, true, "Requested meetup location");
+                }
 
                 Buddy userBuddyInstance = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
                 userBuddyInstance.fetchIfNeeded();
                 WingsGeoPoint currUserDestination = userBuddyInstance.getDestination();
-                wingsMap.setMarker(new LatLng(currUserDestination.getLatitude(), currUserDestination.getLongitude()), BitmapDescriptorFactory.HUE_BLUE, true, "Your Destination");
+                //wingsMap.setMarker(new LatLng(currUserDestination.getLatitude(), currUserDestination.getLongitude()), BitmapDescriptorFactory.HUE_BLUE, true, "Your Destination");
             } catch (ParseException e) {
                 Log.d(TAG, "onViewCreated(): error fetching buddy instance");
                 e.printStackTrace();

@@ -81,8 +81,10 @@ public class DefaultHomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Log.d(TAG, "onCreateView()");
         View mainView = inflater.inflate(R.layout.fragment_default_home, container, false);
         setMapFragment();
+
         return mainView;
     }
 
@@ -136,7 +138,7 @@ public class DefaultHomeFragment extends Fragment {
                     if(possibleAddresses != null || possibleAddresses.size() == 0) {
                         Log.d(TAG, "btnSearch clicked: possibleAddresses is NOT null, possibleAddresses="+possibleAddresses.toString());
                         //1c.) Get + draw the route:
-                        queriedDestination = wingsMap.routeFromCurrentLocation(destinationTxt, true);
+                        queriedDestination = wingsMap.routeFromCurrentLocation(destinationTxt, true, "Your destination");
                         Log.d(TAG, "queriedDestination successfully initialized");
 
                         //2.) Display the confirmDestinationOverlay:
@@ -157,9 +159,10 @@ public class DefaultHomeFragment extends Fragment {
             public void onClick(View v) {
                 Log.d(TAG, "ivAcceptBtn onClick()");
 
-                //1.) Create a new Buddy instance and link it to this user:
-                Buddy buddy = new Buddy(currUser, new WingsGeoPoint(currUser, queriedDestination.latitude, queriedDestination.longitude));
-                buddy.saveInBackground(new SaveCallback() {
+                try {
+                    //1.) Create a new Buddy instance and link it to this user:
+                    Buddy buddy = new Buddy(currUser, new WingsGeoPoint(currUser, queriedDestination.latitude, queriedDestination.longitude));
+                    buddy.save();/*InBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
                         if(e == null){
@@ -169,12 +172,12 @@ public class DefaultHomeFragment extends Fragment {
                             Log.d(TAG, "ivAcceptBtn onClick(): Error saving Buddy!");
                         }
                     }
-                });
+                });*/
 
-                //link new buddy instance to user:
-                currUser.put(User.KEY_ISBUDDY, true);
-                currUser.put(User.KEY_BUDDY, buddy);
-                currUser.saveInBackground(new SaveCallback() {
+                    //link new buddy instance to user:
+                    currUser.put(User.KEY_ISBUDDY, true);
+                    currUser.put(User.KEY_BUDDY, buddy);
+                    currUser.save();/*InBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
                         if(e == null){
@@ -184,11 +187,14 @@ public class DefaultHomeFragment extends Fragment {
                             Log.d(TAG, "ivAcceptBtn onClick(): successfully saved user's isBuddy and Buddy!");
                         }
                     }
-                });
+                });*/
 
-                //2.) Go to BuddyHomeFrag:
-                ParcelableObject sendData = new ParcelableObject(BuddyHomeFragment.KEY_FIND_BUDDY_MODE);
-                listener.toBuddyHomeFragment(sendData);
+                    //2.) Go to BuddyHomeFrag:
+                    ParcelableObject sendData = new ParcelableObject(BuddyHomeFragment.KEY_FIND_BUDDY_MODE);
+                    listener.toBuddyHomeFragment(sendData);
+                }catch(ParseException e){
+                    Log.d(TAG, "acceptDestination button cllicked: error="+ e.getLocalizedMessage());
+                }
             }
         });
 
@@ -198,14 +204,16 @@ public class DefaultHomeFragment extends Fragment {
             public void onClick(View v) {
                 Log.d(TAG, "ivRejectBtn: onClick()");
 
-                //1.) Stop displaying overlay:
-                confirmDestinationOverlay.setVisibility(View.INVISIBLE);
+                try {
+                    //1.) Stop displaying overlay:
+                    confirmDestinationOverlay.setVisibility(View.INVISIBLE);
 
-                //2.) Reset the queriedDestination & destinationStr in database
-                WingsGeoPoint parseQueriedDestination = (WingsGeoPoint) currUser.getParseObject(User.KEY_QUERIEDDESTINATION);
-                parseQueriedDestination.reset();
-                currUser.put(User.KEY_DESTINATIONSTR, "default");
-                currUser.saveInBackground(new SaveCallback() {
+                    //2.) Reset the queriedDestination & destinationStr in database
+                    WingsGeoPoint parseQueriedDestination = (WingsGeoPoint) currUser.getParseObject(User.KEY_QUERIEDDESTINATION);
+                    parseQueriedDestination.reset();
+                    wingsMap.setDestination(null);              //so wingsMap knows to stop mapping
+                    currUser.put(User.KEY_DESTINATIONSTR, "default");
+                    currUser.save();/*InBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
                         if(e == null){
@@ -215,10 +223,13 @@ public class DefaultHomeFragment extends Fragment {
                             Log.d(TAG, "ivRejectBtn: onClick() - user reset failed, error-" + e.getLocalizedMessage());
                         }
                     }
-                });
+                });*/
 
-                //3.) Set the map back to normal
-                wingsMap.removeRoute();
+                    //3.) Set the map back to normal
+                    wingsMap.removeRoute();
+                }catch(ParseException e){
+                    Log.e(TAG, "reject destination bttn clicked: error = " +e.getLocalizedMessage());
+                }
             }
         });
     }

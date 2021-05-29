@@ -165,15 +165,16 @@ public class WingsMap {
      */
 
     //Purpose:          Automatically finds and draws the route from current location to the given destination, draws the first route. animateMap = whether or not to move the map once done drawing route. animateMap = whether or not to move the map once done drawing route
-    public void routeFromCurrentLocation(LatLng destination, boolean animateMap){
+    public void routeFromCurrentLocation(LatLng destination, boolean animateMap, String title){
+        Log.d(TAG, "routeFromCurrentLocation");
         isReady = false;
         ParseGeoPoint curLoc = new ParseGeoPoint(currentLocation.latitude, currentLocation.longitude);
         distanceFromCurLocation = curLoc.distanceInKilometersTo(new ParseGeoPoint(destination.latitude, destination.longitude))*1000;
-        route(currentLocation, destination, animateMap);
+        route(currentLocation, destination, animateMap, title);
     }
 
     //Purpose:          Finds and chooses the first Address found from the given destination text. Routes from currentLocation, return the destination so HomeFragment can use it! animateMap = whether or not to move the map once done drawing route
-    public LatLng routeFromCurrentLocation(String destinationTxt, boolean animateMap){
+    public LatLng routeFromCurrentLocation(String destinationTxt, boolean animateMap, String title){
         //Get possible addresses and choose the first one for now:
         LatLng foundDestination = null;
 
@@ -189,7 +190,7 @@ public class WingsMap {
             setUserDestinationString(destinationTxt);
 
             //2.) Find all routes from current location to destination, choose first route to draw
-            routeFromCurrentLocation(foundDestination, animateMap);
+            routeFromCurrentLocation(foundDestination, animateMap, title);
         }
         return foundDestination;
     }
@@ -211,40 +212,45 @@ public class WingsMap {
     }
 
     //Purpose:          Automatically finds draws the first route from given start location and destination, initializes the allRoutes field. animateMap = whether or not to move the map once done drawing route
-    public void route(LatLng startLocation, LatLng destination, boolean animateMap){
-        Log.d(TAG, "route()");
+    public void route(LatLng startLocation, LatLng destination, boolean animateMap, String title){
+        Log.d(TAG, "route(): startLocation given = " + startLocation.toString() + "  destination given:  " + destination.toString());
 
-        //1.) If there is already a route drawn, clear the map before re-drawing on it:
-        if(routeDrawn){
-            removeRouteDrawn();
-            clearAllRoutes();
+        if(startLocation.latitude != 0 && startLocation.longitude != 0 && destination.latitude != 0 && destination.longitude != 0) {
+            //1.) If there is already a route drawn, clear the map before re-drawing on it:
+            if (routeDrawn) {
+                removeRouteDrawn();
+                clearAllRoutes();
+            }
+            this.startLocation = startLocation;
+            this.destination = destination;
+
+            //Make the api call and handle the response --> if success --> use the DataParser class to parse all routes into WingsRoute objects
+            client.makeDirectionRequest(startLocation, destination, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Headers headers, JSON json) {
+                    Log.d(TAG, "route() - makeDirectionRequest() - success!");
+                    JSONObject jsonObject = json.jsonObject;
+
+                    DataParser parser = new DataParser();           //DataParser does the actual parsing of the JSONObject
+                    List<WingsRoute> result = parser.parse(jsonObject);
+                    if (result == null || result.size() == 0) {
+                        Log.d(TAG, "route(): result = null or size = 0");
+                        Toast.makeText(context, "No directions available!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        setAllRoutes(result);                           //set allRoutes field = result
+                        drawRoute(0, animateMap, title);                       //draw the first route
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                    Log.d(TAG, "route(): making DirectionRequest failed, response=" + response);
+                }
+            });
         }
-        this.startLocation = startLocation;
-        this.destination = destination;
-
-        //Make the api call and handle the response --> if success --> use the DataParser class to parse all routes into WingsRoute objects
-        client.makeDirectionRequest(startLocation, destination, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Headers headers, JSON json) {
-                Log.d(TAG, "route() - makeDirectionRequest() - success!");
-                JSONObject jsonObject = json.jsonObject;
-
-                DataParser parser = new DataParser();           //DataParser does the actual parsing of the JSONObject
-                List<WingsRoute> result = parser.parse(jsonObject);
-                if(result == null){
-                    Toast.makeText(context, "No directions available!", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    setAllRoutes(result);                           //set allRoutes field = result
-                    drawRoute(0, animateMap);                       //draw the first route
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                Log.d(TAG, "route(): making DirectionRequest failed, response=" + response);
-            }
-        });
+        else{
+            Log.d(TAG, "route():    startLocation or destination were 0");
+        }
     }
 
     //Purpose:      removes the route drawn, but technically route is still tracked
@@ -338,15 +344,16 @@ public class WingsMap {
         if (location != null) {
             LatLng receivedLocation = new LatLng(location.getLatitude(), location.getLongitude());
             Log.d(TAG, "onLocationUpdated():  receivedLocation = " + receivedLocation.toString());
+
             //If we are not in the same spot, there is a destination, and we ARE routing from our current location --> re-route
-            if((!currentLocation.equals(receivedLocation)) && destination != null && startLocation.equals(currentLocation)){
+            if((!currentLocation.equals(receivedLocation)) && destination != null && (destination.latitude != 0 && destination.longitude != 0) && startLocation.equals(currentLocation)){
                 Log.d(TAG, "onLocationUpdated(): currentLocation != to location updated --> re-drawing route");
                 currentLocation = receivedLocation;
                 ParseGeoPoint curLoc = new ParseGeoPoint(currentLocation.latitude, currentLocation.longitude);
                 distanceFromCurLocation = curLoc.distanceInKilometersTo(new ParseGeoPoint(destination.latitude, destination.longitude))*1000;
                 Log.d(TAG, "onLocationUpdated(): distanceFromCurrLocation changed = " + distanceFromCurLocation);
                 Log.d(TAG, "onLocationUpdated(): currLocation = " + currentLocation.toString() + "    destination=" + destination.toString());
-                route(receivedLocation, destination, false);
+                route(receivedLocation, destination, false, "");
             }
             //currentLocation = receivedLocation;     //to change map display automatically
         }
@@ -354,7 +361,7 @@ public class WingsMap {
 
 
     //Purpose:      draws the route given the position of which route wanted in allRoutes. Assumes the allRoutes field is already initalized!
-    private void drawRoute(int routePosition, boolean animateMap){
+    private void drawRoute(int routePosition, boolean animateMap, String title){
         Log.d(TAG, "drawRoute()");
         chosenRoute = allRoutes.get(routePosition);
         PolylineOptions lineOptions = chosenRoute.getLineOptions();
@@ -366,10 +373,10 @@ public class WingsMap {
         lineOptions.geodesic(true);
 
         if(!startLocation.equals(currentLocation)) {            //Did we map the route from currUser's current location? if not --> this must be the otherUser's destination
-            setMarker(destination, BitmapDescriptorFactory.HUE_RED, animateMap, "Their Destination:  (" + Math.round(destination.latitude * 1000.0) / 1000.0 + ", " + Math.round(destination.longitude * 1000.0) / 1000.0 + ")");
+            setMarker(destination, BitmapDescriptorFactory.HUE_RED, animateMap, title + ":  (" + Math.round(destination.latitude * 1000.0) / 1000.0 + ", " + Math.round(destination.longitude * 1000.0) / 1000.0 + ")");
         }
         else{
-            setMarker(destination, BitmapDescriptorFactory.HUE_RED, animateMap, "Your Destination:  (" + Math.round(destination.latitude * 1000.0) / 1000.0 + ", " + Math.round(destination.longitude * 1000.0) / 1000.0 + ")");
+            setMarker(destination, BitmapDescriptorFactory.HUE_RED, animateMap, title+ ":  (" + Math.round(destination.latitude * 1000.0) / 1000.0 + ", " + Math.round(destination.longitude * 1000.0) / 1000.0 + ")");
         }
 
         if(trackOtherUser){             //if wingsMap instance was called by a mode=onTrip BuddyHomeFrag --> must also show marker for otherUser's currentLocation
@@ -384,13 +391,13 @@ public class WingsMap {
         return isReady;
     }
     public void setMarker(LatLng destination, float color, boolean animateMap, String title){
-        Log.d(TAG, "setMaker()");
+        Log.d(TAG, "setMarker()");
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(destination);
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(color));
         markerOptions.title(title);
-        map.addMarker(markerOptions).showInfoWindow();
-
+        Marker marker = map.addMarker(markerOptions);
+        marker.showInfoWindow();
        // map.animateCamera(CameraUpdateFactory.newLatLng(destination));
       //  map.animateCamera(CameraUpdateFactory.zoomTo(9));
         if(animateMap) {
@@ -499,54 +506,7 @@ public class WingsMap {
     public double getDistanceFromCurLocation(){
         return distanceFromCurLocation;
     }
-
-    //Saving just in case I need it still:
-    /*public void getAllRoutes(LatLng startLocation, LatLng destination){
-        //Package data to send the counter
-        double[] locations = new double[]{startLocation.latitude, startLocation.longitude, destination.latitude, destination.longitude};
-        Data data = new Data.Builder()
-                .putDoubleArray(KEY_SEND_LOCATIONS, locations)       //send the counter
-                .build();
-
-        //Create the request
-        OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(UpdateLocationWorker.class)
-                .setInputData(data)         //send data
-                //.setInitialDelay(5, TimeUnit.SECONDS)      //wait 5 seconds before doing it         //TODO: don't hardcode, make this time frame a constant
-                .build();
-
-        //Queue up the request
-        WorkManager.getInstance(context)
-                .enqueueUniqueWork(
-                        "sendDataWorker request",
-                        ExistingWorkPolicy.REPLACE,         //says, if it does repeat, replace the new request with the old one
-                        (OneTimeWorkRequest) request
-                );
-
-        //Listen to information from the request
-        WorkManager.getInstance(context).getWorkInfoByIdLiveData(request.getId())      //returns a live data
-                .observe(lifecycleOwner, new Observer<WorkInfo>() {
-
-                    //called every time WorkInfo is changed
-                    public void onChanged(@Nullable WorkInfo workInfo) {
-
-                        //If workInfo is there and it is succeeded --> update the text
-                        if (workInfo != null) {
-                            //Check if finished:
-                            if(workInfo.getState().isFinished()){
-                                if(workInfo.getState() == WorkInfo.State.SUCCEEDED){
-                                    //we can use the allRoutes field now!
-                                    drawRoute(0);       //just draw the first route for now
-                                }
-                                else {
-                                    Log.d(TAG, "Request didn't succeed, status=" + workInfo.getState().name());
-                                }
-                            }
-                        }
-                    }
-                });
-
+    public void setDestination(LatLng newDestination){
+        destination = newDestination;
     }
-
-*/
-
 }

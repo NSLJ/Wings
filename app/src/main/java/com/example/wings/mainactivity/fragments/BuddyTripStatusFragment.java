@@ -19,12 +19,9 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.wings.R;
 import com.example.wings.mainactivity.MAFragmentsListener;
-import com.example.wings.mainactivity.fragments.home.BuddyHomeFragment;
 import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.User;
 import com.example.wings.models.inParseServer.Buddy;
-import com.example.wings.models.inParseServer.BuddyMeetUp;
-import com.example.wings.models.inParseServer.BuddyTrip;
 import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -105,10 +102,10 @@ public class BuddyTripStatusFragment extends Fragment {
 
         btnBack = view.findViewById(R.id.btnBack);
         ivProfilePic = view.findViewById(R.id.ivProfilePic);
-        tvName = view.findViewById(R.id.tvTitle);
+        tvName = view.findViewById(R.id.tvName);
         tvTripStatus = view.findViewById(R.id.tvTripStatus);
         tvUserBuddyId = view.findViewById(R.id.tvUserBuddyId);
-        tvOtherBuddyId = view.findViewById(R.id.tvTripDestination);
+        tvOtherBuddyId = view.findViewById(R.id.tvOtherBuddyId);
         tvUserDestination = view.findViewById(R.id.tvUserDestination);
         tvCommonDestination = view.findViewById(R.id.tvCommonDestination);
 
@@ -157,7 +154,7 @@ public class BuddyTripStatusFragment extends Fragment {
                 tvTripStatus.setText("Trip Status:  On meeting up");
             }
             else if(mode.equals(ON_TRIP_MODE)){
-                tvTripStatus.setText("Trip Status:  On trip walking to destination");
+                tvTripStatus.setText("Trip Status:  On trip together");
             }
             else{
                 tvTripStatus.setText("Error - mode not matching either key");

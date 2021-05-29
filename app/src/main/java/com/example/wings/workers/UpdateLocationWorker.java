@@ -72,19 +72,8 @@ public class UpdateLocationWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-
-
-
-       // Log.i(TAG, "in doWork(): Sending data to Server started!");
-        result = "";
-
-        //1.) Get the counter passed in
-        Data data = getInputData();
-        int counter = data.getInt(KEY_GETCOUNTER, 0);
-      //  Log.d(TAG, "in doWork(): counter received = " + counter);
-
-        //  getCurrentLocation();               //will update the "result" field
-        //2.) Get the current location using the flpClient:
+        Log.d(TAG, "doWork");
+        //1.) Get the current location using the flpClient:
         doTask();
 
         try {
@@ -100,17 +89,7 @@ public class UpdateLocationWorker extends Worker {
             Log.d(TAG, "in doWork(): result = null, returns Result.failure()");
             return Result.failure();
         }
-
-        counter++;
-        result += "\n Output #" + counter;
-
-       // Log.d(TAG, "in doWork(): After doTask() result= " + result);
-        //set output:
-        Data output = new Data.Builder()
-                .putString(KEY_RESULTSTRING, result)
-                .putInt(KEY_SENDCOUNTER, counter)
-                .build();
-        return Result.success(output);
+        return Result.success();
     }
 
 

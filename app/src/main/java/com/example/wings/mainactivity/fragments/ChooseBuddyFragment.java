@@ -89,6 +89,7 @@ public class ChooseBuddyFragment extends Fragment {
      * Purpose;         Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
      */
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        Toast.makeText(getContext(), "Loading potential buddies...", Toast.LENGTH_LONG).show();
         //1.) Connect views:
         usersToDisplay = new ArrayList<>();
         distancesList = new ArrayList<>();

@@ -102,7 +102,7 @@
                         tools:src="@tools:sample/avatars" />
 
                     <TextView
-                        android:id="@+id/tvTitle"
+                        android:id="@+id/tvName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentTop="true"
@@ -119,7 +119,7 @@
                         android:id="@+id/tvTripStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/tvTitle"
+                        android:layout_below="@+id/tvName"
                         android:layout_centerHorizontal="true"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="-5dp"
@@ -129,43 +129,43 @@
                         android:textColor="@color/logo_teal"
                         android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/tvUserBuddyId"
-                        android:layout_width="50dp"
-                        android:layout_height="wrap_content"
-                        android:layout_alignEnd="@id/tvTripDestination"
-                        android:layout_alignParentStart="true"
-                        android:layout_alignParentTop="true"
-                        android:layout_marginStart="40dp"
-                        android:layout_marginTop="107dp"
-                        android:background="@drawable/et_rounded_corners_style"
-                        android:fontFamily="@font/lato"
-                        android:paddingLeft="5dp"
-                        android:paddingTop="5dp"
-                        android:paddingRight="5dp"
-                        android:paddingBottom="5dp"
-                        android:text="Your ID: LOLOLOLOLO"
-                        android:textAlignment="center"
-                        android:textColor="@color/gray"
-                        android:textSize="16sp" />
+            <TextView
+                android:id="@+id/tvUserBuddyId"
+                android:layout_width="210dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="107dp"
+                android:background="@drawable/et_rounded_corners_style"
+                android:fontFamily="@font/lato"
+                android:paddingLeft="5dp"
+                android:paddingTop="5dp"
+                android:paddingRight="5dp"
+                android:paddingBottom="5dp"
+                android:text="Your ID: LOLOLOLOLOL"
+                android:textAlignment="center"
+                android:textColor="@color/gray"
+                android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/tvTripDestination"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/tvUserBuddyId"
-                        android:layout_alignParentStart="true"
-                        android:layout_marginStart="40dp"
-                        android:layout_marginTop="10dp"
-                        android:background="@drawable/et_rounded_corners_style"
-                        android:fontFamily="@font/lato"
-                        android:paddingLeft="5dp"
-                        android:paddingTop="5dp"
-                        android:paddingRight="5dp"
-                        android:paddingBottom="5dp"
-                        android:text="Their ID: KOKOKOKOKO"
-                        android:textColor="@color/gray"
-                        android:textSize="16sp" />
+            <TextView
+                android:id="@+id/tvOtherBuddyId"
+                android:layout_width="210dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvUserBuddyId"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/et_rounded_corners_style"
+                android:fontFamily="@font/lato"
+                android:paddingLeft="5dp"
+                android:paddingTop="5dp"
+                android:paddingRight="5dp"
+                android:paddingBottom="5dp"
+                android:text="Their ID: KOKOKOKOKOK"
+                android:textAlignment="center"
+                android:textColor="@color/gray"
+                android:textSize="16sp" />
 
                     <EditText
                         android:id="@+id/etPin"
@@ -207,7 +207,7 @@
             android:id="@+id/buddyTripInfoOverlay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="380dp"
+            android:layout_marginTop="388dp"
             android:background="@color/gray_background"
             android:paddingBottom="10dp">
 
@@ -264,7 +264,7 @@
                 android:id="@+id/tvTripInfoOtherUserId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tvName"
+                android:layout_below="@id/tvTripInfoName"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="7dp"
                 android:layout_toRightOf="@id/ivTripInfoProfilePic"

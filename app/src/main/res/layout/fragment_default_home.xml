@@ -66,12 +66,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="357dp"
+            android:layout_marginTop="353dp"
             android:background="#121212"
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/tvTitle"
+                android:id="@+id/tvName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
@@ -81,14 +81,14 @@
                 android:text="Start Buddy Trip?"
                 android:textAlignment="center"
                 android:textColor="#FFFFFF"
-                android:textSize="30sp" />
+                android:textSize="27sp" />
 
 
             <TextView
                 android:id="@+id/tvDestination"
                 android:layout_width="300dp"
                 android:layout_height="32dp"
-                android:layout_below="@+id/tvTitle"
+                android:layout_below="@+id/tvName"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/most_opaque_rounded"

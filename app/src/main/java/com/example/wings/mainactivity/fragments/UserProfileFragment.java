@@ -122,7 +122,7 @@ public class UserProfileFragment extends Fragment {
 
         ParseUser current = ParseUser.getCurrentUser();
         profileName.setText(current.getString(User.KEY_FIRSTNAME));
-        profilePin.setText("Pin Code: " + Integer.toString(current.getInt(User.KEY_PIN)));
+        //profilePin.setText("Pin Code: " + Integer.toString(current.getInt(User.KEY_PIN)));
         profileEmail.setText(current.getString(User.KEY_EMAIL));
         profileRating.setRating((float) current.getInt(User.KEY_RATING));
 
