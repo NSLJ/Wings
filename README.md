@@ -1,8 +1,10 @@
 # Wings
-With Wings, You Never Walk Alone
+## With Wings, You Never Walk Alone
 
-## Progress so far (Updated 5/5/2021) - will be updated again soon!
-<img src="5-5-walkthrough.gif">
+## Demo: Walkthrough (Updated 5/29/2021)
+<img src="5-29-walkthrough.gif">
+**Notes:    The map settings on the right is shown to display how to imitate a user's current location! 
+<br>
 
 ## Table of Contents
 1. [Overview](#Overview)
@@ -38,19 +40,19 @@ With Wings, You Never Walk Alone.
 - [x] User can view their own profiles.
 - [x] User can view other profiles
 
-- [ ] User can search for other users.
 - [x] User is shown all possible buddies.
-- [ ] User can choose to be "able to be a Buddy" when not in need of a Buddy themself. 
 - [x] User can send, receive, and respond to multiple Buddy Requests.
 - [x] User can verify their Buddy when meeting in person. 
-- [ ] User can send Emergency Information quickly to Trusted Contacts.
-- [ ] User can confirm when they've safely arrived at their destination. (button to comfirm)
-- [ ] User can choose to be a Solo Walker, where they walk to their destination on their own but is still open to being paired with a Buddy. 
-*Need Google Map features*
+- [x] User can confirm when they've safely arrived at their destination. (button to comfirm)
 - [x] User can input their intended destination on a map. 
 - [x] Users are tracked while on a Buddy Trip.
+- [ ] User can search for other users.
+- [ ] User can send Emergency Information quickly to Trusted Contacts.
 
 **Optional Nice-to-have Stories**
+- [ ] Different modes of buddying up:
+   - [ ] User can choose to be "able to be a Buddy" when not in need of a Buddy themself. 
+   - [ ] User can choose to be a Solo Walker, where they walk to their destination on their own but is still open to being paired with a Buddy. 
 - [ ] User can add friends.
 - [ ] User can view friend list.
 - [ ] Buddies can rate each other after a Buddy Trip. 
