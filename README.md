@@ -12,7 +12,7 @@
 3. [Wireframes](#Wireframes)
 4. [Schema](#Schema)
 
-## Overview
+## Overview:
 ### Description
 Due to the recent rise of hate-crimes, the risk of public danger has significantly escalated for the general population. In addition to this, with the slow integration of in-person activities during the pandemic, countless college campuses are preparing for a large percentage of in-person courses. With both the growth of potential harm and actual public population (especially that of college campuses), Wings inspired to help provide a safer commmunity in these uncertain times.
 
@@ -20,7 +20,7 @@ Wings is an Android application that connects users to others when they feel uns
 
 Users who are connected are confirmed to be safe "walking buddies" for each other, and are intended to walk together to some common, agreed upon destination. However, Wings intends to offer multiple ways to provide trusted safety sources such as: immediate connection to the police, one button notifcation to emrgency contacts, routing to the nearest registered safe spaces. Several safety precautions are taken during this pairing of users. Wings constantly tracks both users and saves real time information in a real time database. Both users' emergency information are held and and may be contacted at any time, even without a pairing to another user. Users may also choose to leave their buddy at any time. 
 
-### App Evaluation
+### App Evaluation:
 - **Category:** Safety
 - **Mobile:** The app's function relies on the user's ability to move and be tracked. The app will utilize a user's location, display urgent notifications, and display relative map views. The programm cannot be used on immobile devices. 
 - **Story:** With the recent rise of hate-crimes, the app was developed to promote safety and community unity. The app can be useful to several demographics and provides a safer aspect of travel for all users. Because of its potential universal use, the app may be well responded to and spread easily. 
@@ -28,7 +28,7 @@ Users who are connected are confirmed to be safe "walking buddies" for each othe
 - **Habit:** The app is very habitual and can be used daily if need be. Users may feel unsafe at any time of the day, and therefore the app can be handy in all such situations. Users only comsume the app, there is currently no plans to allow user creativity.  
 - **Scope:** Wings will be pretty wide, as it will contain many safety feautures and location matching. There is a lot of room to expand to include various other features. Currently the stripped down version is still interesting to build but would not be very secure and safe to use. 
 
-## Product Spec
+## Product Specifications:
 
 ### 1. User Stories (Required and Optional)
 
@@ -113,7 +113,7 @@ Login
     * Profile
     * Map-View
 
-## Wireframes
+## Wireframes:
 <img src="Wireframes/Wings.png" width=800>
 
 ### [BONUS] Digital Wireframes & Mockups
