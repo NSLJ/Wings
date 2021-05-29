@@ -35,7 +35,7 @@
 
     <RatingBar
         android:id="@+id/rbOtherRatings"
-        style="@android:style/Widget.Holo.RatingBar.Indicator"
+        style="@android:style/Widget.Holo.Light.RatingBar.Indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/tvOtherName"

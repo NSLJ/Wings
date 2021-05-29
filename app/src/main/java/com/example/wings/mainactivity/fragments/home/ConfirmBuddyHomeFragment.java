@@ -163,7 +163,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
         ivAcceptRequest = view.findViewById(R.id.ivAccept);
         ivRejectRequest = view.findViewById(R.id.ivReject);
         btnBack = view.findViewById(R.id.btnBack);
-        tvTripDestination = view.findViewById(R.id.tvTripDestination);
+        tvTripDestination = view.findViewById(R.id.tvOtherBuddyId);
 
         btnBack.setOnClickListener(new View.OnClickListener() {         //TODO: I think we should keep a history of fragment passing in MainActivity to just go to some "previous" fragment instead
             @Override

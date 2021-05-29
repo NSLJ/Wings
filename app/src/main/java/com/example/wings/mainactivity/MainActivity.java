@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         fabBuddyRequests = (FloatingActionButton) findViewById(R.id.fabBuddyRequests);
         fabBuddyRequests.setVisibility(View.INVISIBLE);             //do by default so other fragments may choose to toggle if they choose, also has no handler by default!
 
+        Toast.makeText(this, "You may need to refresh the page!", Toast.LENGTH_LONG).show();
         //1.) Figure out which HomeFrag to start on:
         currentHomeFrag = findUserBuddyStatus();
         Log.d(TAG, "onCreate() - currentHomeFrag = " + currentHomeFrag);

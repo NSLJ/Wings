@@ -60,7 +60,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_toEndOf="@+id/ivSendRequestPic"
                 android:fontFamily="@font/satisfy"
-                android:paddingLeft="3dp"
+                android:paddingLeft="5dp"
                 android:paddingTop="3dp"
                 android:paddingRight="3dp"
                 android:paddingBottom="3dp"
@@ -115,7 +115,7 @@
                 android:id="@+id/btnSendRequest"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tvTripDestination"
+                android:layout_below="@+id/tvOtherBuddyId"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="13dp"
                 android:backgroundTint="@color/logo_teal"
@@ -148,7 +148,7 @@
                 tools:src="@drawable/cancel_button" />
 
             <TextView
-                android:id="@+id/tvTripDestination"
+                android:id="@+id/tvOtherBuddyId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tvSendRequestDistance"

@@ -260,7 +260,7 @@ public class BuddyHomeFragment extends Fragment {
         ivProfilePic = view.findViewById(R.id.ivProfilePic);
         tvName = view.findViewById(R.id.tvName);
         tvUserBuddyId = view.findViewById(R.id.tvUserBuddyId);
-        tvOtherBuddyId = view.findViewById(R.id.tvTripDestination);
+        tvOtherBuddyId = view.findViewById(R.id.tvOtherBuddyId);
         etPin = view.findViewById(R.id.etPin);
         btnConfirmBuddyMeetup = view.findViewById(R.id.btnConfirmBuddy);
         btnExitMeetUp = view.findViewById(R.id.btnExit);
