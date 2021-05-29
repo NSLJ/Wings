@@ -105,7 +105,7 @@ public class BuddyTripStatusFragment extends Fragment {
 
         btnBack = view.findViewById(R.id.btnBack);
         ivProfilePic = view.findViewById(R.id.ivProfilePic);
-        tvName = view.findViewById(R.id.tvTitle);
+        tvName = view.findViewById(R.id.tvName);
         tvTripStatus = view.findViewById(R.id.tvTripStatus);
         tvUserBuddyId = view.findViewById(R.id.tvUserBuddyId);
         tvOtherBuddyId = view.findViewById(R.id.tvTripDestination);
@@ -157,7 +157,7 @@ public class BuddyTripStatusFragment extends Fragment {
                 tvTripStatus.setText("Trip Status:  On meeting up");
             }
             else if(mode.equals(ON_TRIP_MODE)){
-                tvTripStatus.setText("Trip Status:  On trip walking to destination");
+                tvTripStatus.setText("Trip Status:  On trip together");
             }
             else{
                 tvTripStatus.setText("Error - mode not matching either key");

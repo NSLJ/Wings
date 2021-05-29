@@ -153,7 +153,9 @@ public class ProfileSetupFragment extends Fragment {
                 //Delete this once fragment is fully done!
                 saveProfileSetup();         //makes profileSetup = true and saves it!
                 mlistener.setRestrictScreen(false);
+                Toast.makeText(getContext(), "Refresh the page to see your current location!", Toast.LENGTH_LONG).show();
                 mlistener.toCurrentHomeFragment();
+
             }
         });
 
@@ -266,7 +268,6 @@ public class ProfileSetupFragment extends Fragment {
         user.saveInBackground(e -> {
             if(e==null){
                 //Save successfull
-                //TODO: There's a bug here where it can't find the context to show the toast, I have no idea why but it did it before on RegisterTwoFragment when it tries to create the user sooo
                // showLongTopToast("Profile set up sucessfully!");
             }else{
                 // Something went wrong while saving

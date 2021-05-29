@@ -81,8 +81,10 @@ public class DefaultHomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Log.d(TAG, "onCreateView()");
         View mainView = inflater.inflate(R.layout.fragment_default_home, container, false);
         setMapFragment();
+
         return mainView;
     }
 
@@ -136,7 +138,7 @@ public class DefaultHomeFragment extends Fragment {
                     if(possibleAddresses != null || possibleAddresses.size() == 0) {
                         Log.d(TAG, "btnSearch clicked: possibleAddresses is NOT null, possibleAddresses="+possibleAddresses.toString());
                         //1c.) Get + draw the route:
-                        queriedDestination = wingsMap.routeFromCurrentLocation(destinationTxt, true);
+                        queriedDestination = wingsMap.routeFromCurrentLocation(destinationTxt, true, "Your destination");
                         Log.d(TAG, "queriedDestination successfully initialized");
 
                         //2.) Display the confirmDestinationOverlay:

@@ -222,7 +222,7 @@ public class HomeFragment extends Fragment{
                 destination = new LatLng(destinationGeoPoint.getLatitude(), destinationGeoPoint.getLongitude());
             }
 
-            wingsMap.routeFromCurrentLocation(destination, true);
+            wingsMap.routeFromCurrentLocation(destination, true, "Trip destination");
             /*if(wingsMap.isNearEnough()){
                 if(meetUpInstance != null) {
                     makeConfirmBuddyDialog();
@@ -308,7 +308,6 @@ public class HomeFragment extends Fragment{
         });
     }
 
-    //TODO:  I have a feeling this is going to be buggy in the future
     private void resetUser(ParseUser userToErase) {
         Log.d(TAG, "in resetUser()");
         //1.) Make all buttons stuff invisible:
@@ -383,7 +382,7 @@ public class HomeFragment extends Fragment{
                     //3.) Save "destination" field to intendedDestination + route to it
                     destination = new LatLng(intendedDestination.getLatitude(), intendedDestination.getLongitude());
 
-                    wingsMap.routeFromCurrentLocation(destination, true);
+                    //wingsMap.routeFromCurrentLocation(destination, true);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -436,7 +435,7 @@ public class HomeFragment extends Fragment{
             Toast.makeText(getContext(), "You didn't enter anything!", Toast.LENGTH_SHORT).show();
         }
         else {
-            destination = wingsMap.routeFromCurrentLocation(destinationTxt, true);
+        //    destination = wingsMap.routeFromCurrentLocation(destinationTxt, true);
         }
     }
 }
