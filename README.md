@@ -8,17 +8,17 @@
 
 ## Table of Contents
 1. [Overview](#Overview)
-1. [Product Spec](#Product-Spec)
-1. [Wireframes](#Wireframes)
-2. [Schema](#Schema)
+2. [Product Spec](#Product-Spec)
+3. [Wireframes](#Wireframes)
+4. [Schema](#Schema)
 
 ## Overview
 ### Description
-Since the rise of hate-crimes, it is now more dangerous to be in public alone. With the goal to create a safer community, we developed Wings: an app that connects users to others when they feel unsafe in their current location. 
+Due to the recent rise of hate-crimes, the risk of public danger has significantly escalated for the general population. In addition to this, with the slow integration of in-person activities during the pandemic, countless college campuses are preparing for a large percentage of in-person courses. With both the growth of potential harm and actual public population (especially that of college campuses), Wings inspired to help provide a safer commmunity in these uncertain times.
 
-Connected users can be confirmed to have a safe "walking buddy" to get to safer common destinations. The app also includes other safety features such as: references to near registered "safe spots", warnings of areas with recent reported suspicious activity, and emergency functions to call campus police. 
+Wings is an Android application that connects users to others when they feel unsafe in their current conditions. 
 
-With Wings, You Never Walk Alone. 
+Users who are connected are confirmed to be safe "walking buddies" for each other, and are intended to walk together to some common, agreed upon destination. However, Wings intends to offer multiple ways to provide trusted safety sources such as: immediate connection to the police, one button notifcation to emrgency contacts, routing to the nearest registered safe spaces. Several safety precautions are taken during this pairing of users. Wings constantly tracks both users and saves real time information in a real time database. Both users' emergency information are held and and may be contacted at any time, even without a pairing to another user. Users may also choose to leave their buddy at any time. 
 
 ### App Evaluation
 - **Category:** Safety
