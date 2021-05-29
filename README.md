@@ -2,7 +2,7 @@
 ## With Wings, You Never Walk Alone
 
 ## Demo: Walkthrough (Updated 5/29/2021)
-<img src="5-29-walkthrough.gif">
+<img src="History of walkthroughs/5-29-walkthrough.gif">
 **Notes:    The map settings on the right is shown to display how to imitate a user's current location! 
 <br>
 
