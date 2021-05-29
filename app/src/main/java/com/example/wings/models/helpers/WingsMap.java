@@ -212,39 +212,43 @@ public class WingsMap {
 
     //Purpose:          Automatically finds draws the first route from given start location and destination, initializes the allRoutes field. animateMap = whether or not to move the map once done drawing route
     public void route(LatLng startLocation, LatLng destination, boolean animateMap){
-        Log.d(TAG, "route()");
+        Log.d(TAG, "route(): startLocation given = " + startLocation.toString() + "  destination given:  " + destination.toString());
 
-        //1.) If there is already a route drawn, clear the map before re-drawing on it:
-        if(routeDrawn){
-            removeRouteDrawn();
-            clearAllRoutes();
+        if(startLocation.latitude != 0 && startLocation.longitude != 0 && destination.latitude != 0 && destination.longitude != 0) {
+            //1.) If there is already a route drawn, clear the map before re-drawing on it:
+            if (routeDrawn) {
+                removeRouteDrawn();
+                clearAllRoutes();
+            }
+            this.startLocation = startLocation;
+            this.destination = destination;
+
+            //Make the api call and handle the response --> if success --> use the DataParser class to parse all routes into WingsRoute objects
+            client.makeDirectionRequest(startLocation, destination, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Headers headers, JSON json) {
+                    Log.d(TAG, "route() - makeDirectionRequest() - success!");
+                    JSONObject jsonObject = json.jsonObject;
+
+                    DataParser parser = new DataParser();           //DataParser does the actual parsing of the JSONObject
+                    List<WingsRoute> result = parser.parse(jsonObject);
+                    if (result == null || result.size() == 0) {
+                        Toast.makeText(context, "No directions available!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        setAllRoutes(result);                           //set allRoutes field = result
+                        drawRoute(0, animateMap);                       //draw the first route
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                    Log.d(TAG, "route(): making DirectionRequest failed, response=" + response);
+                }
+            });
         }
-        this.startLocation = startLocation;
-        this.destination = destination;
-
-        //Make the api call and handle the response --> if success --> use the DataParser class to parse all routes into WingsRoute objects
-        client.makeDirectionRequest(startLocation, destination, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Headers headers, JSON json) {
-                Log.d(TAG, "route() - makeDirectionRequest() - success!");
-                JSONObject jsonObject = json.jsonObject;
-
-                DataParser parser = new DataParser();           //DataParser does the actual parsing of the JSONObject
-                List<WingsRoute> result = parser.parse(jsonObject);
-                if(result == null){
-                    Toast.makeText(context, "No directions available!", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    setAllRoutes(result);                           //set allRoutes field = result
-                    drawRoute(0, animateMap);                       //draw the first route
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                Log.d(TAG, "route(): making DirectionRequest failed, response=" + response);
-            }
-        });
+        else{
+            Log.d(TAG, "route():    startLocation or destination were 0");
+        }
     }
 
     //Purpose:      removes the route drawn, but technically route is still tracked
@@ -338,8 +342,9 @@ public class WingsMap {
         if (location != null) {
             LatLng receivedLocation = new LatLng(location.getLatitude(), location.getLongitude());
             Log.d(TAG, "onLocationUpdated():  receivedLocation = " + receivedLocation.toString());
+
             //If we are not in the same spot, there is a destination, and we ARE routing from our current location --> re-route
-            if((!currentLocation.equals(receivedLocation)) && destination != null && startLocation.equals(currentLocation)){
+            if((!currentLocation.equals(receivedLocation)) && destination != null && (destination.latitude != 0 && destination.longitude != 0) && startLocation.equals(currentLocation)){
                 Log.d(TAG, "onLocationUpdated(): currentLocation != to location updated --> re-drawing route");
                 currentLocation = receivedLocation;
                 ParseGeoPoint curLoc = new ParseGeoPoint(currentLocation.latitude, currentLocation.longitude);
@@ -499,54 +504,7 @@ public class WingsMap {
     public double getDistanceFromCurLocation(){
         return distanceFromCurLocation;
     }
-
-    //Saving just in case I need it still:
-    /*public void getAllRoutes(LatLng startLocation, LatLng destination){
-        //Package data to send the counter
-        double[] locations = new double[]{startLocation.latitude, startLocation.longitude, destination.latitude, destination.longitude};
-        Data data = new Data.Builder()
-                .putDoubleArray(KEY_SEND_LOCATIONS, locations)       //send the counter
-                .build();
-
-        //Create the request
-        OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(UpdateLocationWorker.class)
-                .setInputData(data)         //send data
-                //.setInitialDelay(5, TimeUnit.SECONDS)      //wait 5 seconds before doing it         //TODO: don't hardcode, make this time frame a constant
-                .build();
-
-        //Queue up the request
-        WorkManager.getInstance(context)
-                .enqueueUniqueWork(
-                        "sendDataWorker request",
-                        ExistingWorkPolicy.REPLACE,         //says, if it does repeat, replace the new request with the old one
-                        (OneTimeWorkRequest) request
-                );
-
-        //Listen to information from the request
-        WorkManager.getInstance(context).getWorkInfoByIdLiveData(request.getId())      //returns a live data
-                .observe(lifecycleOwner, new Observer<WorkInfo>() {
-
-                    //called every time WorkInfo is changed
-                    public void onChanged(@Nullable WorkInfo workInfo) {
-
-                        //If workInfo is there and it is succeeded --> update the text
-                        if (workInfo != null) {
-                            //Check if finished:
-                            if(workInfo.getState().isFinished()){
-                                if(workInfo.getState() == WorkInfo.State.SUCCEEDED){
-                                    //we can use the allRoutes field now!
-                                    drawRoute(0);       //just draw the first route for now
-                                }
-                                else {
-                                    Log.d(TAG, "Request didn't succeed, status=" + workInfo.getState().name());
-                                }
-                            }
-                        }
-                    }
-                });
-
+    public void setDestination(LatLng newDestination){
+        destination = newDestination;
     }
-
-*/
-
 }

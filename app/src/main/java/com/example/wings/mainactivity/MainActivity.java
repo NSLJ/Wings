@@ -274,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         //Create the request
         OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(UpdateLocationWorker.class)
                 .setInputData(data)         //send data
-                .setInitialDelay(2, TimeUnit.MINUTES)      //wait 5 seconds before doing it         //TODO: don't hardcode, make this time frame a constant
+                .setInitialDelay(5, TimeUnit.SECONDS)      //wait 5 seconds before doing it         //TODO: don't hardcode, make this time frame a constant
                 .build();
 
         //Queue up the request
@@ -353,21 +353,21 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                             switch (item.getItemId()) {
                                 case R.id.action_search_friends:
                                     fragment = new SearchUserFragment();
+                                    fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, fragment).commit();
                                     break;
 
                                 case R.id.action_home:
                                     fragment = getCorrespondingFrag(currentHomeFrag);
+                                    fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, fragment).addToBackStack(null).commit();
                                     break;
 
                                 case R.id.action_profile:
                                     fragment = new UserProfileFragment();
+                                    fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, fragment).commit();
                                     break;
                                 default:
                                     break;
                             }
-
-                            //Raise the fragment:
-                            fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, fragment).commit();
                             return true;
                         }
                     });
@@ -461,7 +461,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     //Purpose:          navigates to whatever was the last home fragment (= whatever HomeFrag that corresponds to previousHomeFragment class field)
     public void toCurrentHomeFragment() {
         Fragment fragment = getCorrespondingFrag(currentHomeFrag);
-        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, fragment).commit();
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, fragment).addToBackStack(null).commit();
     }
 
     @Override
@@ -593,6 +593,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
             return new DefaultHomeFragment();
         }
         else if(fragLabel.equals(BUDDY_HOME_FIND_MODE)){
+            Log.d(TAG, "getCorrespondingFrag(): currUser = " + currUser.getObjectId());
             sendData.setMode(BuddyHomeFragment.KEY_FIND_BUDDY_MODE);
             bundle.putParcelable(BuddyHomeFragment.KEY_DATA, Parcels.wrap(sendData));
             frag.setArguments(bundle);

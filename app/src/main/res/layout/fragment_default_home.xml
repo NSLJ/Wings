@@ -66,7 +66,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="357dp"
+            android:layout_marginTop="353dp"
             android:background="#121212"
             android:orientation="horizontal">
 
@@ -81,7 +81,7 @@
                 android:text="Start Buddy Trip?"
                 android:textAlignment="center"
                 android:textColor="#FFFFFF"
-                android:textSize="30sp" />
+                android:textSize="27sp" />
 
 
             <TextView

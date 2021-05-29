@@ -228,7 +228,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
                 Buddy userBuddyInstance = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
                 userBuddyInstance.fetchIfNeeded();
                 WingsGeoPoint currUserDestination = userBuddyInstance.getDestination();
-                wingsMap.setMarker(new LatLng(currUserDestination.getLatitude(), currUserDestination.getLongitude()), BitmapDescriptorFactory.HUE_BLUE, true, "Your Destination");
+                //wingsMap.setMarker(new LatLng(currUserDestination.getLatitude(), currUserDestination.getLongitude()), BitmapDescriptorFactory.HUE_BLUE, true, "Your Destination");
             } catch (ParseException e) {
                 Log.d(TAG, "onViewCreated(): error fetching buddy instance");
                 e.printStackTrace();

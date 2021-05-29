@@ -297,6 +297,7 @@ public class BuddyHomeFragment extends Fragment {
         fabCancelBuddy.setOnClickListener(new View.OnClickListener() {              //TODO: figure out how to reset the otherUser from here + deleting all relevant ParseObjects (e.g. if they were on BuddyMeetUp vs. BuddyTrip)
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "cancelBuddyBtn onClick invoked!");
                 resetUser(currUser);
                 listener.setBuddyRequestBttn(false);
                 listener.toDefaultHomeFragment();
@@ -342,13 +343,15 @@ public class BuddyHomeFragment extends Fragment {
 
     //Purpose:  In charge of setting up necessary handlers in Find buddy mode:
     private void setFindBuddyMode(){
-        Log.d(TAG, "setFindBuddyMode()");
+        currUser = ParseUser.getCurrentUser();
+        Log.d(TAG, "setFindBuddyMode(): currUser = " + currUser.getObjectId());
         needBuddyButtonOverlay.setVisibility(View.VISIBLE);
 
         //1.) Map the user's intended destination --> obtain + save it + draw route:
         Buddy currBuddy = (Buddy) currUser.getParseObject(User.KEY_BUDDY);
         try {
             currBuddy.fetchIfNeeded();
+            Log.d(TAG, "setFindBuddyMode(): currBuddy = " + currBuddy.getObjectId());
             WingsGeoPoint intendedDestination = currBuddy.getDestination();
 
             //2.) Save "destination" field to intendedDestination + route to it
@@ -360,7 +363,6 @@ public class BuddyHomeFragment extends Fragment {
         }
 
         //2.) Set onClickListeners:
-
         //2a.) Choose Buddy bttn = onClick --> go to ChooseBuddyFragment to see list of potential buddies"
         fabGoChooseBuddyFrag.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -454,7 +456,7 @@ public class BuddyHomeFragment extends Fragment {
         btnConfirmArrival.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               /* String attemptedPin = etConfirmArrivalPin.getText().toString();
+                String attemptedPin = etConfirmArrivalPin.getText().toString();
                 Log.d(TAG, "setMeetBuddyMode(): attemptedPin = " + attemptedPin);
                 if(attemptedPin.length() != 4){
                         Toast.makeText(getContext(), "You did not enter your PIN # for confirmation!", Toast.LENGTH_LONG).show();
@@ -465,13 +467,13 @@ public class BuddyHomeFragment extends Fragment {
                     Log.d(TAG, "setMeetBuddyMode(): correct pin = " + correctPin);
 
                     if(attemptedPin.equals(correctPin)){
-                        Toast.makeText(getContext(), "You confirmed your safe arrival!", Toast.LENGTH_LONG).show();*/
+                        Toast.makeText(getContext(), "You confirmed your safe arrival!", Toast.LENGTH_LONG).show();
                         onConfirmArrival();
-               /*     }
+                    }
                     else{   //pin entered was not correct
                         Toast.makeText(getContext(), "The pin entered is incorrect!", Toast.LENGTH_LONG).show();
                     }
-                }*/
+                }
             }
         });
 
@@ -546,6 +548,9 @@ public class BuddyHomeFragment extends Fragment {
             BuddyTrip buddyTrip = new BuddyTrip(senderBuddy, receiverBuddy, currLocation, meetUpInstance.getDestination());
             buddyTrip.save();
 
+            updateBuddyForTrip(curBuddyInstance, buddyTrip);
+            updateBuddyForTrip(otherBuddyInstance, buddyTrip);
+
             ParcelableObject sendData = new ParcelableObject();
             sendData.setMode(KEY_ON_TRIP_MODE);
             sendData.setBuddyTrip(buddyTrip);
@@ -558,6 +563,16 @@ public class BuddyHomeFragment extends Fragment {
             e.printStackTrace();
         }
     }
+    public static void updateBuddyForTrip(Buddy buddyToUpdate, BuddyTrip buddyTrip){
+        try {
+            buddyToUpdate.setBuddyTrip(buddyTrip);
+            buddyToUpdate.setOnBuddyTrip(true);
+            buddyToUpdate.setOnMeetup(false);
+            buddyToUpdate.save();
+        }catch(ParseException e){
+            Log.d(TAG, "updatedBuddyFroTrip(): error="+e.getLocalizedMessage());
+        }
+    }
 
     public static void enableMeetUpOverlay(){
         meetUpOverlayEnabled = true;
@@ -567,7 +582,7 @@ public class BuddyHomeFragment extends Fragment {
         btnConfirmBuddyMeetup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*if(etPin.getText().toString().length() != 4){
+                if(etPin.getText().toString().length() != 4){
                     Toast.makeText(context, "You did not enter your PIN # for confirmation!", Toast.LENGTH_LONG).show();
                 }
                 else{
@@ -582,11 +597,11 @@ public class BuddyHomeFragment extends Fragment {
                     if(attemptedPin.equals(correctPin)){            //TODO: Commenting out for now --> checking strings won't work for some reason --> debugging --> correctPin = "####" and attemptedPin = #### ?
                         //Create a BuddyTrip:*/
                         onConfirmMeetUp();
-                  /*  }
+                    }
                     else{   //pin entered was not correct
                         Toast.makeText(context, "The pin entered is incorrect!", Toast.LENGTH_LONG).show();
                     }
-                }*/
+                }
             }
         });
     }
@@ -647,7 +662,6 @@ public class BuddyHomeFragment extends Fragment {
             tvConfirmArrivalTripDestination.setText("Trip Destination:  ("+ Math.round(tripDestination.getLatitude()*1000.0)/1000.0 +", " + Math.round(tripDestination.getLongitude()*1000.0)/1000.0+")");
             wingsMap.routeFromCurrentLocation(new LatLng(tripDestination.getLatitude(), tripDestination.getLongitude()), true);
 
-            //TODO: constantly show the otherBuddy's current location through moving marker
             setOtherUserLocationMarker();
         }
     }
@@ -657,7 +671,7 @@ public class BuddyHomeFragment extends Fragment {
         WingsGeoPoint otherUserCurrLocation = (WingsGeoPoint) otherUser.getParseObject(User.KEY_CURRENTLOCATION);
         try {
             otherUserCurrLocation.fetchIfNeeded();
-            wingsMap.setMarker(new LatLng(otherUserCurrLocation.getLatitude(), otherUserCurrLocation.getLongitude()), BitmapDescriptorFactory.HUE_BLUE, true, "Your Buddy");
+            wingsMap.setMarker(new LatLng(otherUserCurrLocation.getLatitude(), otherUserCurrLocation.getLongitude()), BitmapDescriptorFactory.HUE_ORANGE, true, "Your Buddy's current location");
         } catch (ParseException e) {
             e.printStackTrace();
         }
