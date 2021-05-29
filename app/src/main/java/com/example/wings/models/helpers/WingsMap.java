@@ -52,6 +52,13 @@ import okhttp3.Headers;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
+/**
+ * Purpose:             Model class that aids GREATLY in creating a GoogleMap, displaying it on the Context, and invoking any necessary functions corresponding to it. E.g. routing, drawing routes, updating Parse datavase
+ *                      Utilizes WingsRoute to encapsulate all info relevant to a drawn route.
+ *
+ * Classes associated w/:       WingsRoute.java, WingsClient.java, DataParser.java, WingsGeoPoint.java
+ *
+ */
 public class WingsMap {
     private static final String TAG = "WingsMap";
     private static final long UPDATE_INTERVAL = 5000;       //Can change later so other classes can change it

@@ -26,8 +26,11 @@ import org.parceler.Parcels;
 
 /**
  * StartActivity.java
- * Purpose:         Displays the appropriate fragments that executes the beginning functions of the app. Essentially is a container to swap between each fragment.
+ * Purpose:         Displays the appropriate fragments that executes the beginning functions of the app(registering and logging in). Essentially is a container to swap between each fragment.
  *
+ * Classes associated w/:           all start activity fragments!
+ *
+ * Layout file:         activity_start.xml
  */
 public class StartActivity extends AppCompatActivity implements SAFragmentsListener {
     public static final String KEY_SEND_USER = "user";

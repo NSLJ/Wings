@@ -18,7 +18,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.CountDownLatch;
 
-//To make API calls separately on async task
+/**
+ * Purpose:                 Makes the Directions API network request given the needed parameters!
+ *
+ * Used by:         WingsMap.java (in model.helpers package)
+ */
 public class WingsClient {
     private static final String TAG = "WingsClient";
     private static final String BASE_URL = "https://maps.googleapis.com/maps/api/directions/";

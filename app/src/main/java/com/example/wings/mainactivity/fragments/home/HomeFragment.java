@@ -41,9 +41,8 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 /**
  * HomeFragment.java
- * Purpose:         This displays the home screen of the app! Depending on who (what Context) called this, the layout and functionality will be different!
- *
- *
+ * Purpose:         This is not currently used! Will be implemented later to incorporate inheritance.
+ *                  This used to display the home screen! However, too many versions of this home screen was needed --> separated into : DefaultHomeFrag, BuddyHomeFrag, ConfirmBuddyFrag
  */
 
 public class HomeFragment extends Fragment{

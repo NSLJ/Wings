@@ -39,7 +39,11 @@ import java.util.List;
 /**
  * DefaultHomeFragment.java
  * Purpose:         This is the HomeFragment that is called when the user is NOT a Buddy yet and may enter a destination in the search bar to become one! Map functionalities: mapping current location, drawing route from current location to queried destination.
- *                  In charge of confirming a destination to start being a Buddy! --> navigates to BuddyHomeFragment to display the buddy aquiring buttons needed.
+ *                  In charge of confirming a destination to start being a Buddy! --> navigates to BuddyHomeFragment to display the buddy requesting buttons needed.
+ *
+ *                  The simplest out of the three HomeFrags --> only 1 overlay
+ *
+ * Layout file:     fragment_default_home.xml
  */
 public class DefaultHomeFragment extends Fragment {
     private static final String TAG = "DefaultHomeFragment";

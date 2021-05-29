@@ -48,8 +48,10 @@ import org.parceler.Parcels;
 
 /**
  * BuddyHomeFragment.java
- * Purpose:             (Needs to be edited) This HomeFragment is used once the user has confirmed being a Buddy (i.e. wants to start a BuddyTrip). There are three different modes: (1) Finding a Buddy, (2) Meeting a Buddy, (3) on a BuddyTro[.
+ * Purpose:             This HomeFragment is used once the user has confirmed being a Buddy (i.e. wants to start a BuddyTrip). There are three different modes: (1) Finding a Buddy, (2) Meeting a Buddy, (3) on a BuddyTrip.
  *                      Certain Views and functionalities will be hidden depending on the mode. Due to these different modes, the Context calling this fragment MUST specify which mode is desired to display.
+ *
+ * Layout file:     fragment_buddy_home.xml             NOTE:  There are 4 different labeled overlays in this file, one is toggled with visibility at a time depending on the received mode!
  */
 public class BuddyHomeFragment extends Fragment {
     private static final String TAG = "BuddyHomeFragment";
