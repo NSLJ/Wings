@@ -34,11 +34,11 @@ import java.util.List;
 
 /**
  * ChooseBuddyFragment.java
- * Purpose:         This displays all possible buddies for the user to choose one they'd like!
+ * Purpose:         This is when the user needs to find buddies to request --> queries and displays all possible buddies. Displays each buddy with a RecyclerView.
  *
- * Hello Coders! Here is a good sample of how the interface works with the Fragments! Please read through the documentation and let me know if you have any questions or comments on how we could be
- * implementing this better!
+ * Classes associated w/:  ChooseBuddyAdapter.java, relevant model classes e.g. Buddy, WingsGeoPoint
  *
+ * Layout files:        fragment_choose_buddy.xml,  item_choose_buddy
  */
 public class ChooseBuddyFragment extends Fragment {
     private static final String TAG = "ChooseBuddyFragment";

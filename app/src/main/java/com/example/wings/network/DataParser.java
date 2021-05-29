@@ -15,6 +15,8 @@ import java.util.List;
 
 /**
  * Purpose:             In charge of parsing the JSONObject returned by the network call to Google Directions API. Finds all of the possible routes and saves them as a List of WingsRoute objects
+ *
+ * Classes associated w/:        WingsMap.java (in model.helpers package), WingsClient.java (network package)
  */
 public class DataParser {
     private static final String TAG = "DataParser";

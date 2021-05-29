@@ -50,6 +50,8 @@ import java.util.concurrent.CountDownLatch;
  * ConfirmBuddyHomeFragment.java
  * Purpose:                 This HomeFragment is used when the user must either respond to or send a BuddyRequest. Unlike other HomeFragments, this one is solely used to display BuddyRequest information and obtain a response back.
  *                          This HomeFragment has two modes: sending BuddyRequest or answering BuddyRequest. Due to the similarities in the types of funcitons, only one layout file is used and certain views' visibility are toggled.
+ *
+ * Layout file:     fragment_confirm_buddy_home.xml
  */
 public class ConfirmBuddyHomeFragment extends Fragment {
     private static final String TAG = "ConfirmBuddyHomeFragment";

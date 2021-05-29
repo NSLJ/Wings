@@ -32,9 +32,9 @@ import org.parceler.Parcels;
 /**
  * BuddyTripStatusFragment.java
  * Purpose:                         Invoked when the floating Buddy button (maintained by MainActivity) is clicked AND user is either on a BuddyMeetUp or BuddyTrip. This fragment displays important BuddyMeetUp/BuddyTrip details
- *                                  such as the other Buddy's information, destination, etc
+ *                                  such as the other Buddy's information, destination, etc. Also displays the steps of an entire buddy trip and meetup. Does no kind of functionality, simply disiplays information
  *
- *
+ *Layout file:      fragment_buddy_trip_status.xml
  * */
 //TODO: make the layout scrollable, and add a cancel button to cancel the trip
 public class BuddyTripStatusFragment extends Fragment {

@@ -15,9 +15,8 @@ import org.parceler.Parcel;
 import java.io.File;
 import java.util.List;
 
-//Purpose:          This was used specifically to encapsulate ParseObjects/Users in order to make it parcelable and send them from Fragment to Fragment.
-//                  However, I totally forgot about doing this, therefore most Fragments pass objectIds to corresponding ParseObjects --> every Fragment would have to query for information they need.
-//TODO: Make app frame more robust by  implementing this to encapsulate ParseObjects in a Parcelable object
+//Purpose:          This is used specifically to encapsulate ParseObjects/Users in order to make it parcelable and send them from Fragment to Fragment. Enables just one uniform way of sending data!
+
 @Parcel
 public class ParcelableObject {
     User user;

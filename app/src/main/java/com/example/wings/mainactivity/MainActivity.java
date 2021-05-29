@@ -62,8 +62,17 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * MainActivity.java
- * Purpose:         Displays the appropriate fragments that executes the main functions of the app. Essentially is a container to swap between each fragment.
+ * Purpose:         Displays the appropriate fragments that executes the main functions of the app. Essentially is a container to swap between each fragment. Will have to do misc. tasks that fragments cannot do itself
+ *                  e.g. constant floating buddy button + onClick listener. Because this class is the main container for the whole app --> talks to all Worker classes, Fragments, and some models. Many constants are necessary
+ *                  to sort between each.
  *
+ * Classes associated w/:
+ *      Workers:        CheckProximityWorker (checks if user is close to a certain location), UpdateLocationWorker(updates current location to Parse database)
+ *      All fragments:
+ *          HomeFragments:          fragments that are responsible for s specific version of the home page (e.g. onMeetUp, onBuddyTrip, onFindingBuddy,etc)
+ *          Misc.       :           ...all others
+ *
+ * Layout file: activity_main.xml
  */
 public class MainActivity extends AppCompatActivity implements MAFragmentsListener{
     private static final String TAG = "MainActivity";
