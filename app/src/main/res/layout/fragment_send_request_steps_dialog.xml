@@ -24,7 +24,7 @@
             android:textSize="28sp" />
 
         <TextView
-            android:id="@+id/tvDestination"
+            android:id="@+id/tvNotify"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvHeading"
@@ -40,10 +40,10 @@
             android:textSize="18sp" />
 
         <Button
-            android:id="@+id/btnOk"
+            android:id="@+id/btnConfirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/tvDestination"
+            android:layout_below="@+id/tvNotify"
             android:layout_alignParentStart="false"
             android:layout_alignParentEnd="false"
             android:layout_centerHorizontal="true"

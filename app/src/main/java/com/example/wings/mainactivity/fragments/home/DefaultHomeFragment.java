@@ -19,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wings.R;
-import com.example.wings.mainactivity.fragments.home.BuddyHomeFragment;
 import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.helpers.WingsMap;
 import com.example.wings.mainactivity.MAFragmentsListener;
@@ -32,7 +31,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.parse.ParseException;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.List;
 
@@ -117,7 +115,7 @@ public class DefaultHomeFragment extends Fragment {
         btnSearch = view.findViewById(R.id.btnSearch);
         etSearchBar = view.findViewById(R.id.etSearchBar);
         confirmDestinationOverlay = view.findViewById(R.id.chooseDestinationOverlay);
-        displayDestination = view.findViewById(R.id.tvDestination);
+        displayDestination = view.findViewById(R.id.tvNotify);
         ivAcceptBtn = view.findViewById(R.id.ivAccept);
         ivRejectBtn = view.findViewById(R.id.ivReject);
 

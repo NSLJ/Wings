@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.wings.mainactivity.fragments.BuddyTripStatusFragment;
+import com.example.wings.mainactivity.fragments.dialogs.SafetyOptionsDialog;
 import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.inParseServer.BuddyMeetUp;
 import com.example.wings.models.inParseServer.BuddyTrip;
@@ -74,7 +75,7 @@ import java.util.concurrent.TimeUnit;
  *
  * Layout file: activity_main.xml
  */
-public class MainActivity extends AppCompatActivity implements MAFragmentsListener{
+public class MainActivity extends AppCompatActivity implements MAFragmentsListener, SafetyOptionsDialog.SafetyToolkitListener {
     private static final String TAG = "MainActivity";
     private static final String CHECK_PROXIMITY_WORKER_TAG = "checkProximityWorkers";
 
@@ -334,7 +335,10 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
             Option 1: User feels unsafe and suspicious --> notify all Trusted Contacts
             Option 2: Immediate danger --> notify all Trusted Contacts + dial the police
          */
-        Toast.makeText(this, "You pushed the Safety Toolkit button! Sorry, it's not implemented yet!", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "You pushed the Safety Toolkit button! Sorry, it's not implemented yet!", Toast.LENGTH_SHORT).show();
+        SafetyOptionsDialog dialog = SafetyOptionsDialog.newInstance();
+        dialog.show(fragmentManager, "SafetyOptionsDialog");
+        //Handles the response through overriden interface methods onNotify and onEmergency()
     }
 
     /**
@@ -779,4 +783,14 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         toCurrentHomeFragment();
     }
 
+    //-----------------Overriding SafetyToolkitListener methods ---------------------------------------
+    @Override
+    public void onNotifyContacts() {
+        Toast.makeText(this, "I am notifying all your contacts", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onEmergency() {
+        Toast.makeText(this, "I am doing absolute emergency functions", Toast.LENGTH_SHORT).show();
+    }
 }
