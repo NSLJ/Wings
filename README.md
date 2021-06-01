@@ -46,7 +46,7 @@ Users who are connected are confirmed to be safe "walking buddies" for each othe
 - [x] User can confirm when they've safely arrived at their destination. (button to comfirm)
 - [x] User can input their intended destination on a map. 
 - [x] Users are tracked while on a Buddy Trip.
-- [ ] User can search for other users.
+- [x] User can search for other users.
 - [ ] User can send Emergency Information quickly to Trusted Contacts.
 
 **Optional Nice-to-have Stories**
