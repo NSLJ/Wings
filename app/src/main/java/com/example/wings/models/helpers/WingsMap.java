@@ -63,8 +63,6 @@ public class WingsMap {
     private static final String TAG = "WingsMap";
     private static final long UPDATE_INTERVAL = 5000;       //Can change later so other classes can change it
     private static final long FASTEST_INTERVAL = 3000;
-    private static final String KEY_SEND_LOCATIONS = "wingsMap_locations";
-    private static final String KEY_RESULT = "getRoutesWorker_result";
 
     CountDownLatch latch;       //TODO: need to delete instances
 
@@ -74,7 +72,6 @@ public class WingsMap {
     private LifecycleOwner lifecycleOwner;
 
     //Fields:
-    private SupportMapFragment mapFragment;
     private GoogleMap map;
     private UiSettings mapUI;
 
