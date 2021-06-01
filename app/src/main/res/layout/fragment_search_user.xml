@@ -8,13 +8,25 @@
     android:orientation="vertical"
     tools:context=".mainactivity.fragments.SearchUserFragment">
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/satisfy"
+        android:text="Search for Friends"
+        android:textAlignment="center"
+        android:textColor="@color/logo_teal"
+        android:textSize="34sp" />
+
     <SearchView
         android:id="@+id/searchbarFriends"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:autofillHints="Friends"
         android:background="@drawable/btn_rounded_corners_style"
-        android:inputType="textWebEditText" />
+        android:clickable="true"
+        android:contextClickable="true"
+        android:inputType="textWebEditText|text" />
 
 
     <androidx.recyclerview.widget.RecyclerView

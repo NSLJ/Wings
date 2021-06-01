@@ -14,39 +14,39 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.wings.R;
 
-import com.example.wings.adapters.UserAdapter;
+import com.example.wings.adapters.SearchUserAdapter;
 import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.User;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-//All auto-filled stuff, just follow the samples I left behind!
+/**
+ * Purpose:         Allows for the current user to search for other user's and look at their profiles! This way, the user can choose to add friends!
+ */
 
 public class SearchUserFragment extends Fragment {
+    public static final String TAG = "SearchUsersFragment";
 
     private MAFragmentsListener listener;
-
-    public static final String TAG = "SearchUsersFragment";
     private RecyclerView rvUsers;
     //make this a parseUser adapter
-    protected UserAdapter adapter;
-    protected List<User> users;
-    protected SwipeRefreshLayout swipeContainer;
-    private TextView tester, tester2, tester3;
+    protected SearchUserAdapter adapter;
+    protected List<ParseUser> users;
+    SearchView searchBar;
 
-
-    public SearchUserFragment() {
-        // Required empty public constructor
-    }
+    public SearchUserFragment() {}
 
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -70,52 +70,61 @@ public class SearchUserFragment extends Fragment {
 
         rvUsers = view.findViewById(R.id.rvsearchforfriends);
         users = new ArrayList<>();
-        adapter = new UserAdapter(getContext(), users);
-
+        searchBar = view.findViewById(R.id.searchbarFriends);
+        adapter = new SearchUserAdapter(getContext(), users);
 
         rvUsers.setAdapter(adapter);
         rvUsers.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            //called when a query is submitted
+            public boolean onQueryTextSubmit(String query) {
+                Log.d(TAG, "onQueryTextSubmit()");
+                queryForUsers(query);
+                return true;    //bc we are handling it
+            }
 
-   //     queryUsers();
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+      //  searchBar.getQuery()
 
-
-
-
-
-
-
-
+        //queryUsers();
     }
 
-    private void queryUsers() {
-        ParseQuery<User> query = ParseQuery.getQuery(User.class);
-        //dont think we need query include for the general one since it is to include the user but im not sure
-
-        tester2.setText("in queryUsers()");
+    private void queryForUsers(String queriedUsername) {
+        Log.d(TAG, "queryUsers()");
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
 
         //do we want a limit?
         //order it maybe by who is closest? for now just order by when the user was made
-        query.addDescendingOrder(User.KEY_CREATED_AT);
-        query.findInBackground(new FindCallback<User>() {
+        query.whereEqualTo(User.KEY_USERNAME, queriedUsername);
+        query.findInBackground(new FindCallback<ParseUser>() {
             @Override
-            public void done(List<User> objects, ParseException e) {
+            public void done(List<ParseUser> objects, ParseException e) {
                 if(e != null){
                     Log.e(TAG, "Issue getting users", e);
                     return;
                 }
+                else {
+                    Log.d(TAG, "query for users was success!");
+                    if(objects.size() > 0) {
+                        for (ParseUser user : objects) {
+                            Log.i(TAG, "Username: " + user.getUsername());
+                        }
+                        adapter.clear();
+                        adapter.addAll(objects);
+                    }
 
-                for(User user: objects){
-                    //for testing purposes
-
-                    Log.i(TAG, "Username: " + user.getUsername() + " Pin: " + user.getPin());
-
+                    else{
+                        Toast.makeText(getContext(), "There were no users with that username!", Toast.LENGTH_SHORT).show();
+                        //erase what was previously displayed if anything:
+                        adapter.clear();
+                    }
                 }
-
-                adapter.clear();
-                users.addAll(objects);
-                adapter.notifyDataSetChanged();
-
             }
         });
 
