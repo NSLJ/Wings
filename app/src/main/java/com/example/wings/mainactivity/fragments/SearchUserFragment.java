@@ -22,6 +22,8 @@ import com.example.wings.R;
 
 import com.example.wings.adapters.SearchUserAdapter;
 import com.example.wings.mainactivity.MAFragmentsListener;
+import com.example.wings.mainactivity.fragments.dialogs.MakeRatingDialog;
+import com.example.wings.mainactivity.fragments.dialogs.SeeFriendDialog;
 import com.example.wings.models.User;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -71,7 +73,19 @@ public class SearchUserFragment extends Fragment {
         rvUsers = view.findViewById(R.id.rvsearchforfriends);
         users = new ArrayList<>();
         searchBar = view.findViewById(R.id.searchbarFriends);
-        adapter = new SearchUserAdapter(getContext(), users);
+
+        //Create a SearchUserOnclickListener to create the adapter!
+        adapter = new SearchUserAdapter(getContext(), users, new SearchUserAdapter.SearchUserOnClickListener() {
+            @Override
+            public void onClick(String nameToDisplay) {
+                Log.d(TAG, "row in SearchUserAdapter was clicked!");
+
+                //Go to dialog to display friend information + ask if want to add the friend
+                SeeFriendDialog dialog = SeeFriendDialog.newInstance(nameToDisplay);
+                dialog.setTargetFragment(SearchUserFragment.this, 1);
+                dialog.show(getFragmentManager(), "SeeFriendDialog");
+            }
+        });
 
         rvUsers.setAdapter(adapter);
         rvUsers.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -90,9 +104,6 @@ public class SearchUserFragment extends Fragment {
                 return false;
             }
         });
-      //  searchBar.getQuery()
-
-        //queryUsers();
     }
 
     private void queryForUsers(String queriedUsername) {

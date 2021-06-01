@@ -16,7 +16,7 @@
         android:text="Search for Friends"
         android:textAlignment="center"
         android:textColor="@color/logo_teal"
-        android:textSize="34sp" />
+        android:textSize="30sp" />
 
     <SearchView
         android:id="@+id/searchbarFriends"

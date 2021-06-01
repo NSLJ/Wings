@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context=".mainactivity.fragments.dialogs.SeeFriendDialog">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="10dp">
+
+        <ImageButton
+            android:id="@+id/btnExit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="3dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/btn_circle"
+            android:backgroundTint="#E2FF0000"
+            android:src="@android:drawable/ic_menu_close_clear_cancel" />
+
+        <TextView
+            android:id="@+id/tvHeading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/satisfy"
+            android:text="Add Annie?"
+            android:textAlignment="center"
+            android:textColor="@color/gray_background"
+            android:textSize="30sp" />
+
+        <Button
+            android:id="@+id/btnAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvHeading"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentEnd="false"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/logo_teal"
+            android:text="Add" />
+
+    </RelativeLayout>
+</RelativeLayout>

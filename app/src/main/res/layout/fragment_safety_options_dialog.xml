@@ -112,7 +112,7 @@ tools:context=".mainactivity.fragments.dialogs.SafetyOptionsDialog">
         android:textSize="18sp" />
 
     <Button
-        android:id="@+id/btnConfirm"
+        android:id="@+id/btnAdd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/cbEmergency"
@@ -129,7 +129,7 @@ tools:context=".mainactivity.fragments.dialogs.SafetyOptionsDialog">
         android:layout_below="@+id/cbEmergency"
         android:layout_marginTop="26dp"
         android:layout_marginEnd="25dp"
-        android:layout_toStartOf="@+id/btnConfirm"
+        android:layout_toStartOf="@+id/btnAdd"
         android:background="@drawable/et_rounded_corners_style"
         android:ems="10"
         android:fontFamily="@font/lato"

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,10 +27,15 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
     private static final String TAG = "SearchUserAdapter";
     private Context context;
     private List<ParseUser> users;
+    private SearchUserOnClickListener listener;
 
-    public SearchUserAdapter(Context context, List<ParseUser> users) {
+    public interface SearchUserOnClickListener{
+        void onClick(String nameToDisplay);
+    }
+    public SearchUserAdapter(Context context, List<ParseUser> users, SearchUserOnClickListener listener) {
         this.context = context;
         this.users = users;
+        this.listener = listener;
     }
 
     @NonNull
@@ -65,6 +71,7 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
         private ImageView ivProfile;
         private RatingBar ratingBar;
         private TextView tvEmail;
+        private RelativeLayout rlContainer;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -73,9 +80,17 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
             ivProfile = itemView.findViewById(R.id.ivOtherProfile);
             ratingBar = itemView.findViewById(R.id.rbOtherRatings);
             tvEmail = itemView.findViewById(R.id.tvEmail);
+            rlContainer = itemView.findViewById(R.id.rlContainer);
         }
 
         public void bind(ParseUser user) {
+            rlContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onClick(user.getString(User.KEY_FIRSTNAME));
+                }
+            });
+
             tvUsername.setText(user.getString(User.KEY_FIRSTNAME) + " " + user.getString(User.KEY_LASTNAME));
             float rating = (float) user.getDouble(User.KEY_RATING);
             ratingBar.setRating(rating);
