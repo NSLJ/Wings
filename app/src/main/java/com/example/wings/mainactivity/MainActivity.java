@@ -30,6 +30,7 @@ import com.example.wings.mainactivity.fragments.dialogs.SafetyOptionsDialog;
 import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.inParseServer.BuddyMeetUp;
 import com.example.wings.models.inParseServer.BuddyTrip;
+import com.example.wings.models.inParseServer.TrustedContact;
 import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.example.wings.workers.CheckProximityWorker;
 import com.example.wings.R;
@@ -58,6 +59,7 @@ import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -497,6 +499,30 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     public void toProfileSetupFragment(){
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new ProfileSetupFragment()).commit();
     }
+
+    @Override
+    public void toProfileSetupFragment(List<TrustedContact> trustedContacts) {
+        ParcelableObject sendData = new ParcelableObject();
+        sendData.setTrustedContactList(trustedContacts);
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ProfileSetupFragment.KEY_TRUSTED_CONTACTS, Parcels.wrap(sendData));
+        Fragment frag = new ProfileSetupFragment();
+        frag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
+    }
+    @Override
+    public void toEditTrustedContactsFragment(List<TrustedContact> trustedContacts) {
+        ParcelableObject sendData = new ParcelableObject();
+        sendData.setTrustedContactList(trustedContacts);
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ProfileSetupFragment.KEY_TRUSTED_CONTACTS, Parcels.wrap(sendData));        //ProfileSetupFrag and EditTrustedContacts keys are the same but we get error for statically calling EditTrustedCibtacts's key
+        Fragment frag = new EditTrustedContactsFragment();
+        frag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
+    }
+
     @Override
     public void toUserProfileFragment() {
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new UserProfileFragment()).commit();
@@ -518,10 +544,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     public void toSettingsFragment() {
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new SettingsFragment()).commit();
     }
-    @Override
-    public void toEditTrustedContactsFragment() {
-        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new EditTrustedContactsFragment()).commit();
-    }
+
     @Override
     public void toHelpFragment() {
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new HelpFragment()).commit();

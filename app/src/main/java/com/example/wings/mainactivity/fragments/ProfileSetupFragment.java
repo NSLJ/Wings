@@ -29,12 +29,19 @@ import android.widget.Toast;
 
 import com.example.wings.R;
 import com.example.wings.mainactivity.MAFragmentsListener;
+import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.User;
+import com.example.wings.models.inParseServer.TrustedContact;
 import com.example.wings.startactivity.SAFragmentsListener;
 import com.parse.ParseACL;
 import com.parse.ParseUser;
 
+import org.parceler.Parcel;
+import org.parceler.Parcels;
+
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -50,9 +57,8 @@ public class ProfileSetupFragment extends Fragment {
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
     public static final int PICK_PHOTO_CODE = 1046;
     private static final String PHOTO_FILE_NAME = "photo.jpg";         //arbitrary file name to store Post photo in
-    private static final String KEY_RECEIVE_USER = "user";
+    public static final String KEY_TRUSTED_CONTACTS = "receiveTrustedContacts";         //used so MainActivity may send a List<TrustedContact> to work on/save
 
-    private SAFragmentsListener slistener;
     private MAFragmentsListener mlistener;
 
     public File photoFile;
@@ -67,6 +73,7 @@ public class ProfileSetupFragment extends Fragment {
     private TextView tcstatus;
     private Button setupTCBtn;
     private EditText numPIN;
+    private List<TrustedContact> trustedContacts = new ArrayList<>();
 
     public ProfileSetupFragment() {}        // Required empty public constructor
 
@@ -83,6 +90,10 @@ public class ProfileSetupFragment extends Fragment {
     //Purpose:      called once Fragment created, will obtain the User object it was passed in
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(getArguments() != null){
+            ParcelableObject receivedData = (ParcelableObject) Parcels.unwrap(getArguments().getParcelable(KEY_TRUSTED_CONTACTS));
+            trustedContacts.addAll(receivedData.getTrustedContactList());
+        }
     }
 
     @Override
@@ -129,8 +140,8 @@ public class ProfileSetupFragment extends Fragment {
         setupTCBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveProfileSetup();
-                mlistener.toEditTrustedContactsFragment();
+                //saveProfileSetup();
+                mlistener.toEditTrustedContactsFragment(trustedContacts);
             }
         });
 
