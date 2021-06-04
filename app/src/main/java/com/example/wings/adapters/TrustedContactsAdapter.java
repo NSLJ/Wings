@@ -18,6 +18,8 @@ import com.example.wings.models.inParseServer.TrustedContact;
 
 import java.util.List;
 
+import static java.security.AccessController.getContext;
+
 public class TrustedContactsAdapter extends RecyclerView.Adapter<TrustedContactsAdapter.ViewHolder> {
     private static final String TAG = "TrustedContactsAdapter";
 
@@ -93,6 +95,13 @@ public class TrustedContactsAdapter extends RecyclerView.Adapter<TrustedContacts
                 etPhone.setText(tc.getPhoneNumber());
             }
             //else --> not a completed trusted contact nothing needs to be binded
+            else{
+                Log.d(TAG, "Trusted contact is not complete!");
+                etName.setText("");
+                etRelationship.setText("");
+                etEmail.setText("");
+                etPhone.setText("");
+            }
         }
 
         public void isCompleted(int position){

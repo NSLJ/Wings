@@ -2,6 +2,7 @@ package com.example.wings.mainactivity.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +19,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.wings.R;
 import com.example.wings.adapters.TrustedContactsAdapter;
+import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.inParseServer.TrustedContact;
-import com.example.wings.startactivity.SAFragmentsListener;
 
 import org.parceler.Parcels;
 
@@ -31,14 +32,14 @@ public class EditTrustedContactsFragment extends Fragment {
     public static final String TAG = "EditTrustedContactsFragment";
     public static final String KEY_TRUSTED_CONTACTS = "receiveTrustedContacts";         //used so MainActivity may send a List<TrustedContact> to work on/save
 
-    private SAFragmentsListener listener;
+    private MAFragmentsListener listener;
 
     private RecyclerView rvTrustedContacts;
     private ImageButton btnNewTC;
     private Button btnSave;
 
     private TrustedContactsAdapter adapter;
-    private List<TrustedContact> trustedContacts;
+    private List<TrustedContact> trustedContacts = new ArrayList<>();
     private SwipeRefreshLayout swipeContainer;
 
 
@@ -46,15 +47,16 @@ public class EditTrustedContactsFragment extends Fragment {
 
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (context instanceof SAFragmentsListener) {
-            listener = (SAFragmentsListener) context;
+        if (context instanceof MAFragmentsListener) {
+            listener = (MAFragmentsListener) context;
         } else {
-            throw new ClassCastException(context.toString() + " must implement SAFragmentsListener");
+            throw new ClassCastException(context.toString() + " must implement MAFragmentsListener");
         }
     }
     @Override
     //Purpose:      called once Fragment created, will obtain the User object it was passed in
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         if(getArguments() != null){
             ParcelableObject receivedData = (ParcelableObject) Parcels.unwrap(getArguments().getParcelable(KEY_TRUSTED_CONTACTS));
@@ -66,12 +68,14 @@ public class EditTrustedContactsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Log.d(TAG, "onCreateView");
         return inflater.inflate(R.layout.fragment_edit_trusted_contacts, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d(TAG, "onViewCreated");
 
         //2.) Connect views:
         rvTrustedContacts = view.findViewById(R.id.rvTrustedContacts);
@@ -104,7 +108,9 @@ public class EditTrustedContactsFragment extends Fragment {
                         //Then we can go back to ProfileSetupFrag passing in this list --> ProfileSetUpFrag in charge of saving to Parse
                         listener.toProfileSetupFragment(adapter.getTrustedContacts());
                     }
-
+                    else{
+                        Toast.makeText(getContext(), "You have not fulfilled all sections!", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -113,6 +119,8 @@ public class EditTrustedContactsFragment extends Fragment {
         btnNewTC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(getContext(), "Plus button clicked!", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Plus button was clicked: trustedContacts size = " + trustedContacts.size() + "      trustedContacts = " + trustedContacts.toString());
                 if(trustedContacts.size() < 5){     //we only store 5 trusted contacts per user at max
                    addEmptyTrustedContact();
                 }

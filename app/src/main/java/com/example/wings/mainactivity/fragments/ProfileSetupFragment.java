@@ -120,7 +120,7 @@ public class ProfileSetupFragment extends Fragment {
      * Purpose:     Called automatically when creating a Fragment instance, after onCreateView(). Ensures root View is not null. Sets up all Views and event handlers here.
      */
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
+        Log.d(TAG, "onViewCreated");
         //1.) Get references to Views:
         completeBtn = view.findViewById(R.id.completeBtn);
         profileImage = view.findViewById(R.id.profileImage);
@@ -141,6 +141,7 @@ public class ProfileSetupFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 //saveProfileSetup();
+                Log.d(TAG, "trusted contact button clicked --> going to EditTrustedContactsFrag");
                 mlistener.toEditTrustedContactsFragment(trustedContacts);
             }
         });

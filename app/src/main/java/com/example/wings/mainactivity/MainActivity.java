@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.wings.mainactivity.fragments.BuddyTripStatusFragment;
+import com.example.wings.mainactivity.fragments.EditTrustedContactsFragment;
 import com.example.wings.mainactivity.fragments.dialogs.SafetyOptionsDialog;
 import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.inParseServer.BuddyMeetUp;
@@ -37,7 +38,6 @@ import com.example.wings.R;
 import com.example.wings.workers.UpdateLocationWorker;
 import com.example.wings.mainactivity.fragments.home.BuddyHomeFragment;
 import com.example.wings.mainactivity.fragments.ChooseBuddyFragment;
-import com.example.wings.commonFragments.EditTrustedContactsFragment;
 import com.example.wings.commonFragments.HelpFragment;
 import com.example.wings.mainactivity.fragments.home.ConfirmBuddyHomeFragment;
 import com.example.wings.mainactivity.fragments.home.DefaultHomeFragment;
@@ -513,11 +513,12 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     }
     @Override
     public void toEditTrustedContactsFragment(List<TrustedContact> trustedContacts) {
+        Log.d(TAG, "toEditTrustedContactsFragment - trustedContacts = " + trustedContacts.toString());
         ParcelableObject sendData = new ParcelableObject();
         sendData.setTrustedContactList(trustedContacts);
 
         Bundle bundle = new Bundle();
-        bundle.putParcelable(ProfileSetupFragment.KEY_TRUSTED_CONTACTS, Parcels.wrap(sendData));        //ProfileSetupFrag and EditTrustedContacts keys are the same but we get error for statically calling EditTrustedCibtacts's key
+        bundle.putParcelable(EditTrustedContactsFragment.KEY_TRUSTED_CONTACTS, Parcels.wrap(sendData));        //ProfileSetupFrag and EditTrustedContacts keys are the same but we get error for statically calling EditTrustedCibtacts's key
         Fragment frag = new EditTrustedContactsFragment();
         frag.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();

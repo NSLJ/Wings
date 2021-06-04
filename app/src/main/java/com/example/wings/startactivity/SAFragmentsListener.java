@@ -10,6 +10,4 @@ public interface SAFragmentsListener {
     public void toLoginFragment();
     public void toRegisterOneFragment();
     public void toRegisterTwoFragment(User user);
-    public void toProfileSetupFragment(List<TrustedContact> trustedContacts);
-    public void toEditTrustedContacts(List<TrustedContact> trustedContacts);
 }

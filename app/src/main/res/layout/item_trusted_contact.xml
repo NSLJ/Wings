@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/gray_background">
 
 
@@ -46,12 +46,12 @@
             android:ems="10"
             android:fontFamily="@font/lato"
             android:hint="Mom/sister/brother/etc"
+            android:importantForAutofill="no"
             android:inputType="textPersonName"
             android:text="Mother"
             android:textAlignment="viewStart"
             android:textColor="@color/white"
-            android:textSize="14sp"
-            android:importantForAutofill="no" />
+            android:textSize="14sp" />
     </RelativeLayout>
 
     <RelativeLayout

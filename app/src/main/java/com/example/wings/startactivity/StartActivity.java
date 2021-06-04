@@ -9,14 +9,10 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.example.wings.R;
-import com.example.wings.commonFragments.HelpFragment;
 import com.example.wings.mainactivity.MainActivity;
-import com.example.wings.commonFragments.EditTrustedContactsFragment;
-import com.example.wings.commonFragments.SettingsFragment;
 import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.User;
 import com.example.wings.startactivity.fragments.LoginFragment;
-import com.example.wings.mainactivity.fragments.ProfileSetupFragment;
 import com.example.wings.startactivity.fragments.RegisterOneFragment;
 import com.example.wings.startactivity.fragments.RegisterTwoFragment;
 
@@ -89,25 +85,5 @@ public class StartActivity extends AppCompatActivity implements SAFragmentsListe
         Fragment registerTwoFrag= new RegisterTwoFragment();
         registerTwoFrag.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, registerTwoFrag).commit();
-    }
-
-    @Override
-    public void toProfileSetupFragment() {
-        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new ProfileSetupFragment()).commit();
-    }
-
-    @Override
-    public void toEditTrustedContacts() {
-        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new EditTrustedContactsFragment()).commit();
-    }
-
-    @Override
-    public void toSettingsFragment() {
-        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new SettingsFragment()).commit();
-    }
-
-    @Override
-    public void toHelpFragment() {
-        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new HelpFragment()).commit();
     }
 }
