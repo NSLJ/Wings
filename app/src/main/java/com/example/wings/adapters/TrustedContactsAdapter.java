@@ -66,10 +66,10 @@ public class TrustedContactsAdapter extends RecyclerView.Adapter<TrustedContacts
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            tcName = itemView.findViewById(R.id.tcName1);
-            tcRelationship = itemView.findViewById(R.id.tcRelationship1);
-            tcEmail = itemView.findViewById(R.id.tcEmail1);
-            tcNum = itemView.findViewById(R.id.tcNum1);
+            tcName = itemView.findViewById(R.id.etName);
+            tcRelationship = itemView.findViewById(R.id.etRelationship);
+            tcEmail = itemView.findViewById(R.id.etEmail);
+            tcNum = itemView.findViewById(R.id.etPhone);
         }
 
         public void bind(TrustedContact tc) {

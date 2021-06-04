@@ -1,59 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/gray_background">
+
 
     <EditText
-        android:id="@+id/tcName1"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginTop="10dp"
-        android:ems="10"
-        android:hint="Full name"
-        android:inputType="textShortMessage|text"
-        android:singleLine="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.05"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/tcRelationship1"
-        android:layout_width="161dp"
-        android:layout_height="43dp"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="Relationship"
-        android:inputType="textShortMessage|text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.04"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tcName1" />
-
-    <EditText
-        android:id="@+id/tcEmail1"
+        android:id="@+id/etName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginLeft="20dp"
         android:ems="10"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.466"
-        app:layout_constraintStart_toEndOf="@+id/tcRelationship1"
-        app:layout_constraintTop_toBottomOf="@+id/tcName1" />
+        android:fontFamily="@font/lato"
+        android:hint="Full Name"
+        android:inputType="textPersonName"
+        android:text="Mary Lo"
+        android:textColor="@color/white"
+        android:textColorHint="@color/gray" />
 
-    <EditText
-        android:id="@+id/tcNum1"
+    <RelativeLayout
+        android:id="@+id/relationshipContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Phone #"
-        android:inputType="number"
-        tools:layout_editor_absoluteX="10dp"
-        tools:layout_editor_absoluteY="130dp" />
+        android:layout_below="@+id/etName">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/tvRelationshipTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:fontFamily="@font/lato"
+            android:text="Relationship:"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/etRelationship"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="-9dp"
+            android:layout_toEndOf="@+id/tvRelationshipTitle"
+            android:ems="10"
+            android:fontFamily="@font/lato"
+            android:hint="Mom/sister/brother/etc"
+            android:inputType="textPersonName"
+            android:text="Mother"
+            android:textAlignment="viewStart"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:importantForAutofill="no" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/phoneContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/relationshipContainer">
+
+        <TextView
+            android:id="@+id/tvPhoneTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:fontFamily="@font/lato"
+            android:text="Phone: "
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/etPhone"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="-9dp"
+            android:layout_toEndOf="@+id/tvPhoneTitle"
+            android:ems="10"
+            android:fontFamily="@font/lato"
+            android:hint="(###) ###-####"
+            android:importantForAutofill="no"
+            android:inputType="textPersonName"
+            android:text="(345) 321-9087"
+            android:textAlignment="viewStart"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/emailContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/etName"
+        android:layout_toEndOf="@+id/relationshipContainer">
+
+        <TextView
+            android:id="@+id/tvEmailTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/lato"
+            android:text="Email:"
+            android:textAlignment="viewStart"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/etEmail"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvEmailTitle"
+            android:layout_marginTop="-5dp"
+            android:ems="10"
+            android:fontFamily="@font/lato"
+            android:hint="Enter here"
+            android:importantForAutofill="no"
+            android:inputType="textPersonName"
+            android:text="mary321@gmail.com"
+            android:textAlignment="viewStart"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@id/emailContainer"
+        android:layout_marginTop="15dp"
+        android:background="?android:attr/listDivider"
+        android:backgroundTint="@color/gray" />
+
+
+</RelativeLayout>
