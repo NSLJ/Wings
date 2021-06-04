@@ -1,5 +1,6 @@
-# Wings
-## With Wings, You Never Walk Alone
+# Wings: With Wings, You Never Walk Alone
+
+### Important Update (6/4/2021 2:45PM) - Database is down, app temporarily offline!
 
 ## Demo: Walkthrough (Updated 5/29/2021)
 <img src="History of walkthroughs/5-29-walkthrough.gif">
