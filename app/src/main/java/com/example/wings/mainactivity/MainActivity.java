@@ -159,6 +159,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
         //else create bottom nav menu, go to correct HomeFrag, and begin tracking location:
         else {
+            Log.d(TAG, "");
             //2.) Unrestrict the screen --> shows the safety toolkit and bottom nav bar:
             restrictUserScreen = false;
             setRestrictScreen(restrictUserScreen);      //also automatically pulls the HomeFrag corresponding to the currentHomeFrag field onto screen
@@ -183,7 +184,6 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                 else{
                     keepTracking= true;
                     startTracking();           //infinitely runs as long as keepTracking = true;
-                   // setWatchRequests(true);
                 }
     }
 

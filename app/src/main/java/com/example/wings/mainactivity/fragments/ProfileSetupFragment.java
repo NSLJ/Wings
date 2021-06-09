@@ -212,7 +212,6 @@ public class ProfileSetupFragment extends Fragment {
 
         //2.) Navigate to DefaultHomeFrag
         mlistener.setRestrictScreen(false);         //--> tells MainActivity that this user has access to whole app now
-        mlistener.toDefaultHomeFragment();
     }
 
     /**

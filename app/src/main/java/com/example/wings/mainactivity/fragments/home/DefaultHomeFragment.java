@@ -82,6 +82,7 @@ public class DefaultHomeFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(TAG, "OnCreateView()");
         mainView = inflater.inflate(R.layout.fragment_default_home, container, false);
         Log.d(TAG, "onCreateView(): mainView == null: " + (mainView==null));
         return mainView;
