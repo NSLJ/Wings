@@ -18,7 +18,7 @@
         android:inputType="textPersonName"
         android:text="Mary Lo"
         android:textColor="@color/white"
-        android:textColorHint="@color/gray" />
+        android:textColorHint="@color/white" />
 
     <RelativeLayout
         android:id="@+id/relationshipContainer"
@@ -38,19 +38,20 @@
 
         <EditText
             android:id="@+id/etRelationship"
-            android:layout_width="100dp"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginTop="-9dp"
             android:layout_toEndOf="@+id/tvRelationshipTitle"
             android:ems="10"
             android:fontFamily="@font/lato"
-            android:hint="Mom/sister/brother/etc"
+            android:hint="Mom/Dad/etc"
             android:importantForAutofill="no"
             android:inputType="textPersonName"
             android:text="Mother"
             android:textAlignment="viewStart"
             android:textColor="@color/white"
+            android:textColorHint="@color/white"
             android:textSize="14sp" />
     </RelativeLayout>
 
@@ -85,6 +86,7 @@
             android:text="(345) 321-9087"
             android:textAlignment="viewStart"
             android:textColor="@color/white"
+            android:textColorHint="@color/white"
             android:textSize="14sp" />
     </RelativeLayout>
 
@@ -93,7 +95,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/etName"
-        android:layout_toEndOf="@+id/relationshipContainer">
+        android:layout_alignParentEnd="true">
 
         <TextView
             android:id="@+id/tvEmailTitle"
@@ -107,7 +109,7 @@
 
         <EditText
             android:id="@+id/etEmail"
-            android:layout_width="200dp"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvEmailTitle"
             android:layout_marginTop="-5dp"
@@ -119,6 +121,7 @@
             android:text="mary321@gmail.com"
             android:textAlignment="viewStart"
             android:textColor="@color/white"
+            android:textColorHint="@color/white"
             android:textSize="14sp" />
     </RelativeLayout>
 
@@ -127,7 +130,7 @@
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_below="@id/emailContainer"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="20dp"
         android:background="?android:attr/listDivider"
         android:backgroundTint="@color/gray" />
 
