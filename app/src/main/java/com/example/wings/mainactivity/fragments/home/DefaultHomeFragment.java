@@ -63,7 +63,7 @@ public class DefaultHomeFragment extends Fragment {
     private ImageView ivAcceptBtn;
     private ImageView ivRejectBtn;
 
-
+    View mainView;
     public DefaultHomeFragment() {}
 
     @Override
@@ -82,11 +82,8 @@ public class DefaultHomeFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        Log.d(TAG, "onCreateView()");
-        View mainView = inflater.inflate(R.layout.fragment_default_home, container, false);
-        setMapFragment();
-
+        mainView = inflater.inflate(R.layout.fragment_default_home, container, false);
+        Log.d(TAG, "onCreateView(): mainView == null: " + (mainView==null));
         return mainView;
     }
 
@@ -99,6 +96,7 @@ public class DefaultHomeFragment extends Fragment {
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
+                    Log.d(TAG, "onMapReady(): mainView == null: " + (mainView==null));
                     wingsMap = new WingsMap(googleMap, getContext(), getViewLifecycleOwner(), false, false);   //automatically constantly shows current location
                 }
             });
@@ -110,6 +108,8 @@ public class DefaultHomeFragment extends Fragment {
 
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d(TAG, "onViewCreated(): mainView == null: " + (mainView==null));
+        setMapFragment();
 
         //1.) Connect Views:
         btnSearch = view.findViewById(R.id.btnSearch);

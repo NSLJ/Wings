@@ -142,19 +142,18 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bottomNavigationView = findViewById(R.id.bottomNavigation);
-        fabBuddyRequests = (FloatingActionButton) findViewById(R.id.fabBuddyRequests);
-        fabBuddyRequests.setVisibility(View.INVISIBLE);             //do by default so other fragments may choose to toggle if they choose, also has no handler by default!
+        fabBuddyRequests = findViewById(R.id.fabBuddyRequests);
+        fabBuddyRequests.setVisibility(View.INVISIBLE);             //by default so other fragments may choose to toggle if they choose, also has no handler by default!
 
-        Toast.makeText(this, "You may need to refresh the page!", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "You may need to refresh the page!", Toast.LENGTH_LONG).show();
         //1.) Figure out which HomeFrag to start on:
         currentHomeFrag = findUserBuddyStatus();
-        Log.d(TAG, "onCreate() - currentHomeFrag = " + currentHomeFrag);
+        Log.i(TAG, "onCreate() - currentHomeFrag = " + currentHomeFrag);
 
-        //1.) Find out whether or not need to force ProfileSetupFrag:
+        //2.) Find out whether or not need to force ProfileSetupFrag (Intent would be given by StartActivity):
         if(getIntent().getBooleanExtra(KEY_PROFILESETUPFRAG, false)){
-            Log.d(TAG, "onCreate(): going to ProfileSetUpFragment");
             restrictUserScreen = true;
-            setRestrictScreen(restrictUserScreen);          //hides bottom nav bar and safety toolkit button
+            setRestrictScreen(restrictUserScreen);              //hides bottom nav bar and safety toolkit button until user's account is fully set up
             toProfileSetupFragment();
         }
 

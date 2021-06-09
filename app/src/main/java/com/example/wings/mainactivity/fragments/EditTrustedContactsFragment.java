@@ -56,11 +56,11 @@ public class EditTrustedContactsFragment extends Fragment {
     @Override
     //Purpose:      called once Fragment created, will obtain the User object it was passed in
     public void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         if(getArguments() != null){
             ParcelableObject receivedData = (ParcelableObject) Parcels.unwrap(getArguments().getParcelable(KEY_TRUSTED_CONTACTS));
             trustedContacts.addAll(receivedData.getTrustedContactList());
+            Log.d(TAG, "trustedContacts passed in=" + trustedContacts.toString());
         }
     }
 
@@ -119,7 +119,6 @@ public class EditTrustedContactsFragment extends Fragment {
         btnNewTC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Plus button clicked!", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Plus button was clicked: trustedContacts size = " + trustedContacts.size() + "      trustedContacts = " + trustedContacts.toString());
                 if(trustedContacts.size() < 5){     //we only store 5 trusted contacts per user at max
                    addEmptyTrustedContact();
