@@ -1,10 +1,13 @@
 package com.example.wings.adapters;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 
@@ -13,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.example.wings.R;
+import com.example.wings.mainactivity.fragments.EditTrustedContactsFragment;
 import com.example.wings.models.inParseServer.TrustedContact;
 
 
@@ -23,10 +27,14 @@ import static java.security.AccessController.getContext;
 public class TrustedContactsAdapter extends RecyclerView.Adapter<TrustedContactsAdapter.ViewHolder> {
     private static final String TAG = "TrustedContactsAdapter";
 
+    private Context context;
     private List<TrustedContact> trustedContacts;
+    private EditTrustedContactsFragment fragment;           //used by btnExit --> to remove from the model onClick() --> calls fragment.deleteEmptyTrustedContact()
 
-    public TrustedContactsAdapter (List<TrustedContact> trustedContacts) {
+    public TrustedContactsAdapter (Context context, List<TrustedContact> trustedContacts, EditTrustedContactsFragment fragment) {
         this.trustedContacts = trustedContacts;
+        this.fragment = fragment;
+        this.context = context;
     }
 
     @NonNull
@@ -39,7 +47,7 @@ public class TrustedContactsAdapter extends RecyclerView.Adapter<TrustedContacts
     @Override
     public void onBindViewHolder(@NonNull TrustedContactsAdapter.ViewHolder holder, int position) {
         TrustedContact trustedContact = trustedContacts.get(position);
-        holder.bind(trustedContact);
+        holder.bind(trustedContact, position);
     }
 
     @Override
@@ -61,11 +69,11 @@ public class TrustedContactsAdapter extends RecyclerView.Adapter<TrustedContacts
         return trustedContacts;
     }
 
-    public boolean isAllCompleted(){
-        Log.d(TAG, "isAllCompleted(): trustedContacts = " + trustedContacts.toString());
+    public boolean isAllValid(){
+        Log.d(TAG, "isAllValid(): trustedContacts = " + trustedContacts.toString());
 
         for(int i = 0; i < trustedContacts.size(); i++) {
-            if (!trustedContacts.get(i).getIsComplete()) {
+            if (!trustedContacts.get(i).getIsValid()) {
                 return false;
             }
         }
@@ -77,6 +85,7 @@ public class TrustedContactsAdapter extends RecyclerView.Adapter<TrustedContacts
         private EditText etRelationship;
         private EditText etEmail;
         private EditText etPhone;
+        private ImageButton btnClose;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -85,10 +94,11 @@ public class TrustedContactsAdapter extends RecyclerView.Adapter<TrustedContacts
             etRelationship = itemView.findViewById(R.id.etRelationship);
             etEmail = itemView.findViewById(R.id.etEmail);
             etPhone = itemView.findViewById(R.id.etPhone);
+            btnClose = itemView.findViewById(R.id.btnExit);
         }
 
-        public void bind(TrustedContact tc) {
-            if(tc.getIsComplete()) {
+        public void bind(TrustedContact tc, int position) {
+            if(tc.getIsValid()) {
                 etName.setText(tc.getName());
                 etRelationship.setText(tc.getRelationship());
                 etEmail.setText(tc.getEmail());
@@ -102,28 +112,55 @@ public class TrustedContactsAdapter extends RecyclerView.Adapter<TrustedContacts
                 etEmail.setText("");
                 etPhone.setText("");
             }
+            btnClose.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    fragment.deleteEmptyTrustedContact(position);
+                }
+            });
         }
 
-        public void isCompleted(int position){
-            Log.d(TAG, "ViewHolder: isCompleted()");
-
-            String name = etName.getText().toString();
-            String email = etEmail.getText().toString();
-            String relationship = etRelationship.getText().toString();
-            String phone = etPhone.getText().toString();
-
-            if(!name.equals("") && !email.equals("") && !relationship.equals("") && !phone.equals("")){
-                Log.d(TAG, "ViewHolder: isCompleted(): completely filled out!");
+        public void saveInfo(int position, String name, String email, String relationship, String phone){
                 TrustedContact trustedContact = trustedContacts.get(position);
                 trustedContact.setEmail(email);
                 trustedContact.setName(name);
                 trustedContact.setRelationship(relationship);
                 trustedContact.setPhoneNumber(phone);
-                trustedContact.setIsComplete(true);
-                //this should make the trustedContact.complete() return true
+                trustedContact.setIsValid(true);
+        }
+
+        public boolean isValid(int position){
+            String name = etName.getText().toString();
+            String email = etEmail.getText().toString();
+            String relationship = etRelationship.getText().toString();
+            String phone = etPhone.getText().toString();
+
+            //1.) Ensure all fields are filled out:
+            if(!name.equals("") && !email.equals("") && !relationship.equals("") && !phone.equals("")) {
+                //Check phone has only 10 digits:
+                int digitCount = 0;
+                for(int i = 0; i < phone.length(); i++){
+                    if(Character.isDigit(phone.charAt(i))){
+                        digitCount++;
+                    }
+                }
+                if(digitCount != 10){
+                    //Toast.makeText(context, "")
+                    return false;
+                }
+
+                //Ensure email has an '@' and '.'
+                if(!(email.contains("@") && email.contains("."))){
+                    return false;
+                }
+
+                //if execution even gets to this point --> must be valid, no checks needed
+                saveInfo(position, name, email, relationship, phone);
+                return true;
             }
             else{
-                Log.d(TAG, "ViewHolder: isCompleted(): wasn't completely filled out");
+                //Toast.makeText(context, "You did not fill out all the fields.", Toast.LENGTH_LONG).show();
+                return false;
             }
         }
     }

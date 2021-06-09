@@ -7,6 +7,18 @@
     android:background="@color/gray_background">
 
 
+    <ImageButton
+        android:id="@+id/btnExit"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/btn_circle"
+        android:backgroundTint="#E2FF0000"
+        android:src="@android:drawable/ic_menu_close_clear_cancel" />
+
     <EditText
         android:id="@+id/etName"
         android:layout_width="wrap_content"

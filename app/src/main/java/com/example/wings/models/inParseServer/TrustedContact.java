@@ -19,6 +19,7 @@ public class TrustedContact extends ParseObject {
     public static final String KEY_OBJECTID = "objectId";
 
     //Used to check if these fields are filled out by the currentUser (but not yet uploaded into Parse4):
+    boolean isValid = false;
     boolean isComplete = false;
 
     public TrustedContact() {}
@@ -64,14 +65,46 @@ public class TrustedContact extends ParseObject {
         put(KEY_EMAIL, email);
     }
 
-    public String getObjectID() {
-        return getString(KEY_OBJECTID);
+    public void setIsValid(boolean answer){
+        isValid= answer;
+    }
+    public boolean getIsValid(){
+        return isValid;
     }
 
     public void setIsComplete(boolean answer){
-        isComplete = answer;
+        isComplete= answer;
     }
     public boolean getIsComplete(){
         return isComplete;
+    }
+
+    //Purpose:      Returns the actual phone number without any '-', '(', ')' characters.
+    public String parsePhoneNumber(){
+        String phoneNumberString = getPhoneNumber();
+        String actualNumber = "";
+        for(int i = 0; i < phoneNumberString.length(); i++){
+            char currentChar = phoneNumberString.charAt(i);
+
+            if(Character.isDigit(currentChar)){
+                actualNumber += Character.toString(currentChar);
+            }
+        }
+        Log.d("Jo", "actualNumber parsed = " + actualNumber);
+        return actualNumber;
+    }
+
+    //Returns phone number in nice format (###) ###-#### for messaging purposes
+    public String getFormattedPhoneNumber(){
+        String numberInAllDigits = parsePhoneNumber();
+        if(numberInAllDigits.length() == 10) {
+            String result = "(" + numberInAllDigits.substring(0, 3) + ") " + numberInAllDigits.substring(3, 6) + "-" + numberInAllDigits.substring(6, 10);
+            Log.d(TAG, "getFormattedPhoneNumber():  result=" + result);
+            return result;
+        }
+        else{
+            Log.e(TAG, "number parsed did not have 10 chars. This should've been checked in EditTrustedContactsFrag");
+            return "";
+        }
     }
 }

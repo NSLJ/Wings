@@ -28,6 +28,7 @@ import org.parceler.Parcels;
 import java.util.ArrayList;
 import java.util.List;
 
+//Ideas for persisting adapter info --> save all information into TrustedContact objects even if not all completed, when add button or save button is clicked --> adapter will automatically load what info that is saved in the List<TrustedContacts>
 public class EditTrustedContactsFragment extends Fragment {
     public static final String TAG = "EditTrustedContactsFragment";
     public static final String KEY_TRUSTED_CONTACTS = "receiveTrustedContacts";         //used so MainActivity may send a List<TrustedContact> to work on/save
@@ -40,7 +41,6 @@ public class EditTrustedContactsFragment extends Fragment {
 
     private TrustedContactsAdapter adapter;
     private List<TrustedContact> trustedContacts = new ArrayList<>();
-    private SwipeRefreshLayout swipeContainer;
 
 
     public EditTrustedContactsFragment() {}
@@ -83,7 +83,7 @@ public class EditTrustedContactsFragment extends Fragment {
         btnSave = view.findViewById(R.id.btnSave);
 
         //3.) Set up RecyclerView:
-        adapter = new TrustedContactsAdapter(trustedContacts);
+        adapter = new TrustedContactsAdapter(getContext(), trustedContacts, this);
         rvTrustedContacts.setAdapter(adapter);
         rvTrustedContacts.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -102,9 +102,10 @@ public class EditTrustedContactsFragment extends Fragment {
                     //Instruct all ViewHolders to check their fields for data that was inputted --> updates the trustedContacts list in adapter:
                     for(int i = 0; i < trustedContacts.size(); i++) {
                         TrustedContactsAdapter.ViewHolder currentViewHolder = (TrustedContactsAdapter.ViewHolder) rvTrustedContacts.findViewHolderForLayoutPosition(i);          //assuming there
-                        currentViewHolder.isCompleted(i);
+                        //currentViewHolder.isCompleted(i);
+                        currentViewHolder.isValid(i);
                     }
-                    if(adapter.isAllCompleted()){
+                    if(adapter.isAllValid()){
                         //Then we can go back to ProfileSetupFrag passing in this list --> ProfileSetUpFrag in charge of saving to Parse
                         listener.toProfileSetupFragment(adapter.getTrustedContacts());
                     }
@@ -131,6 +132,12 @@ public class EditTrustedContactsFragment extends Fragment {
     private void addEmptyTrustedContact(){
         TrustedContact newContact = new TrustedContact();
         trustedContacts.add(newContact);
+        adapter.notifyDataSetChanged();
+    }
+
+    //Purpose:          Deletes an emtpty TrustedContact when the btnClose is clicked in adapter.viewholder
+    public void deleteEmptyTrustedContact(int position){
+        trustedContacts.remove(position);
         adapter.notifyDataSetChanged();
     }
 

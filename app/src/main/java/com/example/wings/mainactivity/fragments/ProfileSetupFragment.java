@@ -42,7 +42,10 @@ import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
-
+//Ideas for persistence --> check to see if we receive a String[] when frag is created. if we do --> user had entered info in the fields --> automtically load them
+//                          if no String[] received --> user had not entered info
+//                          onClick btnGoEditTrustedContacts --> SAVE all info into a Strnig[] to pass to EditTrustedContactsFrag
+//                          so EditTrustedContactFrag --> responsible for passing back a String[] to autofill the ProfileSetupFrag.
 /**
  * ProfileSetupFragment.java
  * Purpose:            This displays the profile setup screen for the user to complete all required user information before using the app. This includes

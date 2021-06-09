@@ -16,9 +16,12 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import android.Manifest;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -106,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
     //UpdateLocationWorker keys:
     private static final int REQUEST_CODE_LOCATION_PERMISSION = 1;              //request code for permissions result
+    private static final int REQUEST_CODE_CALL_PHONE_AND_TEXT_PERMISSION = 1234;
     public static final String KEY_SENDCOUNTER = "activity_counter";
     public static final String KEY_RESULTSTRING = "result_string";
     public static final String KEY_GETCOUNTER = "worker_counter";
@@ -259,6 +263,15 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
             else{
                 Toast.makeText(this, "Permission was denied!", Toast.LENGTH_SHORT).show();
                 //TODO: handle what to do when location permision is denied , i.e ask again or Toast, etc
+            }
+        }
+
+        if(requestCode == REQUEST_CODE_CALL_PHONE_AND_TEXT_PERMISSION && grantResults.length>1){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                //makePhoneCall()
+            }
+            else{
+                Toast.makeText(this, "Permission was denied!", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -809,11 +822,56 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     //-----------------Overriding SafetyToolkitListener methods ---------------------------------------
     @Override
     public void onNotifyContacts() {
-        Toast.makeText(this, "I am notifying all your contacts", Toast.LENGTH_SHORT).show();
+        //Check permissions for it:   don't needthe call permision but still. TODO: should probably ask for permissions in onCreate() btw
+        if((ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) || (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)){
+            ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS}, REQUEST_CODE_CALL_PHONE_AND_TEXT_PERMISSION);
+        }
+        else {
+            Toast.makeText(this, "I am notifying all your contacts", Toast.LENGTH_SHORT).show();
+            User currLocalUser = new User(currUser);
+            String message = currLocalUser.getNotifyMessage();
+            messageAllTC(message);
+        }
     }
 
     @Override
     public void onEmergency() {
         Toast.makeText(this, "I am doing absolute emergency functions", Toast.LENGTH_SHORT).show();
+        //Check permissions for it:
+        if((ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) || (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)){
+            ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS}, REQUEST_CODE_CALL_PHONE_AND_TEXT_PERMISSION);
+        }
+        else{
+            //1.) Call Emergency services: 911 or campus phone, etc
+            Intent intent = new Intent(Intent.ACTION_CALL);
+            intent.setData(Uri.parse("tel:9169528086"));
+            startActivity(intent);
+
+            //2.) Text message every one of the user's trusted contacts:
+            User currLocalUser = new User(currUser);
+            String emergencyMessage = currLocalUser.getEmergencyMessage();
+            messageAllTC(emergencyMessage);
+        }
     }
+
+    //Purpose:      Helper for overridden SafetyToolkitListener methods --> sends given message to all of user's trusted contacts
+    public void messageAllTC(String message){
+        //Log.d(TAG, "messageAllTC(): message =" + message);
+        List<TrustedContact> trustedContacts = currUser.getList(User.KEY_TRUSTEDCONTACTS);
+        Log.d(TAG, "messageAllTC(): trustedContacts = " + trustedContacts.toString());
+
+        SmsManager smsManager = SmsManager.getDefault();
+        PendingIntent sentPI;
+        for(int i = 0; i < trustedContacts.size(); i++) {
+            TrustedContact currTC = trustedContacts.get(i);
+            try {
+                currTC.fetchIfNeeded();
+                sentPI = PendingIntent.getBroadcast(this, 0,new Intent("SMS_SENT"), 0);
+                smsManager.sendTextMessage("+1"+currTC.parsePhoneNumber(), null, message, sentPI, null);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
