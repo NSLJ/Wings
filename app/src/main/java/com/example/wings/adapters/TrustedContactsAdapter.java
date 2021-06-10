@@ -5,10 +5,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 
 import androidx.annotation.NonNull;
@@ -21,8 +19,6 @@ import com.example.wings.models.inParseServer.TrustedContact;
 
 
 import java.util.List;
-
-import static java.security.AccessController.getContext;
 
 public class TrustedContactsAdapter extends RecyclerView.Adapter<TrustedContactsAdapter.ViewHolder> {
     private static final String TAG = "TrustedContactsAdapter";
@@ -94,7 +90,7 @@ public class TrustedContactsAdapter extends RecyclerView.Adapter<TrustedContacts
             etRelationship = itemView.findViewById(R.id.etRelationship);
             etEmail = itemView.findViewById(R.id.etEmail);
             etPhone = itemView.findViewById(R.id.etPhone);
-            btnClose = itemView.findViewById(R.id.btnExit);
+            btnClose = itemView.findViewById(R.id.btnOptionsExit);
         }
 
         public void bind(TrustedContact tc, int position) {

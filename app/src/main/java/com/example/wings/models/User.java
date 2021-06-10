@@ -20,6 +20,15 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+Things todo:
+    - Get to know your driver before you step into their car. You can see their rating, how many trips they've completed, how long they’ve been driving, compliments from previous riders, and more.
+
+    -Using sensors and GPS data, RideCheck can help detect if a trip has an unexpected long stop. If so, we'll check on you and offer tools to get help.¹
+
+    -Perhaps if we can find an API --> All potential driver-partners must complete a criminal background screening process before they can accept ride requests through the Uber app.
+
+ */
 
 //Purpose:          allows us to get info from Parse database through passing in a ParseUser as User{} cannot GET info by itself --> needs a ParseUser. BUT, User{} CAN instantiate and create a Parseuser to be saved in database.
 //                  Rules then:     If you need to GET info --> pass in a ParseUser to get info from
@@ -270,61 +279,63 @@ public class User extends ParseUser {
 
     //TODO: time of current location, history of locations
     public String getEmergencyMessage(){
-        String emergencyMesssage = "URGENT: I sent this through Wings' Emergency Service, I need urgent help right now! I am currently dialing the police, but here is my current information:\n"
+        String fName = getFirstName();
+        String emergencyMesssage = "URGENT:  From Wing's EMERGENCY Service: \n\n" +fName+ " needs urgent help right now!! We have dialed the police for them, but here is their current information for your knowledge. You will be notified again if " + fName + " can confirm their safety!\n\n\nINFORMATION:\n\n"
                 + getCurrentLocationMessage();
 
-        if(!getIsBuddy()){
-            emergencyMesssage += "\n\n\tI was NOT with a paired Buddy when I called for emergency services.";
+        /*if(!getIsBuddy()){
+            notifyMesssage += "\n\n" +fName+" was NOT with a paired Buddy when they called for notification services.";
         }
         else if(getBuddyInstance().getHasBuddy()){
-            emergencyMesssage += "\n\n\tI was NOT with a paired Buddy when I called for emergency services.";
+            notifyMesssage += "\n\n" +fName+" was NOT with a paired Buddy when they called for notification services.";
         }
-        else if(getBuddyInstance().getOnMeetup()){
-            emergencyMesssage += "\n\n\tI was MEETING with a paired Buddy when I called for emergency services. Here is their information:\n"
+        else */if(getBuddyInstance().getOnMeetup()){
+            emergencyMesssage += "\n\n" +fName+ " was MEETING with a paired Buddy when they called for Emergency services. Here is their Buddy's information:\n"
                     + getBuddyInfo()
-                    + "\n\n\tHere is our Trip information:\n"
+                    + "\n\nTrip information:\n"
                     + getTripInfo();
         }
         else if(getBuddyInstance().getOnBuddyTrip()){
-            emergencyMesssage += "\n\n\tI was WALKING with a paired Buddy when I called for emergency services. Here is their information:\n"
+            emergencyMesssage += "\n\n" +fName+" was WALKING with a paired Buddy when they called for notification services. Here is their Buddy's information:\n"
                     + getBuddyInfo()
-                    + "\n\n\tHere is our Trip information:\n"
+                    + "\n\nTrip information:\n"
                     + getTripInfo();
         }
         else{   //User doesn't fit in one of these stages --> must be an error
             Log.e(TAG, "getEmergencyMessage(): user is not in one of the acceptable stages!");
         }
 
-        emergencyMesssage += "\n\n\tHere are the others I have contacted with this EMERGENCY information. Get in contact with each other and the police! :" + getTCsNotifiedMessage();
+        emergencyMesssage += "\n\n- Others also contacted with this info:" + getTCsNotifiedMessage();
         return emergencyMesssage;
     }
     public String getNotifyMessage(){
-        String notifyMesssage = "I sent this through Wing's Notification Service. I feel unsafe right now, here is my current information just in case! I will notify again once I am okay!\n"
+        String fName = getFirstName();
+        String notifyMesssage = "IMPORTANT:  From Wing's Notification Service: \n\n" +fName+ " feels unsafe right now, here is their current information just in case! You will be notified again once " + fName + " confirms their safety!\n\n\nINFORMATION:\n\n"
                 + getCurrentLocationMessage();
 
-        if(!getIsBuddy()){
-            notifyMesssage += "\n\n\tI was NOT with a paired Buddy when I called for notification services.";
+        /*if(!getIsBuddy()){
+            notifyMesssage += "\n\n" +fName+" was NOT with a paired Buddy when they called for notification services.";
         }
         else if(getBuddyInstance().getHasBuddy()){
-            notifyMesssage += "\n\n\tI was NOT with a paired Buddy when I called for notification services.";
+            notifyMesssage += "\n\n" +fName+" was NOT with a paired Buddy when they called for notification services.";
         }
-        else if(getBuddyInstance().getOnMeetup()){
-            notifyMesssage += "\n\n\tI was MEETING with a paired Buddy when I called for notification services. Here is their information:\n"
+        else */if(getBuddyInstance().getOnMeetup()){
+            notifyMesssage += "\n\n" +fName+ " was MEETING with a paired Buddy when they called for notification services. Here is their Buddy's information:\n"
                     + getBuddyInfo()
-                    + "\n\n\tHere is our Trip information:\n"
+                    + "\n\nHere is their Trip information:\n"
                     + getTripInfo();
         }
         else if(getBuddyInstance().getOnBuddyTrip()){
-            notifyMesssage += "\n\n\tI was WALKING with a paired Buddy when I called for notification services. Here is their information:\n"
+            notifyMesssage += "\n\n" +fName+" was WALKING with a paired Buddy when they called for notification services. Here is their Buddy's information:\n"
                     + getBuddyInfo()
-                    + "\n\n\tHere is our Trip information:\n"
+                    + "\n\nHere is their Trip information:\n"
                     + getTripInfo();
         }
         else{   //User doesn't fit in one of these stages --> must be an error
             Log.e(TAG, "getEmergencyMessage(): user is not in one of the acceptable stages!");
         }
 
-        notifyMesssage += "\n\n\tHere are the others I have contacted with this information. If you don't hear back from me, you may want to contact each other!:" + getTCsNotifiedMessage();
+        notifyMesssage += "\n\n- Others also contacted with this info:" + getTCsNotifiedMessage();
         return notifyMesssage;
     }
 
@@ -335,7 +346,7 @@ public class User extends ParseUser {
     public String getCurrentLocationMessage(){
         //1.) Build the URL:
         WingsGeoPoint currLocation = getCurrentLocation();
-        return "\tMy current location:     " + getLocationLink(currLocation);
+        return "- Current location:     \n" + getLocationLink(currLocation);
     }
 
     //Purpose:          Because this url is used many times w/ different locations --. reduce boilerplate
@@ -495,10 +506,9 @@ public class User extends ParseUser {
         double partnerLat = partnerCurrLocation.getLatitude();
         double partnerLong = partnerCurrLocation.getLongitude();
 
-
         double dLon = Math.toRadians(partnerLong - userLong);
 
-//convert to radians
+        //convert to radians
         userLat = Math.toRadians(userLat);
         partnerLat = Math.toRadians(partnerLat);
         userLong = Math.toRadians(userLong);
@@ -508,7 +518,7 @@ public class User extends ParseUser {
         double lat3 = Math.atan2(Math.sin(userLat) + Math.sin(partnerLat), Math.sqrt((Math.cos(userLat) + Bx) * (Math.cos(userLat) + Bx) + By * By));
         double lon3 = userLong + Math.atan2(By, Math.cos(userLat) + Bx);
 
-//print out in degrees
+        //print out in degrees
         return new double[]{Math.toDegrees(lat3), Math.toDegrees(lon3)};
     }
 

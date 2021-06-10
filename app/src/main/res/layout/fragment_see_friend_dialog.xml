@@ -14,7 +14,7 @@ tools:context=".mainactivity.fragments.dialogs.SeeFriendDialog">
         android:padding="10dp">
 
         <ImageButton
-            android:id="@+id/btnExit"
+            android:id="@+id/btnOptionsExit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -26,7 +26,7 @@ tools:context=".mainactivity.fragments.dialogs.SeeFriendDialog">
             android:src="@android:drawable/ic_menu_close_clear_cancel" />
 
         <TextView
-            android:id="@+id/tvHeading"
+            android:id="@+id/tvOptionsHeading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/satisfy"
@@ -36,10 +36,10 @@ tools:context=".mainactivity.fragments.dialogs.SeeFriendDialog">
             android:textSize="30sp" />
 
         <Button
-            android:id="@+id/btnAdd"
+            android:id="@+id/btnConfirmSafety"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/tvHeading"
+            android:layout_below="@+id/tvOptionsHeading"
             android:layout_alignParentStart="false"
             android:layout_alignParentEnd="false"
             android:layout_centerHorizontal="true"

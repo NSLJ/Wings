@@ -265,7 +265,7 @@ public class BuddyHomeFragment extends Fragment {
         tvOtherBuddyId = view.findViewById(R.id.tvOtherBuddyId);
         etPin = view.findViewById(R.id.etPin);
         btnConfirmBuddyMeetup = view.findViewById(R.id.btnConfirmBuddy);
-        btnExitMeetUp = view.findViewById(R.id.btnExit);
+        btnExitMeetUp = view.findViewById(R.id.btnOptionsExit);
 
         //ConfirmArrival overlay + views:           shown at end of BuddyTrip to end it
         confirmArrivalOverlay = view.findViewById(R.id.confirmArrivalOverlay);

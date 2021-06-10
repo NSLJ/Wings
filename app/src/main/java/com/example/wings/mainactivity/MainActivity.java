@@ -62,6 +62,7 @@ import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -109,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
     //UpdateLocationWorker keys:
     private static final int REQUEST_CODE_LOCATION_PERMISSION = 1;              //request code for permissions result
-    private static final int REQUEST_CODE_CALL_PHONE_AND_TEXT_PERMISSION = 1234;
+    private static final int REQUEST_CODE_CALL_PHONE_AND_TEXT = 1234;
     public static final String KEY_SENDCOUNTER = "activity_counter";
     public static final String KEY_RESULTSTRING = "result_string";
     public static final String KEY_GETCOUNTER = "worker_counter";
@@ -136,6 +137,8 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     private int receivedRequestCount;
     private int counter = 0;
     LifecycleOwner owner = this;                    //used in the startTracking() to listen to WorkInfo responses from the UpdateLocationWorker
+
+    private boolean sToolkitWaitingForOkay = false;             //used to tell SafetyOptionsDialog which overlay to show (options or safety confirmation?)
 
     @Override
     /**
@@ -266,9 +269,10 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
             }
         }
 
-        if(requestCode == REQUEST_CODE_CALL_PHONE_AND_TEXT_PERMISSION && grantResults.length>1){
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+        if(requestCode == REQUEST_CODE_CALL_PHONE_AND_TEXT && grantResults.length>2){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
                 //makePhoneCall()
+                Toast.makeText(this, "Please try again for now! This will be fixed soon!", Toast.LENGTH_SHORT).show();
             }
             else{
                 Toast.makeText(this, "Permission was denied!", Toast.LENGTH_SHORT).show();
@@ -350,7 +354,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
             Option 2: Immediate danger --> notify all Trusted Contacts + dial the police
          */
         //Toast.makeText(this, "You pushed the Safety Toolkit button! Sorry, it's not implemented yet!", Toast.LENGTH_SHORT).show();
-        SafetyOptionsDialog dialog = SafetyOptionsDialog.newInstance();
+        SafetyOptionsDialog dialog = SafetyOptionsDialog.newInstance(sToolkitWaitingForOkay);
         dialog.show(fragmentManager, "SafetyOptionsDialog");
         //Handles the response through overriden interface methods onNotify and onEmergency()
     }
@@ -821,10 +825,16 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
     //-----------------Overriding SafetyToolkitListener methods ---------------------------------------
     @Override
+    //Purpose:          Toggle flag "sToolkitWaitingForOkay" so we wait for user to confirm their safety. Text all trusted contacts of current info.
     public void onNotifyContacts() {
+        sToolkitWaitingForOkay = true;
+
         //Check permissions for it:   don't needthe call permision but still. TODO: should probably ask for permissions in onCreate() btw
-        if((ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) || (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)){
-            ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS}, REQUEST_CODE_CALL_PHONE_AND_TEXT_PERMISSION);
+        if((ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED)
+                || (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
+                || (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED)
+        ){
+            ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS}, REQUEST_CODE_CALL_PHONE_AND_TEXT);
         }
         else {
             Toast.makeText(this, "I am notifying all your contacts", Toast.LENGTH_SHORT).show();
@@ -835,11 +845,17 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     }
 
     @Override
+    //Purpose:          Toggle flag "sToolkitWaitingForOkay" so we wait for user to confirm their safety. Make dial call immediately to police + text all trusted contacts of current info.
     public void onEmergency() {
+        sToolkitWaitingForOkay = true;
+
         Toast.makeText(this, "I am doing absolute emergency functions", Toast.LENGTH_SHORT).show();
         //Check permissions for it:
-        if((ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) || (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)){
-            ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS}, REQUEST_CODE_CALL_PHONE_AND_TEXT_PERMISSION);
+        if((ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED)
+                || (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
+                || (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED)
+                ){
+            ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS}, REQUEST_CODE_CALL_PHONE_AND_TEXT);
         }
         else{
             //1.) Call Emergency services: 911 or campus phone, etc
@@ -853,6 +869,11 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
             messageAllTC(emergencyMessage);
         }
     }
+    @Override
+    //Purpose:      Toggle flag so we no longer check for user to be in danger.
+    public void onOkayNow(){
+        sToolkitWaitingForOkay = false;
+    }
 
     //Purpose:      Helper for overridden SafetyToolkitListener methods --> sends given message to all of user's trusted contacts
     public void messageAllTC(String message){
@@ -861,13 +882,14 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         Log.d(TAG, "messageAllTC(): trustedContacts = " + trustedContacts.toString());
 
         SmsManager smsManager = SmsManager.getDefault();
-        PendingIntent sentPI;
+        ArrayList<String> messageArray = smsManager.divideMessage(message);         //bc the message is to long
         for(int i = 0; i < trustedContacts.size(); i++) {
             TrustedContact currTC = trustedContacts.get(i);
             try {
                 currTC.fetchIfNeeded();
-                sentPI = PendingIntent.getBroadcast(this, 0,new Intent("SMS_SENT"), 0);
-                smsManager.sendTextMessage("+1"+currTC.parsePhoneNumber(), null, message, sentPI, null);
+
+                //smsManager.sendTextMessage(currTC.parsePhoneNumber(), null, "Just testing again", null, null);            //only for short messages
+                smsManager.sendMultipartTextMessage(currTC.parsePhoneNumber(), null, messageArray, null, null);
             } catch (ParseException e) {
                 e.printStackTrace();
             }

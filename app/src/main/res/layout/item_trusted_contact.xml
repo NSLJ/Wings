@@ -8,7 +8,7 @@
 
 
     <ImageButton
-        android:id="@+id/btnExit"
+        android:id="@+id/btnOptionsExit"
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:layout_alignParentTop="true"

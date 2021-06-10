@@ -35,7 +35,7 @@ public class MakeRatingDialog extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         //Views:
-        Button btnOk = view.findViewById(R.id.btnAdd);
+        Button btnOk = view.findViewById(R.id.btnConfirmSafety);
         ratingBar = view.findViewById(R.id.ratingBar);
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
