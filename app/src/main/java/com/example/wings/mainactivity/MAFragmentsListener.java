@@ -54,6 +54,5 @@ public interface MAFragmentsListener {
     void toHelpFragment();
     void toUserBuddyRequestFragment();
 
-
-
+    void sendArrivedMessage();
 }

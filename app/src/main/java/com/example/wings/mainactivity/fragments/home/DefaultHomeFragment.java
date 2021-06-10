@@ -116,7 +116,7 @@ public class DefaultHomeFragment extends Fragment {
         btnSearch = view.findViewById(R.id.btnSearch);
         etSearchBar = view.findViewById(R.id.etSearchBar);
         confirmDestinationOverlay = view.findViewById(R.id.chooseDestinationOverlay);
-        displayDestination = view.findViewById(R.id.tvNotify);
+        displayDestination = view.findViewById(R.id.tvToReviewFrag);
         ivAcceptBtn = view.findViewById(R.id.ivAccept);
         ivRejectBtn = view.findViewById(R.id.ivReject);
 

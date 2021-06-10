@@ -597,6 +597,15 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         WorkManager.getInstance(getApplicationContext()).cancelAllWorkByTag(CHECK_PROXIMITY_WORKER_TAG);       //probably will need to refine by Tags so specific requests get canceled
     }
 
+    @Override
+    //Purpose:          Called by BuddyHomeFrag --> which user has confirmed safe arrival home --> sends messages to all Trusted Contacts that user has supposedly arrived home IF user had previously used the safety toolkit at all this trip
+    public void sendArrivedMessage(){
+        if(sToolkitWaitingForOkay){
+            Log.d(TAG, "sendArrivedMessage():  sending all TC's that this user has arrived home/destination");
+            User localParseUser = new User(currUser);
+            messageAllTC(localParseUser.getArrivedMessage());
+        }
+    }
 
     //------------Misc. helper methods------------------------------------------------------------------------
     private void setCurrentHomeFragment(String key){
@@ -873,6 +882,8 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     //Purpose:      Toggle flag so we no longer check for user to be in danger.
     public void onOkayNow(){
         sToolkitWaitingForOkay = false;
+        User currLocalUser = new User(currUser);
+        messageAllTC(currLocalUser.getOkayMessage());
     }
 
     //Purpose:      Helper for overridden SafetyToolkitListener methods --> sends given message to all of user's trusted contacts

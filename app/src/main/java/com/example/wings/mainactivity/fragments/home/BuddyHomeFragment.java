@@ -695,6 +695,7 @@ public class BuddyHomeFragment extends Fragment {
         MakeRatingDialog dialog = MakeRatingDialog.newInstance();
         dialog.setTargetFragment(thisFragInstance, 1);
         dialog.show(fragManager, "MakeRatingDialogTag");
+        listener.sendArrivedMessage();                      //tells all the user's trusted contacts that the user supposedly safely arrived home --> only in the case user had invoked the safety toolkit at all
     }
 
     public static boolean checkNearEnough(){
