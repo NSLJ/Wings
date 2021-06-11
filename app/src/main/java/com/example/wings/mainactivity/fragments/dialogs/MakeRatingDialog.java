@@ -108,6 +108,7 @@ public class MakeRatingDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
                 listener.toReviewFragment(forUser);
+                getDialog().dismiss();
             }
         });
     }

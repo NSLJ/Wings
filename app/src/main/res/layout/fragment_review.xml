@@ -58,7 +58,7 @@
         android:paddingBottom="10dp"
         android:textAlignment="textStart"
         android:textColor="@color/gray"
-        android:textColorHint="@color/gray_background"
+        android:textColorHint="@color/gray"
         android:textSize="14sp"
         tools:text="It was terrible sara is terrible it all horrible. goshgosh never ever again." />
 

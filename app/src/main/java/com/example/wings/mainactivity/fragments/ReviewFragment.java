@@ -1,5 +1,6 @@
 package com.example.wings.mainactivity.fragments;
 
+import android.content.Context;
 import android.media.Rating;
 import android.os.Bundle;
 
@@ -19,8 +20,14 @@ import android.widget.TextView;
 
 import com.example.wings.R;
 import com.example.wings.databinding.FragmentReviewBinding;
+import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.ParcelableObject;
+import com.example.wings.models.User;
+import com.example.wings.models.helpers.UpdateHandler;
+import com.example.wings.models.inParseServer.Review;
+import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
@@ -33,9 +40,12 @@ public class ReviewFragment extends Fragment {
     private static final String TAG = "ReviewFragment";
     public static final String KEY_FOR_USER = "userReviewFor";
 
+    MAFragmentsListener listener;
     FragmentReviewBinding binding;
 
     ParseUser userReviewFor;
+    User localParseUser;
+    String userName;
 
     //Views:
     TextView tvTitle;
@@ -44,8 +54,15 @@ public class ReviewFragment extends Fragment {
     TextView tvPrompt;
     Button btnSubmit;
 
-    public ReviewFragment() {
-        // Required empty public constructor
+    public ReviewFragment() {}
+
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof MAFragmentsListener) {
+            listener = (MAFragmentsListener) context;
+        } else {
+            throw new ClassCastException(context.toString() + " must implement MAFragmentsListener");
+        }
     }
 
     @Override
@@ -54,7 +71,9 @@ public class ReviewFragment extends Fragment {
         if (getArguments() != null) {
             ParcelableObject dataReceived = (ParcelableObject) Parcels.unwrap(getArguments().getParcelable(KEY_FOR_USER));
             userReviewFor = dataReceived.getOtherParseUser();
-            Log.d(TAG, "user received = " + userReviewFor.getObjectId());
+            localParseUser = new User(userReviewFor);                   //allows us to use getters instead of making repeated requests to database
+            userName = localParseUser.getFirstName();
+            Log.d(TAG, "user received = " + userReviewFor.getObjectId() + "   name = " + userName);
         }
     }
 
@@ -75,5 +94,41 @@ public class ReviewFragment extends Fragment {
         etBody = binding.etReviewText;
         tvPrompt = binding.tvPromptReview;
         btnSubmit = binding.btnSubmit;
+
+        if (userName != null) {
+            //2.) Set up prompts (prompts are a bit personal to each user!'
+            tvTitle.setText("Review " + userName + "?");
+            tvPrompt.setText("How was " + userName + " as a Buddy?");
+
+            //3.) Set on click listeners:
+            btnSubmit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    float rating = ratingBar.getRating();
+                    String reviewBody = etBody.getText().toString();
+
+                    //As long as its filled out --> create a Review object + update using UpdateHandler
+                    if(!reviewBody.equals("") && rating > 0){
+                        //1.) Create a Review instance:
+                        Review review = new Review(userReviewFor.getObjectId(), ParseUser.getCurrentUser().getObjectId(), reviewBody, rating);
+
+                        saveReview(review);
+                    }
+                }
+            });
+        }
+    }
+
+    private void saveReview(Review review){
+        review.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                //If no error saving the Review in Parse --> make an Update object for the user the review is for
+                if(e == null){
+                    UpdateHandler.updateReviews(userReviewFor.getObjectId(), review);
+                    listener.toCurrentHomeFragment();
+                }
+            }
+        });
     }
 }

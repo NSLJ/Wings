@@ -61,7 +61,7 @@ tools:context=".mainactivity.fragments.dialogs.MakeRatingDialog">
         android:layout_below="@+id/tvToReviewFrag"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="14dp"
-        android:layout_marginEnd="30dp"
+        android:layout_marginEnd="15dp"
         android:backgroundTint="@color/logo_teal"
         android:text="Submit" />
 
