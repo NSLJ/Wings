@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.wings.R;
+import com.example.wings.TimeFormatter;
 import com.example.wings.adapters.ReviewAdapter;
 import com.example.wings.databinding.FragmentOtherProfileBinding;
 import com.example.wings.mainactivity.MAFragmentsListener;
@@ -53,6 +54,7 @@ public class OtherProfileFragment extends Fragment {
     private List<Review> reviews;
     private RecyclerView rvReviews;
     private ReviewAdapter reviewAdapter;
+    private TextView tvNumReviews;
 
     public OtherProfileFragment() {}         // Required empty public constructor
 
@@ -97,23 +99,21 @@ public class OtherProfileFragment extends Fragment {
             //1.) Connect views:
             ImageView otherPic = binding.otherPic;
             TextView otherName = binding.otherName;
-            TextView otherEmail = binding.otherEmail;
+            TextView otherUsername = binding.tvUsername;
             RatingBar profileRating = binding.profileRating;
             TextView tvNumRatings = binding.tvNumRatings;
             TextView tvNumTrips = binding.tvNumTrips;
-            TextView tvNumReviews = binding.tvNumReviews;
+            tvNumReviews = binding.tvNumReviews;
             TextView tvMemberTime = binding.tvMemberTime;
             rvReviews = binding.rvReviews;
 
-            Log.d(TAG, "email = " + otherUser.getString(User.KEY_EMAIL));
-            //2.) Populate views:
+            //2.) Populate views, EXCEPT for tvNumReviews --> waits until query is finished and updates there!:
             otherName.setText(localParseUser.getFirstName() + " " + localParseUser.getLastName());
-            otherEmail.setText(otherUser.getString(User.KEY_EMAIL));
+            otherUsername.setText("@"+localParseUser.getUsername());
             profileRating.setRating((float) localParseUser.getRating());
             tvNumRatings.setText("(" + localParseUser.getNumRatings() + " ratings)");
-            tvMemberTime.setText("Member since:     " + localParseUser.toString());
-            tvNumTrips.setText( localParseUser.getNumTrips() + " total trips");
-            tvNumReviews.setText("(" + localParseUser.getNumReviews() + " reviews)");
+            tvMemberTime.setText("Member since:     " + TimeFormatter.getProperDate(otherUser.getCreatedAt().toString()));
+            tvNumTrips.setText("Total Completed Trips:   " + localParseUser.getNumTrips() + " trips");
             ParseFile image = localParseUser.getProfilePic();
             if (image != null) {
                 Glide.with(getContext())
@@ -152,6 +152,7 @@ public class OtherProfileFragment extends Fragment {
                         Log.d(TAG, "query found reviews for this person!");
                         reviews.addAll(objects);
                         reviewAdapter.notifyDataSetChanged();
+                        tvNumReviews.setText("(" + reviews.size() + " reviews)");
                     }
                 }
             }

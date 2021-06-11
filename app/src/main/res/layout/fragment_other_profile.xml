@@ -39,21 +39,22 @@
             android:textSize="38sp" />
 
         <TextView
-            android:id="@+id/otherEmail"
+            android:id="@+id/tvUsername"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/otherName"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="-10dp"
-            android:text="annie@cpp.edu"
+            android:text="@annieLo34"
             android:textColor="@color/gray"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <RatingBar
             android:id="@+id/profileRating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/otherEmail"
+            android:layout_below="@+id/tvUsername"
             android:layout_alignParentStart="true"
             android:layout_marginStart="75dp"
             android:layout_marginTop="5dp"
@@ -95,7 +96,7 @@
             android:layout_marginTop="16dp"
             android:layout_toRightOf="@id/ivTripIcon"
             android:fontFamily="@font/lato"
-            android:text="7 total trips"
+            android:text="Total Completed Trips:   7 trips"
             android:textAlignment="center"
             android:textColor="@color/gray"
             android:textSize="18sp" />
@@ -125,7 +126,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/topDivider"
-            android:layout_marginLeft="23dp"
+            android:layout_marginLeft="21dp"
             android:layout_marginTop="16dp"
             android:layout_toRightOf="@id/ivMemberIcon"
             android:fontFamily="@font/lato"
@@ -174,9 +175,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/tvReviewTitle"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="30dp"
             android:layout_marginBottom="100dp">
 
         </androidx.recyclerview.widget.RecyclerView>

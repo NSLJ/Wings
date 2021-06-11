@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.wings.TimeFormatter;
 import com.example.wings.databinding.ItemReviewBinding;
 import com.example.wings.models.User;
 import com.example.wings.models.inParseServer.Review;
@@ -90,9 +91,9 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
             if(fromUser != null) {
                 User localParseUser = new User(fromUser);       //encapsulates in User{} for easy calling to Parse
                 tvName.setText(localParseUser.getFirstName() + " " + localParseUser.getLastName());
-                tvMemberSince.setText("Member since:   " + fromUser.getCreatedAt().toString());
+                tvMemberSince.setText("Member since:   " + TimeFormatter.getAbbreviatedDate(fromUser.getCreatedAt().toString()));
                 ratingBar.setRating(reviewToPost.getRating());
-                tvReviewDate.setText(reviewToPost.getCreatedAt().toString());
+                tvReviewDate.setText(TimeFormatter.getTimeDifference(reviewToPost.getCreatedAt().toString()) + " ago");
                 tvBody.setText(reviewToPost.getBody());
                 ParseFile image = localParseUser.getProfilePic();
                 if (image != null) {

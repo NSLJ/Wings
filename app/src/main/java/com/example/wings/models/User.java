@@ -94,13 +94,7 @@ public class User extends ParseUser {
 
     //returns the username part of the cpp email (Example: billybronco@cpp.edu would return billybronco)
     public String getUsername() {
-        String username = "";
-        //index of the '@' char
-        int atIndex = getEmail().indexOf("@");
-
-        //gets substring of email address until '@'
-        username = getEmail().substring(0, atIndex);
-        return username;
+        return user.getString(KEY_USERNAME);
     }
 
     public void setUsername(String username) {
