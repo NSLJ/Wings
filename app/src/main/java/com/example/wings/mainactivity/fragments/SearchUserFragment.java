@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,7 +79,7 @@ public class SearchUserFragment extends Fragment {
         //Editing some colors on the searchbar here as I couldn't do it on the layout.xml!
         EditText searchEditText = (EditText) searchBar.findViewById(androidx.appcompat.R.id.search_src_text);
         searchEditText.setTextColor(getResources().getColor(R.color.gray, null));
-        searchEditText.setHintTextColor(getResources().getColor(R.color.gray_100, null));
+        searchEditText.setHintTextColor(getResources().getColor(R.color.gray_background, null));
 
         //Create a SearchUserOnclickListener to create the adapter!
         adapter = new SearchUserAdapter(getContext(), users, new SearchUserAdapter.SearchUserOnClickListener() {
@@ -137,7 +138,9 @@ public class SearchUserFragment extends Fragment {
                     }
 
                     else{
-                        Toast.makeText(getContext(), "There were no users with that username!", Toast.LENGTH_SHORT).show();
+                        Toast toast = Toast.makeText(getContext(), "There were no users with that username!", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.TOP, 0, 0);
+                        toast.show();
                         //erase what was previously displayed if anything:
                         adapter.clear();
                     }
