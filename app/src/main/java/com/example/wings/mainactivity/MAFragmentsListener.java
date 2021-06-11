@@ -53,6 +53,6 @@ public interface MAFragmentsListener {
     void toEditTrustedContactsFragment(List<TrustedContact> trustedContacts);           //So can persist the same list of TrustedContacts during profile set up
     void toHelpFragment();
     void toUserBuddyRequestFragment();
-
+    void toReviewFragment(ParseUser userReviewFor);
     void sendArrivedMessage();
 }

@@ -463,14 +463,14 @@ public class BuddyHomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String attemptedPin = etConfirmArrivalPin.getText().toString();
-                Log.d(TAG, "setMeetBuddyMode(): attemptedPin = " + attemptedPin);
+                Log.d(TAG, "setOnTripMode(): attemptedPin = " + attemptedPin);
                 if(attemptedPin.length() != 4){
                         Toast.makeText(getContext(), "You did not enter your PIN # for confirmation!", Toast.LENGTH_LONG).show();
                 }
                 else{
                     //Get the current user's pin field to check match:
                     String correctPin = currUser.getString(User.KEY_PIN).toString();
-                    Log.d(TAG, "setMeetBuddyMode(): correct pin = " + correctPin);
+                    Log.d(TAG, "setOnTripMode(): correct pin = " + correctPin);
 
                     if(attemptedPin.equals(correctPin)){
                         Toast.makeText(getContext(), "You confirmed your safe arrival!", Toast.LENGTH_LONG).show();
@@ -691,11 +691,12 @@ public class BuddyHomeFragment extends Fragment {
         listener.stopCheckingProximity();
 
         //Buddy Trip is finished --> reset both users + show dialog asking if they'd like to rate each other:
-        fabCancelBuddy.performClick();                                      //needs to reset both users completely (including deleting BuddyTrip) and go back to DefaultHomeFrag
-        MakeRatingDialog dialog = MakeRatingDialog.newInstance();
+        MakeRatingDialog dialog = MakeRatingDialog.newInstance(otherUser);
+        Log.d("Jo", "onConfirmArrival(): otherUser = " + otherUser.getObjectId());
         dialog.setTargetFragment(thisFragInstance, 1);
         dialog.show(fragManager, "MakeRatingDialogTag");
         listener.sendArrivedMessage();                      //tells all the user's trusted contacts that the user supposedly safely arrived home --> only in the case user had invoked the safety toolkit at all
+        fabCancelBuddy.performClick();                                      //needs to reset both users completely (including deleting BuddyTrip) and go back to DefaultHomeFrag
     }
 
     public static boolean checkNearEnough(){

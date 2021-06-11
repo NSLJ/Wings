@@ -16,7 +16,6 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import android.Manifest;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -30,6 +29,7 @@ import android.widget.Toast;
 
 import com.example.wings.mainactivity.fragments.BuddyTripStatusFragment;
 import com.example.wings.mainactivity.fragments.EditTrustedContactsFragment;
+import com.example.wings.mainactivity.fragments.ReviewFragment;
 import com.example.wings.mainactivity.fragments.dialogs.SafetyOptionsDialog;
 import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.inParseServer.BuddyMeetUp;
@@ -303,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         //Create the request
         OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(UpdateLocationWorker.class)
                 .setInputData(data)         //send data
-                .setInitialDelay(5, TimeUnit.SECONDS)      //wait 5 seconds before doing it         //TODO: don't hardcode, make this time frame a constant
+                .setInitialDelay(60, TimeUnit.SECONDS)      //wait 5 seconds before doing it         //TODO: don't hardcode, make this time frame a constant
                 .build();
 
         //Queue up the request
@@ -569,6 +569,17 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     @Override
     public void toUserBuddyRequestFragment() {
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new UserBuddyRequestsFragment()).commit();
+    }
+
+    @Override
+    public void toReviewFragment(ParseUser userReviewFor) {
+        ParcelableObject sendData = new ParcelableObject();
+        sendData.setOtherParseUser(userReviewFor);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ReviewFragment.KEY_FOR_USER, Parcels.wrap(sendData));
+        Fragment fragment = new ReviewFragment();
+        fragment.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, fragment).commit();
     }
 
     @Override
