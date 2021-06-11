@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -22,12 +23,16 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.wings.R;
+import com.example.wings.adapters.ReviewAdapter;
 import com.example.wings.databinding.FragmentOtherProfileBinding;
 import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.User;
 import com.example.wings.models.inParseServer.Review;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import org.parceler.Parcels;
@@ -47,6 +52,7 @@ public class OtherProfileFragment extends Fragment {
 
     private List<Review> reviews;
     private RecyclerView rvReviews;
+    private ReviewAdapter reviewAdapter;
 
     public OtherProfileFragment() {}         // Required empty public constructor
 
@@ -63,7 +69,6 @@ public class OtherProfileFragment extends Fragment {
             throw new ClassCastException(context.toString() + " must implement MAFragmentsListener");
         }
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,16 +101,19 @@ public class OtherProfileFragment extends Fragment {
             RatingBar profileRating = binding.profileRating;
             TextView tvNumRatings = binding.tvNumRatings;
             TextView tvNumTrips = binding.tvNumTrips;
+            TextView tvNumReviews = binding.tvNumReviews;
             TextView tvMemberTime = binding.tvMemberTime;
             rvReviews = binding.rvReviews;
 
+            Log.d(TAG, "email = " + otherUser.getString(User.KEY_EMAIL));
             //2.) Populate views:
             otherName.setText(localParseUser.getFirstName() + " " + localParseUser.getLastName());
-            otherEmail.setText(localParseUser.getEmail());
+            otherEmail.setText(otherUser.getString(User.KEY_EMAIL));
             profileRating.setRating((float) localParseUser.getRating());
             tvNumRatings.setText("(" + localParseUser.getNumRatings() + " ratings)");
             tvMemberTime.setText("Member since:     " + localParseUser.toString());
             tvNumTrips.setText( localParseUser.getNumTrips() + " total trips");
+            tvNumReviews.setText("(" + localParseUser.getNumReviews() + " reviews)");
             ParseFile image = localParseUser.getProfilePic();
             if (image != null) {
                 Glide.with(getContext())
@@ -116,10 +124,37 @@ public class OtherProfileFragment extends Fragment {
 
             //3.) Set up the recycler view:
             reviews = new ArrayList<>();
+            reviewAdapter = new ReviewAdapter(getContext(), reviews);
+            rvReviews.setAdapter(reviewAdapter);
+            rvReviews.setLayoutManager(new LinearLayoutManager(getContext()));
 
+            //4.) Populate info into the modeL;
+            queryForReviews();
         }
         else{
             Toast.makeText(getContext(), "There was an error! Did not receive a user to populate :(", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void queryForReviews(){
+        String forUserId = otherUser.getObjectId();
+        ParseQuery<Review> query = ParseQuery.getQuery(Review.class);
+        query.whereEqualTo(Review.KEY_FOR_USER, forUserId);
+        query.findInBackground(new FindCallback<Review>() {
+            @Override
+            public void done(List<Review> objects, ParseException e) {
+                if(e == null){
+                    Log.d(TAG, "query sucessful: object = " + objects.toString());
+                    if(objects == null || objects.size() == 0){
+                        Log.d(TAG, "Query did not return anything");
+                    }
+                    else{
+                        Log.d(TAG, "query found reviews for this person!");
+                        reviews.addAll(objects);
+                        reviewAdapter.notifyDataSetChanged();
+                    }
+                }
+            }
+        });
     }
 }

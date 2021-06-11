@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     android:backgroundTintMode="src_over"
     android:fillViewport="true">
 
@@ -17,8 +16,8 @@
 
         <ImageView
             android:id="@+id/otherPic"
-            android:layout_width="125dp"
-            android:layout_height="125dp"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="25dp"
@@ -31,9 +30,9 @@
             android:id="@+id/otherName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
+            android:layout_below="@id/otherPic"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="177dp"
+            android:layout_marginTop="5dp"
             android:fontFamily="@font/satisfy"
             android:text="Annie Lo"
             android:textColor="@color/logo_teal"
@@ -177,7 +176,8 @@
             android:layout_below="@id/tvReviewTitle"
             android:layout_marginLeft="30dp"
             android:layout_marginTop="10dp"
-            android:layout_marginRight="30dp">
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="100dp">
 
         </androidx.recyclerview.widget.RecyclerView>
     </RelativeLayout>

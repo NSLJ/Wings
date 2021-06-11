@@ -9,10 +9,10 @@ import com.parse.ParseUser;
 public class Review extends ParseObject {
     private static final String TAG = "Review";
 
-    private static final String KEY_FOR_USER = "forUserId";
-    private static final String KEY_FROM_USER = "fromUserId";
-    private static final String KEY_BODY = "body";
-    private static final String KEY_RATING = "rating";
+    public static final String KEY_FOR_USER = "forUserId";
+    public static final String KEY_FROM_USER = "fromUserId";
+    public static final String KEY_BODY = "body";
+    public static final String KEY_RATING = "rating";
 
     public Review(){}
 
@@ -46,7 +46,7 @@ public class Review extends ParseObject {
         return getString(KEY_BODY);
     }
     public float getRating(){
-        return (float) getNumber(KEY_RATING);
+        return getNumber(KEY_RATING).floatValue();
     }
 
 }

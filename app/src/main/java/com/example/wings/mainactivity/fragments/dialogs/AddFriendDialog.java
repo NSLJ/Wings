@@ -21,7 +21,7 @@ import com.example.wings.R;
  * Purpose:         Invoked by the SearchUserFragment. Used when user finds another user they may like to add as a friend! This Dialog --> displays profile information about this potential friend and asks whether or not the user would like to add them
  *                  Later when there is more information to show --> can change into a regular Fragment to display a whole profile page --> displays other's reviews of them.
  */
-public class SeeFriendDialog extends DialogFragment {
+public class AddFriendDialog extends DialogFragment {
     private static final String TAG = "SeeFriendDialog";
     private static final String KEY_OTHERUSER = "otherUser's name";
 
@@ -31,10 +31,10 @@ public class SeeFriendDialog extends DialogFragment {
     TextView tvHeading;
     Button btnAdd;
 
-    public SeeFriendDialog() {}
+    public AddFriendDialog() {}
 
-    public static SeeFriendDialog newInstance(String name) {
-        SeeFriendDialog fragment = new SeeFriendDialog();
+    public static AddFriendDialog newInstance(String name) {
+        AddFriendDialog fragment = new AddFriendDialog();
         Bundle args = new Bundle();
         args.putString(KEY_OTHERUSER, name);
         fragment.setArguments(args);

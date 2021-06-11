@@ -45,19 +45,10 @@ import java.io.File;
 import static android.app.Activity.RESULT_OK;
 
 
-//All auto-filled stuff, just follow the samples I left behind!
-
-
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link UserProfileFragment# newInstance} factory method to
- * create an instance of this fragment.
- */
 public class UserProfileFragment extends Fragment {
     public static final String TAG = "UserProfileFragment";
 
     private MAFragmentsListener listener;
-
 
     private ImageView profilePic;
     private TextView profileName;

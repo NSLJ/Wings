@@ -8,22 +8,19 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wings.R;
 
 import com.example.wings.adapters.SearchUserAdapter;
 import com.example.wings.mainactivity.MAFragmentsListener;
-import com.example.wings.mainactivity.fragments.dialogs.MakeRatingDialog;
-import com.example.wings.mainactivity.fragments.dialogs.SeeFriendDialog;
+import com.example.wings.mainactivity.fragments.dialogs.AddFriendDialog;
 import com.example.wings.models.User;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -77,13 +74,14 @@ public class SearchUserFragment extends Fragment {
         //Create a SearchUserOnclickListener to create the adapter!
         adapter = new SearchUserAdapter(getContext(), users, new SearchUserAdapter.SearchUserOnClickListener() {
             @Override
-            public void onClick(String nameToDisplay) {
-                Log.d(TAG, "row in SearchUserAdapter was clicked!");
-
+            public void onClick(ParseUser userClickedOn) {
                 //Go to dialog to display friend information + ask if want to add the friend
-                SeeFriendDialog dialog = SeeFriendDialog.newInstance(nameToDisplay);
+               /* AddFriendDialog dialog = AddFriendDialog.newInstance(nameToDisplay);
                 dialog.setTargetFragment(SearchUserFragment.this, 1);
-                dialog.show(getFragmentManager(), "SeeFriendDialog");
+                dialog.show(getFragmentManager(), "SeeFriendDialog");*/
+
+                //go to OtherProfileFrag to see this person's profile!
+                listener.toOtherProfileFragment(userClickedOn);
             }
         });
 
@@ -106,12 +104,11 @@ public class SearchUserFragment extends Fragment {
         });
     }
 
+    //TODO: allow querying for usernames, actual names, emails, etc, and automatic querying without having to click on search
     private void queryForUsers(String queriedUsername) {
         Log.d(TAG, "queryUsers()");
         ParseQuery<ParseUser> query = ParseUser.getQuery();
 
-        //do we want a limit?
-        //order it maybe by who is closest? for now just order by when the user was made
         query.whereEqualTo(User.KEY_USERNAME, queriedUsername);
         query.findInBackground(new FindCallback<ParseUser>() {
             @Override

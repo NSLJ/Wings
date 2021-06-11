@@ -550,8 +550,14 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     }
     //Purpose:      Displays the corresponding Fragment classes
     @Override
-    public void toOtherProfileFragment() {
-        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new OtherProfileFragment()).commit();
+    public void toOtherProfileFragment(ParseUser userToShow) {
+        ParcelableObject sendData = new ParcelableObject();
+        sendData.setOtherParseUser(userToShow);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(OtherProfileFragment.KEY_OTHER_USER, Parcels.wrap(sendData));
+        Fragment frag = new OtherProfileFragment();
+        frag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
     }
     @Override
     public void toChooseBuddyFragment() {

@@ -182,6 +182,9 @@ public class User extends ParseUser {
     public int getNumRatings(){
         return getAllRatings().size();
     }
+    public int getNumReviews(){
+        return getReviewsReceived().size();
+    }
 
     public List<Review> getReviewsReceived(){
         return user.getList(KEY_REVIEWS_RECEIVED);
