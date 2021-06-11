@@ -93,7 +93,7 @@ public class ChooseBuddyFragment extends Fragment {
         //1.) Connect views:
         usersToDisplay = new ArrayList<>();
         distancesList = new ArrayList<>();
-        recyclerView = view.findViewById(R.id.rvBuddies);
+        recyclerView = view.findViewById(R.id.rvReviews);
         btnBack = view.findViewById(R.id.btnBack);
 
         btnBack.setOnClickListener(new View.OnClickListener() {

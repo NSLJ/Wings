@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:layout_marginTop="-100dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/gray_background"
     android:orientation="vertical"
     tools:context=".mainactivity.fragments.BuddyTripStatusFragment">
-
 
     <TextView
         android:id="@+id/tvTitle"
@@ -262,3 +266,4 @@
     </LinearLayout>
 
 </LinearLayout>
+</ScrollView>

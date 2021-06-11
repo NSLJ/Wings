@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.wings.models.inParseServer.Buddy;
 import com.example.wings.models.inParseServer.BuddyMeetUp;
 import com.example.wings.models.inParseServer.BuddyTrip;
+import com.example.wings.models.inParseServer.Review;
 import com.example.wings.models.inParseServer.TrustedContact;
 import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.parse.ParseClassName;
@@ -54,6 +55,10 @@ public class User extends ParseUser {
     public static final String KEY_ISBUDDY = "isBuddy";
     public static final String KEY_DESTINATIONSTR = "destinationString";
     public static final String KEY_BUDDY = "buddyInstance";
+    public static final String KEY_REVIEWS_RECEIVED = "reviewsReceived";
+    public static final String KEY_NUM_TRIPS = "numTrips";
+    public static final String KEY_ALL_RATINGS = "allRatings";
+
 
     //not sure if we will need this
     public static final String KEY_OBJECTID = "objectId";
@@ -168,6 +173,19 @@ public class User extends ParseUser {
         return queriedDestination;
     }
 
+    public int getNumTrips(){
+        return (int) user.getNumber(KEY_NUM_TRIPS);
+    }
+    public List<Float> getAllRatings(){
+        return user.getList(KEY_ALL_RATINGS);
+    }
+    public int getNumRatings(){
+        return getAllRatings().size();
+    }
+
+    public List<Review> getReviewsReceived(){
+        return user.getList(KEY_REVIEWS_RECEIVED);
+    }
     public void setIsBuddy(boolean answer) {
         put(KEY_ISBUDDY, answer);
     }

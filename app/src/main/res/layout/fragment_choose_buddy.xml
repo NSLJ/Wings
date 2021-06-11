@@ -26,7 +26,7 @@
         android:text="Back" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvBuddies"
+        android:id="@+id/rvReviews"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
