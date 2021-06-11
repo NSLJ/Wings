@@ -14,7 +14,7 @@
         android:padding="10dp">
 
         <TextView
-            android:id="@+id/tvHeading"
+            android:id="@+id/tvOptionsHeading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/satisfy"
@@ -24,10 +24,10 @@
             android:textSize="28sp" />
 
         <TextView
-            android:id="@+id/tvNotify"
+            android:id="@+id/tvToReviewFrag"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tvHeading"
+            android:layout_below="@id/tvOptionsHeading"
             android:layout_centerHorizontal="false"
             android:layout_marginLeft="45dp"
             android:layout_marginTop="5dp"
@@ -40,10 +40,10 @@
             android:textSize="18sp" />
 
         <Button
-            android:id="@+id/btnAdd"
+            android:id="@+id/btnConfirmSafety"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/tvNotify"
+            android:layout_below="@+id/tvToReviewFrag"
             android:layout_alignParentStart="false"
             android:layout_alignParentEnd="false"
             android:layout_centerHorizontal="true"

@@ -6,8 +6,10 @@ import com.example.wings.models.inParseServer.Buddy;
 import com.example.wings.models.inParseServer.BuddyMeetUp;
 import com.example.wings.models.inParseServer.BuddyRequest;
 import com.example.wings.models.inParseServer.BuddyTrip;
+import com.example.wings.models.inParseServer.Review;
 import com.example.wings.models.inParseServer.TrustedContact;
 import com.example.wings.models.User;
+import com.example.wings.models.inParseServer.Update;
 import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.parse.Parse;
 import com.parse.ParseObject;
@@ -32,11 +34,13 @@ public class ParseApplication extends Application {
         ParseObject.registerSubclass(TrustedContact.class);
         ParseObject.registerSubclass(WingsGeoPoint.class);
         ParseObject.registerSubclass(BuddyMeetUp.class);
+        ParseObject.registerSubclass(Review.class);
+        ParseObject.registerSubclass(Update.class);
 
         // Initializes Parse SDK as soon as the application is created
         Parse.initialize(new Parse.Configuration.Builder(this)
-                .applicationId("72bJpnuYmdfcxDrigJ0PnmJyghvSk5dzRXTnWhc4")
-                .clientKey("lZY7K2bp0kmXkVJDbVHop4ZxDnOaZ6u58YLHmlok")
+                .applicationId("1RaG1OyUOkupAelJwPAOxtp80KZ2BokQuVvRq1SP")
+                .clientKey("HZqvpoD3UrgiAMucL83uSMode9HHr1bZp9rFh2OC")
                 .server("https://parseapi.back4app.com")
                 .build()
         );

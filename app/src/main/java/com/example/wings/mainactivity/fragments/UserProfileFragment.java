@@ -109,7 +109,6 @@ public class UserProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
         profilePic = view.findViewById(R.id.profilePic);
         profileName = view.findViewById(R.id.profileName);
         profilePin = view.findViewById(R.id.profilePin);
@@ -164,9 +163,6 @@ public class UserProfileFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
-
-
     }
 
 

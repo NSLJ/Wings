@@ -14,7 +14,7 @@ tools:context=".mainactivity.fragments.dialogs.MakeRatingDialog">
     android:padding="10dp">
 
     <TextView
-        android:id="@+id/tvHeading"
+        android:id="@+id/tvOptionsHeading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="@font/satisfy"
@@ -28,16 +28,17 @@ tools:context=".mainactivity.fragments.dialogs.MakeRatingDialog">
         style="@android:style/Widget.DeviceDefault.RatingBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvHeading"
+        android:layout_below="@+id/tvOptionsHeading"
         android:layout_centerHorizontal="true"
         android:isIndicator="false"
         android:numStars="5"
+        android:progressBackgroundTint="@color/gray_100"
         android:progressTint="@color/logo_teal"
         android:rating="3.5"
         android:stepSize="0.5" />
 
     <TextView
-        android:id="@+id/tvNotify"
+        android:id="@+id/tvToReviewFrag"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/ratingBar"
@@ -47,22 +48,33 @@ tools:context=".mainactivity.fragments.dialogs.MakeRatingDialog">
         android:layout_marginRight="30dp"
         android:background="@null"
         android:fontFamily="@font/lato"
-        android:text="This will affect their overall rating!"
+        android:text="Want to make a review?  Click here!"
         android:textAlignment="center"
-        android:textColor="@color/gray"
-        android:textSize="18sp" />
+        android:textColor="#0DD106"
+        android:textSize="18sp"
+        android:textStyle="italic" />
 
     <Button
-        android:id="@+id/btnAdd"
+        android:id="@+id/btnConfirmSafety"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvNotify"
-        android:layout_alignParentStart="false"
-        android:layout_alignParentEnd="false"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
+        android:layout_below="@+id/tvToReviewFrag"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="15dp"
         android:backgroundTint="@color/logo_teal"
-        android:text="Ok" />
+        android:text="Submit" />
+
+    <Button
+        android:id="@+id/btnNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvToReviewFrag"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="30dp"
+        android:layout_toStartOf="@+id/btnConfirmSafety"
+        android:backgroundTint="@color/gray_100"
+        android:text="No Thanks" />
 
 </RelativeLayout>
 </RelativeLayout>

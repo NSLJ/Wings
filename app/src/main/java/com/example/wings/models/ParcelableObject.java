@@ -13,6 +13,7 @@ import com.parse.ParseUser;
 import org.parceler.Parcel;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 //Purpose:          This is used specifically to encapsulate ParseObjects/Users in order to make it parcelable and send them from Fragment to Fragment. Enables just one uniform way of sending data!
@@ -34,6 +35,7 @@ public class ParcelableObject {
     String contextFrom = "";
     String meetUpId = "";
     boolean someBoolean = false;
+    List<TrustedContact> trustedContacts = new ArrayList<>();
 
     public ParcelableObject(){}
 
@@ -64,7 +66,12 @@ public class ParcelableObject {
     public void setTrustedContact(TrustedContact trustedContact) {
         this.trustedContact = trustedContact;
     }
-
+    public void setTrustedContactList(List<TrustedContact> newList){
+        trustedContacts.addAll(newList);
+    }
+    public List<TrustedContact> getTrustedContactList(){
+        return trustedContacts;
+    }
     public void setMode(String string){
         mode = string;
     }

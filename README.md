@@ -1,8 +1,6 @@
 # Wings: With Wings, You Never Walk Alone
 
-### Important Update (6/4/2021 2:45PM) - Database is down, app temporarily offline!
-
-## Demo: Walkthrough (Updated 5/29/2021)
+## Demo: Walkthrough (Updated 5/29/2021), to be updated again soon!
 <img src="History of walkthroughs/5-29-walkthrough.gif">
 **Notes:    The map settings on the right is shown to display how to imitate a user's current location! 
 <br>
@@ -34,38 +32,46 @@ Users who are connected are confirmed to be safe "walking buddies" for each othe
 ### 1. User Stories (Required and Optional)
 
 **Required Must-have Stories**
-- [X] Database set up in back4app.
 - [x] User can register a new account.
-- [x] User can login.
-- [x] User can log off.
-- [x] User can view their own profiles.
-- [x] User can view other profiles
-
+- [x] User can login and log off.
+- [x] User can view their own profiles and other users' profiles
 - [x] User is shown all possible buddies.
 - [x] User can send, receive, and respond to multiple Buddy Requests.
-- [x] User can verify their Buddy when meeting in person. 
-- [x] User can confirm when they've safely arrived at their destination. (button to comfirm)
+- [x] User can set a marker on the map to determine the common destination for both Buddies to walk together towards. 
+- [x] User can verify their Buddy via PIN, assigned ID numbers, and profile pictures.
+- [x] User can confirm via PIN when they've safely arrived at their destination.
 - [x] User can input their intended destination on a map. 
 - [x] Users are tracked while on a Buddy Trip.
+- [x] Users must be within 15 meters of their destination or meetup location before being able to confirm to the next step. 
 - [x] User can search for other users.
-- [ ] User can send Emergency Information quickly to Trusted Contacts.
+- [x] User can set up their Trusted Contacts with a max. of 5 contacts.
+- [x] User can cancel the Buddy Trip at any time.
+- [ ] Buddy Trips and Meetups must be completed within a given lenient ETA. The ETA may be extended with the consent + confirmation of both Buddies.
+- [x] User can see the most current information about the Buddy Trip at any time.
+- [x] User can use the Safety Toolkit to notify Trusted Contacts at ANY time (during or not during a Buddy Trip):
+   - [x] Safety Toolkit can only be used with confirmation of PIN.
+   - [x] User can choose from two options in the Safety Toolkit: (1) Notify Trusted Contacts or (2) Immediate emergency:
+      - User can choose the Notify Trusted Contacts option to automatically send texts of relevant information to all their saved Trusted Contacts. It is used when the user feels unsafe but is NOT in immediate danger.
+      - User can choose the Immediate emergency option in the case that they need immediate help. Automatic dialing of police and automatic texts sent to all Trusted Contacts with urgent messages. 
+   - [x] All applicable relevant information is sent: All Buddies' current locations, intended destinations, their Buddy's general information, all other contacted Trusted Contacts
+   - [ ] All sent locations via text message always shows real time locations. 
+   - [x] After being invoked, Safety Toolkit waits for the user to confirm their safety once again via PIN, and then automatically sends all Trusted Contacts an updated message of their safety. 
+   - [ ] If the user has NOT confirmed safety after reaching their destination and after a lenient time period, Safety Toolkit notifies/updates all Trusted Contacts. 
+- [x] Buddies can rate and review each other after a Buddy Trip. 
+- [ ] Users are banned if their rating is too low. 
 
 **Optional Nice-to-have Stories**
 - [ ] Different modes of buddying up:
    - [ ] User can choose to be "able to be a Buddy" when not in need of a Buddy themself. 
-   - [ ] User can choose to be a Solo Walker, where they walk to their destination on their own but is still open to being paired with a Buddy. 
+   - [ ] User can choose to be a Solo Walker, where they walk to their destination on their own but is still open to being paired with a Buddy (i.e still receiving Buddy Requests). 
 - [ ] User can add friends.
 - [ ] User can view friend list.
-- [ ] Buddies can rate each other after a Buddy Trip. 
 - [ ] Users can chat with their Buddies. 
 - [ ] User can request to chat with other users. 
 - [ ] Buddying can be extended to groups.
 - [ ] The user is shown best matched possible buddies first.
 - [ ] Filters are available when a user searches through a list of possible buddies. 
-- [ ] User can modify their profile information.
-- [ ] User can modify their account and app settings. 
 - [ ] Users can choose to receive notifications when there is a new possible buddy.
-- [ ] Users are banned if their rating is too low. 
 - [ ] Users are shown the nearest registered safe spaces.
 - [ ] Users can report suspicious areas/activity.
 

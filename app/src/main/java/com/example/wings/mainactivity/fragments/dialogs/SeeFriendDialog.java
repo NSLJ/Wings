@@ -5,7 +5,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,10 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wings.R;
-import com.example.wings.models.ParcelableObject;
-import com.parse.ParseUser;
-
-import org.parceler.Parcels;
 
 /**
  * Purpose:         Invoked by the SearchUserFragment. Used when user finds another user they may like to add as a friend! This Dialog --> displays profile information about this potential friend and asks whether or not the user would like to add them
@@ -65,9 +60,9 @@ public class SeeFriendDialog extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        btnExit = view.findViewById(R.id.btnExit);
-        btnAdd = view.findViewById(R.id.btnAdd);
-        tvHeading = view.findViewById(R.id.tvHeading);
+        btnExit = view.findViewById(R.id.btnOptionsExit);
+        btnAdd = view.findViewById(R.id.btnConfirmSafety);
+        tvHeading = view.findViewById(R.id.tvOptionsHeading);
 
         tvHeading.setText("Add " + otherName+"?");
         btnExit.setOnClickListener(new View.OnClickListener() {

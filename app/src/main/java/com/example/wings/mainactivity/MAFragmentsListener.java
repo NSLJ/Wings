@@ -6,8 +6,11 @@ import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.inParseServer.Buddy;
 import com.example.wings.models.inParseServer.BuddyMeetUp;
 import com.example.wings.models.inParseServer.BuddyTrip;
+import com.example.wings.models.inParseServer.TrustedContact;
 import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.parse.ParseUser;
+
+import java.util.List;
 
 /**
  * MAFragmentsListener.java
@@ -41,15 +44,15 @@ public interface MAFragmentsListener {
     //Other frags:
     void toHomeFragment(String modeKey);
     void toProfileSetupFragment();
+    void toProfileSetupFragment(List<TrustedContact> trustedContacts);          //so EditTrustedContactsFrag may pass the finalized list of Trusted Contacts
     void toUserProfileFragment();
     void toSearchUserFragment();
     void toOtherProfileFragment();
     void toChooseBuddyFragment();
     void toSettingsFragment();
-    void toEditTrustedContactsFragment();
+    void toEditTrustedContactsFragment(List<TrustedContact> trustedContacts);           //So can persist the same list of TrustedContacts during profile set up
     void toHelpFragment();
     void toUserBuddyRequestFragment();
-
-
-
+    void toReviewFragment(ParseUser userReviewFor);
+    void sendArrivedMessage();
 }

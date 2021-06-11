@@ -18,7 +18,9 @@ import androidx.work.WorkManager;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,17 +28,19 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.wings.mainactivity.fragments.BuddyTripStatusFragment;
+import com.example.wings.mainactivity.fragments.EditTrustedContactsFragment;
+import com.example.wings.mainactivity.fragments.ReviewFragment;
 import com.example.wings.mainactivity.fragments.dialogs.SafetyOptionsDialog;
 import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.inParseServer.BuddyMeetUp;
 import com.example.wings.models.inParseServer.BuddyTrip;
+import com.example.wings.models.inParseServer.TrustedContact;
 import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.example.wings.workers.CheckProximityWorker;
 import com.example.wings.R;
 import com.example.wings.workers.UpdateLocationWorker;
 import com.example.wings.mainactivity.fragments.home.BuddyHomeFragment;
 import com.example.wings.mainactivity.fragments.ChooseBuddyFragment;
-import com.example.wings.commonFragments.EditTrustedContactsFragment;
 import com.example.wings.commonFragments.HelpFragment;
 import com.example.wings.mainactivity.fragments.home.ConfirmBuddyHomeFragment;
 import com.example.wings.mainactivity.fragments.home.DefaultHomeFragment;
@@ -58,6 +62,8 @@ import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -104,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
     //UpdateLocationWorker keys:
     private static final int REQUEST_CODE_LOCATION_PERMISSION = 1;              //request code for permissions result
+    private static final int REQUEST_CODE_CALL_PHONE_AND_TEXT = 1234;
     public static final String KEY_SENDCOUNTER = "activity_counter";
     public static final String KEY_RESULTSTRING = "result_string";
     public static final String KEY_GETCOUNTER = "worker_counter";
@@ -131,6 +138,8 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     private int counter = 0;
     LifecycleOwner owner = this;                    //used in the startTracking() to listen to WorkInfo responses from the UpdateLocationWorker
 
+    private boolean sToolkitWaitingForOkay = false;             //used to tell SafetyOptionsDialog which overlay to show (options or safety confirmation?)
+
     @Override
     /**
      * Purpose:         called automatically when activity is launched. Initializes the BottomNavigationView with listeners when each menu item is clicked. on click --> raise correct fragment class.
@@ -140,24 +149,24 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bottomNavigationView = findViewById(R.id.bottomNavigation);
-        fabBuddyRequests = (FloatingActionButton) findViewById(R.id.fabBuddyRequests);
-        fabBuddyRequests.setVisibility(View.INVISIBLE);             //do by default so other fragments may choose to toggle if they choose, also has no handler by default!
+        fabBuddyRequests = findViewById(R.id.fabBuddyRequests);
+        fabBuddyRequests.setVisibility(View.INVISIBLE);             //by default so other fragments may choose to toggle if they choose, also has no handler by default!
 
-        Toast.makeText(this, "You may need to refresh the page!", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "You may need to refresh the page!", Toast.LENGTH_LONG).show();
         //1.) Figure out which HomeFrag to start on:
         currentHomeFrag = findUserBuddyStatus();
-        Log.d(TAG, "onCreate() - currentHomeFrag = " + currentHomeFrag);
+        Log.i(TAG, "onCreate() - currentHomeFrag = " + currentHomeFrag);
 
-        //1.) Find out whether or not need to force ProfileSetupFrag:
+        //2.) Find out whether or not need to force ProfileSetupFrag (Intent would be given by StartActivity):
         if(getIntent().getBooleanExtra(KEY_PROFILESETUPFRAG, false)){
-            Log.d(TAG, "onCreate(): going to ProfileSetUpFragment");
             restrictUserScreen = true;
-            setRestrictScreen(restrictUserScreen);          //hides bottom nav bar and safety toolkit button
+            setRestrictScreen(restrictUserScreen);              //hides bottom nav bar and safety toolkit button until user's account is fully set up
             toProfileSetupFragment();
         }
 
         //else create bottom nav menu, go to correct HomeFrag, and begin tracking location:
         else {
+            Log.d(TAG, "");
             //2.) Unrestrict the screen --> shows the safety toolkit and bottom nav bar:
             restrictUserScreen = false;
             setRestrictScreen(restrictUserScreen);      //also automatically pulls the HomeFrag corresponding to the currentHomeFrag field onto screen
@@ -182,7 +191,6 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                 else{
                     keepTracking= true;
                     startTracking();           //infinitely runs as long as keepTracking = true;
-                   // setWatchRequests(true);
                 }
     }
 
@@ -260,6 +268,16 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                 //TODO: handle what to do when location permision is denied , i.e ask again or Toast, etc
             }
         }
+
+        if(requestCode == REQUEST_CODE_CALL_PHONE_AND_TEXT && grantResults.length>2){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+                //makePhoneCall()
+                Toast.makeText(this, "Please try again for now! This will be fixed soon!", Toast.LENGTH_SHORT).show();
+            }
+            else{
+                Toast.makeText(this, "Permission was denied!", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     /**
@@ -285,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         //Create the request
         OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(UpdateLocationWorker.class)
                 .setInputData(data)         //send data
-                .setInitialDelay(5, TimeUnit.SECONDS)      //wait 5 seconds before doing it         //TODO: don't hardcode, make this time frame a constant
+                .setInitialDelay(60, TimeUnit.SECONDS)      //wait 5 seconds before doing it         //TODO: don't hardcode, make this time frame a constant
                 .build();
 
         //Queue up the request
@@ -336,7 +354,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
             Option 2: Immediate danger --> notify all Trusted Contacts + dial the police
          */
         //Toast.makeText(this, "You pushed the Safety Toolkit button! Sorry, it's not implemented yet!", Toast.LENGTH_SHORT).show();
-        SafetyOptionsDialog dialog = SafetyOptionsDialog.newInstance();
+        SafetyOptionsDialog dialog = SafetyOptionsDialog.newInstance(sToolkitWaitingForOkay);
         dialog.show(fragmentManager, "SafetyOptionsDialog");
         //Handles the response through overriden interface methods onNotify and onEmergency()
     }
@@ -497,6 +515,31 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     public void toProfileSetupFragment(){
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new ProfileSetupFragment()).commit();
     }
+
+    @Override
+    public void toProfileSetupFragment(List<TrustedContact> trustedContacts) {
+        ParcelableObject sendData = new ParcelableObject();
+        sendData.setTrustedContactList(trustedContacts);
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ProfileSetupFragment.KEY_TRUSTED_CONTACTS, Parcels.wrap(sendData));
+        Fragment frag = new ProfileSetupFragment();
+        frag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
+    }
+    @Override
+    public void toEditTrustedContactsFragment(List<TrustedContact> trustedContacts) {
+        Log.d(TAG, "toEditTrustedContactsFragment - trustedContacts = " + trustedContacts.toString());
+        ParcelableObject sendData = new ParcelableObject();
+        sendData.setTrustedContactList(trustedContacts);
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(EditTrustedContactsFragment.KEY_TRUSTED_CONTACTS, Parcels.wrap(sendData));        //ProfileSetupFrag and EditTrustedContacts keys are the same but we get error for statically calling EditTrustedCibtacts's key
+        Fragment frag = new EditTrustedContactsFragment();
+        frag.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, frag).commit();
+    }
+
     @Override
     public void toUserProfileFragment() {
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new UserProfileFragment()).commit();
@@ -518,10 +561,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     public void toSettingsFragment() {
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new SettingsFragment()).commit();
     }
-    @Override
-    public void toEditTrustedContactsFragment() {
-        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new EditTrustedContactsFragment()).commit();
-    }
+
     @Override
     public void toHelpFragment() {
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new HelpFragment()).commit();
@@ -529,6 +569,17 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     @Override
     public void toUserBuddyRequestFragment() {
         fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, new UserBuddyRequestsFragment()).commit();
+    }
+
+    @Override
+    public void toReviewFragment(ParseUser userReviewFor) {
+        ParcelableObject sendData = new ParcelableObject();
+        sendData.setOtherParseUser(userReviewFor);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ReviewFragment.KEY_FOR_USER, Parcels.wrap(sendData));
+        Fragment fragment = new ReviewFragment();
+        fragment.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.flFragmentContainer, fragment).commit();
     }
 
     @Override
@@ -557,6 +608,15 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         WorkManager.getInstance(getApplicationContext()).cancelAllWorkByTag(CHECK_PROXIMITY_WORKER_TAG);       //probably will need to refine by Tags so specific requests get canceled
     }
 
+    @Override
+    //Purpose:          Called by BuddyHomeFrag --> which user has confirmed safe arrival home --> sends messages to all Trusted Contacts that user has supposedly arrived home IF user had previously used the safety toolkit at all this trip
+    public void sendArrivedMessage(){
+        if(sToolkitWaitingForOkay){
+            Log.d(TAG, "sendArrivedMessage():  sending all TC's that this user has arrived home/destination");
+            User localParseUser = new User(currUser);
+            messageAllTC(localParseUser.getArrivedMessage());
+        }
+    }
 
     //------------Misc. helper methods------------------------------------------------------------------------
     private void setCurrentHomeFragment(String key){
@@ -785,12 +845,77 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
     //-----------------Overriding SafetyToolkitListener methods ---------------------------------------
     @Override
+    //Purpose:          Toggle flag "sToolkitWaitingForOkay" so we wait for user to confirm their safety. Text all trusted contacts of current info.
     public void onNotifyContacts() {
-        Toast.makeText(this, "I am notifying all your contacts", Toast.LENGTH_SHORT).show();
+        sToolkitWaitingForOkay = true;
+
+        //Check permissions for it:   don't needthe call permision but still. TODO: should probably ask for permissions in onCreate() btw
+        if((ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED)
+                || (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
+                || (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED)
+        ){
+            ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS}, REQUEST_CODE_CALL_PHONE_AND_TEXT);
+        }
+        else {
+            Toast.makeText(this, "I am notifying all your contacts", Toast.LENGTH_SHORT).show();
+            User currLocalUser = new User(currUser);
+            String message = currLocalUser.getNotifyMessage();
+            messageAllTC(message);
+        }
     }
 
     @Override
+    //Purpose:          Toggle flag "sToolkitWaitingForOkay" so we wait for user to confirm their safety. Make dial call immediately to police + text all trusted contacts of current info.
     public void onEmergency() {
+        sToolkitWaitingForOkay = true;
+
         Toast.makeText(this, "I am doing absolute emergency functions", Toast.LENGTH_SHORT).show();
+        //Check permissions for it:
+        if((ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED)
+                || (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
+                || (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED)
+                ){
+            ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS}, REQUEST_CODE_CALL_PHONE_AND_TEXT);
+        }
+        else{
+            //1.) Call Emergency services: 911 or campus phone, etc
+            Intent intent = new Intent(Intent.ACTION_CALL);
+            intent.setData(Uri.parse("tel:9169528086"));
+            startActivity(intent);
+
+            //2.) Text message every one of the user's trusted contacts:
+            User currLocalUser = new User(currUser);
+            String emergencyMessage = currLocalUser.getEmergencyMessage();
+            messageAllTC(emergencyMessage);
+        }
     }
+    @Override
+    //Purpose:      Toggle flag so we no longer check for user to be in danger.
+    public void onOkayNow(){
+        sToolkitWaitingForOkay = false;
+        User currLocalUser = new User(currUser);
+        messageAllTC(currLocalUser.getOkayMessage());
+    }
+
+    //Purpose:      Helper for overridden SafetyToolkitListener methods --> sends given message to all of user's trusted contacts
+    public void messageAllTC(String message){
+        //Log.d(TAG, "messageAllTC(): message =" + message);
+        List<TrustedContact> trustedContacts = currUser.getList(User.KEY_TRUSTEDCONTACTS);
+        Log.d(TAG, "messageAllTC(): trustedContacts = " + trustedContacts.toString());
+
+        SmsManager smsManager = SmsManager.getDefault();
+        ArrayList<String> messageArray = smsManager.divideMessage(message);         //bc the message is to long
+        for(int i = 0; i < trustedContacts.size(); i++) {
+            TrustedContact currTC = trustedContacts.get(i);
+            try {
+                currTC.fetchIfNeeded();
+
+                //smsManager.sendTextMessage(currTC.parsePhoneNumber(), null, "Just testing again", null, null);            //only for short messages
+                smsManager.sendMultipartTextMessage(currTC.parsePhoneNumber(), null, messageArray, null, null);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

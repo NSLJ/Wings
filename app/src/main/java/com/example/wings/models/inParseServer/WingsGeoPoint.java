@@ -27,6 +27,11 @@ public class WingsGeoPoint extends ParseObject {
         setLongitude(longitude);
         setLocation(latitude, longitude);
     }
+    public WingsGeoPoint(double latitude, double longitude){
+        setLatitude(latitude);
+        setLongitude(longitude);
+        setLocation(latitude, longitude);
+    }
 
     public WingsGeoPoint(){}            //required
 
