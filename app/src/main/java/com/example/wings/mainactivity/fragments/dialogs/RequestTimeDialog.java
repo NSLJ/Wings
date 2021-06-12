@@ -105,11 +105,11 @@ public class RequestTimeDialog extends DialogFragment {
                 }
                 else if(cbOption1.isChecked()){
                     //Hardcoded, represents 15 minutes:
-                    handleClick(15*60); //TODO: ensure to uncomment these! They are commented now just for easy testing!
+                    handleClick(15/**60*/); //TODO: ensure to uncomment these! They are commented now just for easy testing!
                 }
                 else if(cbOption2.isChecked()){
                     //Hardcoded, represents 20 minutes:
-                    handleClick(20*60);
+                    handleClick(20/**60*/);
                 }
                 else{
                     Toast.makeText(getContext(), "No option is selected.", Toast.LENGTH_SHORT).show();
