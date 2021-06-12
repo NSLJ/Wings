@@ -55,17 +55,12 @@ import org.parceler.Parcels;
  */
 public class BuddyHomeFragment extends Fragment {
     private static final String TAG = "BuddyHomeFragment";
-    public static final String KEY_MODE = "whatMode?";     //mode passed in
-    public static final String KEY_BUDDYMEETUPID = "buddyMeetUpId";
-    public static final String KEY_CLOSE_ENOUGH = "userCloseEnough?";           //used when MainActivity needs to tell this frag that the user is close enough to the meetUp/destination
     public static final String KEY_DATA = "dataGivenAsParcelableObject";
 
     //Three possible modes, one of these choices must be passed in by the Context calling it in order for this fragment to function
     public static final String KEY_FIND_BUDDY_MODE = "modeFindBuddy";
     public static final String KEY_MEET_BUDDY_MODE = "modeMeetBuddy";
-    //public static final String KEY_MEET_BUDDY_MODE_NEAR = "modeMeetBuddy - near enough";            //TODO: fix so don't need this
     public static final String KEY_ON_TRIP_MODE = "modeOnTrip";
-    public static final String CONTEXT_MAIN_ACTIVITY = "fromMainActivity";          //We NEED to know who called this fragment --> different parameters are packaged into the Parcelable Object received
 
     private static MAFragmentsListener listener;
     //Fields to hold the data passed in:
@@ -73,6 +68,7 @@ public class BuddyHomeFragment extends Fragment {
     private static String otherUserId;
     private static String meetUpId;
     private boolean closeEnough = false;
+    private boolean isTimerOn = false;
 
     //General fields:
     static ParseUser currUser = ParseUser.getCurrentUser();
@@ -112,7 +108,6 @@ public class BuddyHomeFragment extends Fragment {
     private static ImageButton btnExitMeetUp;
     private static Button btnConfirmBuddyMeetup;
     static boolean meetUpOverlayEnabled;
-
 
 
     //Fields used for onTrip mode:
@@ -170,6 +165,9 @@ public class BuddyHomeFragment extends Fragment {
                 if(mode.equals(KEY_FIND_BUDDY_MODE)){}      //nothing needs to be done as no data is passed in this mode
 
                 else if(mode.equals(KEY_MEET_BUDDY_MODE) || (mode.equals(KEY_ON_TRIP_MODE))) {
+                    //Need to get whether or not the timer is already on so we do NOT start the time again!
+                    isTimerOn = dataReceived.getIsTimerOn();
+
                     otherBuddyInstance = dataReceived.getOtherBuddy();
                     otherUser = dataReceived.getOtherParseUser();
                     curBuddyInstance = dataReceived.getCurrBuddy();
@@ -217,19 +215,20 @@ public class BuddyHomeFragment extends Fragment {
                 public void onMapReady(GoogleMap googleMap) {
                     if(mode.equals(KEY_ON_TRIP_MODE)) {
                         wingsMap = new WingsMap(googleMap, getContext(), getViewLifecycleOwner(), false, true);        //automatically constantly shows current location
-                    }
-                    else {
-                        wingsMap = new WingsMap(googleMap, getContext(), getViewLifecycleOwner(), false, false);        //automatically constantly shows current location
-                    }
-                    //Ensures to set mode once map is done loading:
-                    if(mode.equals(KEY_FIND_BUDDY_MODE)){
-                        setFindBuddyMode();
+                        wingsMap.setIsTimed(true);              //let map know to save the est from the route it's mapping
+                        wingsMap.setMAFragmentListener(listener);
+                        setOnTripMode();
                     }
                     else if(mode.equals(KEY_MEET_BUDDY_MODE)){
+                        wingsMap = new WingsMap(googleMap, getContext(), getViewLifecycleOwner(), false, false);        //automatically constantly shows current location
+                        wingsMap.setIsTimed(true);          //yo map, its time to start taking this seriously bc we're actually going to track this route this time, save your etas
+                        wingsMap.setMAFragmentListener(listener);
                         setMeetBuddyMode();
                     }
-                    else if(mode.equals(KEY_ON_TRIP_MODE)){
-                        setOnTripMode();
+                    else if (mode.equals(KEY_FIND_BUDDY_MODE)){
+                        wingsMap = new WingsMap(googleMap, getContext(), getViewLifecycleOwner(), false, false);        //automatically constantly shows current location
+                        wingsMap.setIsTimed(false);
+                        setFindBuddyMode();
                     }
                     else{
                         Toast.makeText(getContext(), "Error! BuddyHomeFragment received a mode that wasn't valid!", Toast.LENGTH_SHORT).show();
@@ -306,6 +305,11 @@ public class BuddyHomeFragment extends Fragment {
                     curBuddyInstance.reset();
                 }
                 listener.setBuddyRequestBttn(false);
+
+                if(mode.equals(KEY_ON_TRIP_MODE) || mode.equals(KEY_MEET_BUDDY_MODE)){
+                    listener.stopCheckingProximity();
+                    listener.stopTimer();
+                }
                 listener.toDefaultHomeFragment();
             }
         });
@@ -391,7 +395,7 @@ public class BuddyHomeFragment extends Fragment {
     private void setMeetBuddyMode(){
         Log.d(TAG, "setMeetBuddyMode()");
         currUser = ParseUser.getCurrentUser();
-        //1.) (1) Out of the needBuddyButtonOverlay --> ONLY make the cancel button visible and (2) Show the meetUp overlay but disable the confirm button:
+        //1.) (1) Out of the needBuddyButtonOverlay --> ONLY make the cancel button visible and (2) Show the meetUp overlay but disable the confirm button: TODO: perhaps turn confirm button into an invoke this overlay button?
         fabGoChooseBuddyFrag.setVisibility(View.INVISIBLE);
         fabCancelBuddy.setText("Cancel the Meet Up");
         confirmMeetingOverlay.setVisibility(View.VISIBLE);
@@ -417,15 +421,20 @@ public class BuddyHomeFragment extends Fragment {
         });
 
         //4.) Watch current location
-        //We were told that the user is close enough --> show the overlay
+        //We were told that the user is close enough (e.g. we were already tracking this meetup)--> show the overlay
         if(closeEnough){
             enableMeetUpOverlay();
         }
-        else{
+        else{           //we need to begin tracking this meetup
             listener.startCheckingProximity(100, meetUpInstance);               //tells MainActivity to start CheckProximityWorker --> responds whether currUser is close enough to meeting up with their Buddy
+
+            //if timer not yet on --> Start timer for this meetup:
+            if(!isTimerOn) {
+                isTimerOn = true;
+                listener.startTimer(true, wingsMap.getCurrentEst());     //true = we are starting a meetUp
+            }
         }
     }
-
 
     //Purpose:  In charge of setting up necessary handlers in on trip mode:
     private void setOnTripMode(){
@@ -446,8 +455,10 @@ public class BuddyHomeFragment extends Fragment {
         else{           //Otherwise --> show the tripInfoOverlay (just displays overall significant info at beginning of BuddyTrip)
             tripInfoOverlay.setVisibility(View.VISIBLE);
             listener.startCheckingProximity(100, meetUpInstance);               //tells MainActivity to start CheckProximityWorker --> responds whether currUser is close enough to meeting up with their Buddy
+            if(!isTimerOn) {
+                listener.startTimer(true, wingsMap.getCurrentEst());
+            }
         }
-
 
         //4.) Set all onClick listener's need for both trip overlays:
         // 4a.) for tripInfoOverlay:  exit bttn
@@ -547,6 +558,7 @@ public class BuddyHomeFragment extends Fragment {
     private static void onConfirmMeetUp(){
         Toast.makeText(context, "You confirmed Meet up with your buddy!", Toast.LENGTH_LONG).show();
         listener.stopCheckingProximity();
+        listener.stopTimer();
 
         //Create a BuddyTrip instance!
         WingsGeoPoint currLocation = (WingsGeoPoint) currUser.getParseObject(User.KEY_CURRENTLOCATION);
@@ -689,6 +701,7 @@ public class BuddyHomeFragment extends Fragment {
     private static void onConfirmArrival(){
         Toast.makeText(context, "You confirmed reaching your destination!", Toast.LENGTH_LONG).show();
         listener.stopCheckingProximity();
+        listener.stopTimer();
 
         //Buddy Trip is finished --> reset both users + show dialog asking if they'd like to rate each other:
         MakeRatingDialog dialog = MakeRatingDialog.newInstance(otherUser);

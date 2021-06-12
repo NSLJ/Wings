@@ -34,9 +34,9 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="5dp"
             android:fontFamily="@font/satisfy"
-            android:text="Annie Lo"
             android:textColor="@color/logo_teal"
-            android:textSize="38sp" />
+            android:textSize="38sp"
+            tools:text="Annie Lo" />
 
         <TextView
             android:id="@+id/tvUsername"
@@ -45,10 +45,10 @@
             android:layout_below="@+id/otherName"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="-10dp"
-            android:text="@annieLo34"
             android:textColor="@color/gray"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="@annieLo34" />
 
         <RatingBar
             android:id="@+id/profileRating"
@@ -74,9 +74,9 @@
             android:layout_marginTop="271dp"
             android:layout_toEndOf="@+id/profileRating"
             android:fontFamily="@font/lato"
-            android:text="(43 ratings)"
             android:textColor="@color/gray"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            tools:text="(43 ratings)" />
 
         <View
             android:id="@+id/topDivider"
@@ -96,10 +96,11 @@
             android:layout_marginTop="16dp"
             android:layout_toRightOf="@id/ivTripIcon"
             android:fontFamily="@font/lato"
-            android:text="Total Completed Trips:   7 trips"
+            android:text="Total Completed Trips:   "
             android:textAlignment="center"
             android:textColor="@color/gray"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            tools:text="Total Completed Trips:   7 trips" />
 
         <ImageView
             android:id="@+id/ivTripIcon"
@@ -130,10 +131,11 @@
             android:layout_marginTop="16dp"
             android:layout_toRightOf="@id/ivMemberIcon"
             android:fontFamily="@font/lato"
-            android:text="Member since:     July 7, 2020"
+            android:text="Member since:    "
             android:textAlignment="center"
             android:textColor="@color/gray"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            tools:text="Member since:     July 7, 2020" />
 
         <View
             android:id="@+id/bottomDivider"
@@ -167,8 +169,8 @@
             android:layout_marginTop="15dp"
             android:layout_toEndOf="@+id/tvReviewTitle"
             android:fontFamily="@font/lato"
-            android:text="(24 reviews)"
-            android:textColor="@color/gray" />
+            android:textColor="@color/gray"
+            tools:text="(24 reviews)" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvReviews"
@@ -178,5 +180,6 @@
             android:layout_marginBottom="100dp">
 
         </androidx.recyclerview.widget.RecyclerView>
+
     </RelativeLayout>
 </ScrollView>

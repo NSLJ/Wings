@@ -27,6 +27,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+
+import com.example.wings.SheetsAndJava;
 import com.example.wings.mainactivity.fragments.BuddyTripStatusFragment;
 import com.example.wings.mainactivity.fragments.EditTrustedContactsFragment;
 import com.example.wings.mainactivity.fragments.ReviewFragment;
@@ -38,6 +40,7 @@ import com.example.wings.models.inParseServer.TrustedContact;
 import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.example.wings.workers.CheckProximityWorker;
 import com.example.wings.R;
+import com.example.wings.workers.TimerWorker;
 import com.example.wings.workers.UpdateLocationWorker;
 import com.example.wings.mainactivity.fragments.home.BuddyHomeFragment;
 import com.example.wings.mainactivity.fragments.ChooseBuddyFragment;
@@ -56,12 +59,16 @@ import com.example.wings.models.User;
 import com.example.wings.startactivity.StartActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.model.ValueRange;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
 
 import org.parceler.Parcels;
 
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -83,7 +90,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class MainActivity extends AppCompatActivity implements MAFragmentsListener, SafetyOptionsDialog.SafetyToolkitListener {
     private static final String TAG = "MainActivity";
-    private static final String CHECK_PROXIMITY_WORKER_TAG = "checkProximityWorkers";
+    private static final String CHECK_PROXIMITY_WORKER_TAG = "checkProximityWorkers";       //these two are needed to stop workers when necessary
+    private static final String TIMER_WORKER_TAG = "timerWorkers";
+
 
     //MainActivity specific constants --> to label which HomeFragment currUser needs to go to/previously have gone to:
     public static final String DEFAULT_HOME = "DefaultHomeFragment";
@@ -139,6 +148,10 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     LifecycleOwner owner = this;                    //used in the startTracking() to listen to WorkInfo responses from the UpdateLocationWorker
 
     private boolean sToolkitWaitingForOkay = false;             //used to tell SafetyOptionsDialog which overlay to show (options or safety confirmation?)
+
+    //For TimerWorker:
+    private boolean timerOn = false;                 //used so BuddyHomeFrag can tell MainActivity to start timer for tracking EST
+    private boolean onInitialWait = false;          //are we just starting a trip/meetup? e.g. = false when we've given a warning already/on agreed request/not waiting
 
     @Override
     /**
@@ -436,9 +449,11 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     @Override
     public void toBuddyHomeFragment(ParcelableObject data) {
         Log.d(TAG, "toBuddyHomeFrag(ParcelableObject");
+        //Always update this before sending it off! --> ensures BuddyHomeFrag will always know whether or not the timer is on --> will not accidentally start the timer again
+        data.setTimerOn(timerOn);
+
         //1.) update HomeFrag history:
         String mode = data.getMode();
-        //String contextFrom = data.getContextFrom();
         boolean closeEnough = data.getBoolean();            //returns false by default if "data" did not specifically initalize it
 
         if(!mode.equals("")){
@@ -624,6 +639,31 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         }
     }
 
+    @Override
+    //Purpose:          changes the startTimer field --> starts TimerWorker to wait for this amount of time
+    public void startTimer(boolean isInitalWait, long est) {
+        timerOn = true;
+        onInitialWait = isInitalWait;
+        //If this is the first time we are waiting for a trip/meetup --> wait for the est + 10 extra minutes
+        if(isInitalWait){
+            startTimerWorker(est+600);      //10 min * 60sec = 600 sec added
+        }
+
+        //Otherwise we are starting the timer due to a reqest --> do NOT give them extra time.
+        else{
+            startTimerWorker(est);
+        }
+    }
+
+    @Override
+    public void stopTimer(){
+        timerOn = false;
+        onInitialWait = false;
+        WorkManager.getInstance(getApplicationContext()).cancelAllWorkByTag(TIMER_WORKER_TAG);
+        Log.d(TAG, "timer stopped.");
+    }
+
+
     //------------Misc. helper methods------------------------------------------------------------------------
     private void setCurrentHomeFragment(String key){
         currentHomeFrag = key;          //assuming the key is one of the main activity's constants --> needs error checking
@@ -757,6 +797,49 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                 });
     }
 
+    //Purpose:          given how much time to wait in total in sec --> starts the TimerWorker to time it. This method will chop the calculatedEst accordingly in order to give warnings and chances for users to finish trip okay.
+    public void startTimerWorker(long est) {
+        //Warning 1 --> After 10 min passed the original est
+        //Warning 2 --> After
+
+        //For now just + 10min to est --> can request for time
+        //Test TimerWorker:
+        Data data = new Data.Builder().putLong(TimerWorker.KEY_TIME_WAIT_FOR, est).build();
+
+        //Create the request
+        OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(TimerWorker.class)
+                .setInputData(data)         //send data
+                .addTag(TIMER_WORKER_TAG)
+                .build();
+
+        //Queue up the request
+        WorkManager.getInstance(getApplicationContext())
+                .enqueueUniqueWork(
+                        "timerWorker request",
+                        ExistingWorkPolicy.REPLACE,         //says, if it does repeat, replace the new request with the old one
+                        (OneTimeWorkRequest) request
+                );
+        //Listen to information from the request
+        WorkManager.getInstance(getApplicationContext()).getWorkInfoByIdLiveData(request.getId())      //returns a live data
+                .observe(owner, new Observer<WorkInfo>() {
+
+                    //called every time WorkInfo is changed
+                    public void onChanged(@Nullable WorkInfo workInfo) {
+
+                        //If workInfo is there and it is succeeded
+                        if (workInfo != null) {
+                            if (workInfo.getState().isFinished()) {
+                                if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                                    Log.d(TAG, "Request succeeded ");
+                                    Toast.makeText(getApplicationContext(), "timer is done!!", Toast.LENGTH_SHORT).show();
+                                    //Do more stuff later
+                                }
+                            }
+                        }
+                    }
+                });
+    }
+
     //Purpose:          Creates/packages a BuddyHomeFragment for mode=onMeetUp. Because this mode will be display different depending on closeEnough, closeEnough is REQUIRED to be specified. Used by getCorrespondingFragment(), and
     //                  handling WorkerRequests when on success! (WorkerRequests keep checking certain fields for when closeEnough can = true!)
     private Fragment makeBuddyHomeFragmentMeetUp(BuddyMeetUp meetUpInstance, boolean closeEnough){
@@ -853,7 +936,32 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     @Override
     //Purpose:          Toggle flag "sToolkitWaitingForOkay" so we wait for user to confirm their safety. Text all trusted contacts of current info.
     public void onNotifyContacts() {
-        sToolkitWaitingForOkay = true;
+        //To test google sheets API:
+        /*try {
+            SheetsAndJava sheetsAndJavaObject = new SheetsAndJava();
+            Sheets sheetsService = sheetsAndJavaObject.getSheetsService(this);
+            String range = "Sheet1!A2:E2";
+            ValueRange response = sheetsService.spreadsheets().values()
+                    .get(SheetsAndJava.SPREADSHEET_ID, range)
+                    .execute();
+
+            List<List<Object>> values = response.getValues();
+            if (values == null || values.isEmpty()) {
+                Log.d("Jo", "no data found");
+            } else {
+                for (List row : values) {
+                    Log.d("Jo", (String) row.get(0) + " " + (String) row.get(1) + " " + (String) row.get(2) + " " + (String) row.get(3) + " " + (String) row.get(4));   //columns 1-5 --> indexes 0 - 4
+                }
+            }
+        } catch(IOException ioException){
+
+        }*/
+
+        //testing setStartTimer() + startTimerWorker():
+        startTimer(true, 30);        //start timer fr 30 sec
+
+        //Un comment all of this later:
+       /* sToolkitWaitingForOkay = true;
 
         //Check permissions for it:   don't needthe call permision but still. TODO: should probably ask for permissions in onCreate() btw
         if((ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED)
@@ -867,7 +975,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
             User currLocalUser = new User(currUser);
             String message = currLocalUser.getNotifyMessage();
             messageAllTC(message);
-        }
+        }*/
     }
 
     @Override

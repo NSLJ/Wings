@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
+import com.example.wings.mainactivity.MAFragmentsListener;
 import com.example.wings.mainactivity.fragments.home.BuddyHomeFragment;
 import com.example.wings.mainactivity.fragments.home.ConfirmBuddyHomeFragment;
 import com.example.wings.models.User;
@@ -64,7 +65,7 @@ public class WingsMap {
     private static final long UPDATE_INTERVAL = 5000;       //Can change later so other classes can change it
     private static final long FASTEST_INTERVAL = 3000;
 
-    CountDownLatch latch;       //TODO: need to delete instances
+    private MAFragmentsListener listener;
 
     private ParseUser currentUser;      //B/c we need to make tons of updates to the Parse
     private WingsClient client;
@@ -92,6 +93,8 @@ public class WingsMap {
     private double distanceFromCurLocation;
     public boolean isReady;
     private boolean trackOtherUser;
+    private long currentEst = -1;
+    private boolean isTimed = false;            //toggled when onMeetup or onBuddyTrip
 
     public WingsMap(GoogleMap map, Context context, LifecycleOwner fragLifecycleOwner, boolean isConfirmBuddyFrag, boolean trackOtherUser){
         this.map = map;
@@ -243,6 +246,22 @@ public class WingsMap {
                     } else {
                         setAllRoutes(result);                           //set allRoutes field = result
                         drawRoute(0, animateMap, title);                       //draw the first route
+
+
+                        //Are we keeping track of this route? e.g. onMeetup or onBuddyTrip?
+                        if(isTimed){
+                            long thisEta = result.get(0).getEst();
+
+                            //Do we need to change/initialize the currentEst?
+                            if (currentEst == -1 || thisEta > currentEst) {              //if this is the first time we are using it or if the new route --> a higher est than the old one
+                                setCurrentEst(thisEta);
+                                if((thisEta > currentEst) && listener != null) {
+                                    //Then we changed the previous Eta --> clear the timer + restart with new eta!
+                                    listener.stopTimer();
+                                    listener.startTimer(false, currentEst);             //false --> this is NOT timing the whole trip
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -426,6 +445,22 @@ public class WingsMap {
     public void clearAllRoutes(){
         allRoutes.clear();
         hasRoutes = false;
+    }
+    public void setIsTimed(boolean answer){
+        isTimed = answer;
+        if(!answer){                        //if we aren't timing this route anymore --> reset the currentEst
+            currentEst = -1;
+        }
+    }
+    public void setMAFragmentListener(MAFragmentsListener listener){
+        this.listener = listener;
+    }
+    public void setCurrentEst(long newEst){
+        currentEst = newEst;
+    }
+    public long getCurrentEst(){
+        Log.d(TAG, "getCurrentEst(): currentEst = " + currentEst);
+        return currentEst;
     }
     public boolean hasRoutes(){
         return hasRoutes;

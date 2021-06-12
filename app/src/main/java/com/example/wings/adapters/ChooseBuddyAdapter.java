@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.wings.R;
+import com.example.wings.databinding.ItemChooseBuddyBinding;
 import com.example.wings.models.User;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -29,10 +31,12 @@ public class ChooseBuddyAdapter extends RecyclerView.Adapter<ChooseBuddyAdapter.
     private List<ParseUser> buddiesToShow;
     private List<Double> distancesList;
     private OnClickListener clickListener;
+    ItemChooseBuddyBinding binding;
 
     //To pass in the position of row clicked on:
     public interface OnClickListener{
         void onClick(int position);
+        void goOtherProfile(ParseUser user);
     }
 
     //Pass in the models and an onClickListener:
@@ -47,8 +51,8 @@ public class ChooseBuddyAdapter extends RecyclerView.Adapter<ChooseBuddyAdapter.
     @Override
     public ChooseBuddyAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Log.d("ChooseBuddyAdapter", "onCreateViewHolder");
-        View buddyView = LayoutInflater.from(context).inflate(R.layout.item_choose_buddy, parent, false);
-        return new ViewHolder(buddyView);
+        binding = ItemChooseBuddyBinding.inflate(LayoutInflater.from(context), parent, false);
+        return new ViewHolder(binding.getRoot());
     }
 
     @Override
@@ -84,14 +88,16 @@ public class ChooseBuddyAdapter extends RecyclerView.Adapter<ChooseBuddyAdapter.
         TextView tvName;
         TextView tvDistance;
         RatingBar ratingBar;
+        Button btnGoProfile;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            rlContainer = (RelativeLayout) itemView.findViewById(R.id.rlContainer);
-            ivProfilePic = (ImageView) itemView.findViewById(R.id.ivOtherProfile);
-            tvName = (TextView) itemView.findViewById(R.id.tvOtherName);
-            tvDistance = (TextView) itemView.findViewById(R.id.tvDistance);
-            ratingBar = (RatingBar) itemView.findViewById(R.id.rbOtherRatings);
+            rlContainer = binding.rlContainer;
+            ivProfilePic = binding.ivOtherProfile;
+            tvName = binding.tvOtherName;
+            tvDistance = binding.tvDistance;
+            ratingBar = binding.rbOtherRatings;
+            btnGoProfile = binding.btnToProfile;
         }
 
         //Do all binding to a specific buddy here:
@@ -103,6 +109,12 @@ public class ChooseBuddyAdapter extends RecyclerView.Adapter<ChooseBuddyAdapter.
                 @Override
                 public void onClick(View v) {
                     clickListener.onClick(getAdapterPosition());
+                }
+            });
+            btnGoProfile.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    clickListener.goOtherProfile(user);
                 }
             });
             try {

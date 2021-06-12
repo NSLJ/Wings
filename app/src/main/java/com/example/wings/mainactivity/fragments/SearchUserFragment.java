@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wings.R;
@@ -49,6 +50,7 @@ public class SearchUserFragment extends Fragment {
     protected SearchUserAdapter adapter;
     protected List<ParseUser> users;
     SearchView searchBar;
+    TextView tvNoResults;
 
     public SearchUserFragment() {}
 
@@ -75,6 +77,7 @@ public class SearchUserFragment extends Fragment {
         rvUsers = binding.rvsearchforfriends;
         users = new ArrayList<>();
         searchBar = binding.searchBar;
+        tvNoResults = binding.tvNoResults;                 //Shown by default --> toggle visibilitiy when query
 
         //Editing some colors on the searchbar here as I couldn't do it on the layout.xml!
         EditText searchEditText = (EditText) searchBar.findViewById(androidx.appcompat.R.id.search_src_text);
@@ -135,12 +138,14 @@ public class SearchUserFragment extends Fragment {
                         }
                         adapter.clear();
                         adapter.addAll(objects);
+                        tvNoResults.setVisibility(View.INVISIBLE);
                     }
 
                     else{
                         Toast toast = Toast.makeText(getContext(), "There were no users with that username!", Toast.LENGTH_SHORT);
                         toast.setGravity(Gravity.TOP, 0, 0);
                         toast.show();
+                        tvNoResults.setVisibility(View.VISIBLE);
                         //erase what was previously displayed if anything:
                         adapter.clear();
                     }

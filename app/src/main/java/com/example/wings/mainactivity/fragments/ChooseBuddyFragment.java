@@ -114,6 +114,13 @@ public class ChooseBuddyFragment extends Fragment {
 
                 listener.toConfirmBuddyHomeFragment(ConfirmBuddyHomeFragment.KEY_SEND_MODE, objectId);
             }
+
+            @Override
+            public void goOtherProfile(ParseUser userToShow){
+                listener.toOtherProfileFragment(userToShow);
+
+                //TODO: implement back button function
+            }
         };
 
         buddyAdapter = new ChooseBuddyAdapter(getContext(), usersToDisplay, distancesList, onClickListener);

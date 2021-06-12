@@ -55,4 +55,7 @@ public interface MAFragmentsListener {
     void toUserBuddyRequestFragment();
     void toReviewFragment(ParseUser userReviewFor);
     void sendArrivedMessage();
+
+    void startTimer(boolean isInitialWait, long est);
+    void stopTimer();
 }
