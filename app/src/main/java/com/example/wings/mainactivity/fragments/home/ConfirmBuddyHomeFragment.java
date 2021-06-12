@@ -90,6 +90,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
     private ImageView ivAcceptRequest;
     private ImageView ivRejectRequest;
     public static TextView tvTripDestination;
+    TextView tvLoad;
 
     public static Resources resource;
     public ConfirmBuddyHomeFragment() {}
@@ -166,6 +167,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
         ivRejectRequest = view.findViewById(R.id.ivReject);
         btnBack = view.findViewById(R.id.btnBack);
         tvTripDestination = view.findViewById(R.id.tvOtherBuddyId);
+        tvLoad = view.findViewById(R.id.tvLoad);
 
         btnBack.setOnClickListener(new View.OnClickListener() {         //TODO: I think we should keep a history of fragment passing in MainActivity to just go to some "previous" fragment instead
             @Override
@@ -194,6 +196,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
                     }
                     else{
                         setUp();
+                        tvLoad.setVisibility(View.INVISIBLE);
                     }
                 }
                 else{
@@ -251,6 +254,7 @@ public class ConfirmBuddyHomeFragment extends Fragment {
                     BuddyRequest requestInQuestion = objects.get(0);
                     setBuddyRequestInstance(requestInQuestion);
                     setUp();
+                    tvLoad.setVisibility(View.INVISIBLE);
                 }
             }
         });

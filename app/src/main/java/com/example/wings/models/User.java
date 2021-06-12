@@ -93,7 +93,7 @@ public class User extends ParseUser {
     }
 
     //returns the username part of the cpp email (Example: billybronco@cpp.edu would return billybronco)
-    public String getUsername() {
+    public String getParseUsername() {
         return user.getString(KEY_USERNAME);
     }
 
@@ -557,5 +557,36 @@ public class User extends ParseUser {
     public String getArrivedMessage(){
         return "UPDATE: From Wing's Messaging Service: \n\n" + getFirstName() + " has confirmed their safe arrival at their destination with us. It is suggested to personally check in with them right now to truly ensure that.\n\nHere is their last location following their safety confirmation: \n"
                 + getLocationLink(getCurrentLocation());
+    }
+
+    //Purpose:      When the user hasn't entered an emergency but Wing's detects one!
+    public String getEmergencyNoResponseMessage(){
+        String fName = getFirstName();
+        String emergencyMesssage = "URGENT:  From Wing's EMERGENCY Service: \n\n" + fName + " has not responded to us for an extensive amount of time! Here is their current information. You will be notified again if " + fName + " can confirm their safety!\n\n\nINFORMATION:\n\n"
+                + getCurrentLocationMessage();
+
+        /*if(!getIsBuddy()){
+            notifyMesssage += "\n\n" +fName+" was NOT with a paired Buddy when they called for notification services.";
+        }
+        else if(getBuddyInstance().getHasBuddy()){
+            notifyMesssage += "\n\n" +fName+" was NOT with a paired Buddy when they called for notification services.";
+        }
+        else */
+        if (getBuddyInstance().getOnMeetup()) {
+            emergencyMesssage += "\n\n" + fName + " was MEETING with a paired Buddy. Here is their Buddy's information:\n"
+                    + getBuddyInfo()
+                    + "\n\n*Trip information:\n"
+                    + getTripInfo();
+        } else if (getBuddyInstance().getOnBuddyTrip()) {
+            emergencyMesssage += "\n\n" + fName + " was WALKING with a paired Buddy. Here is their Buddy's information:\n"
+                    + getBuddyInfo()
+                    + "\n\n*Trip information:\n"
+                    + getTripInfo();
+        } else {   //User doesn't fit in one of these stages --> must be an error
+            Log.e(TAG, "getEmergencyMessage(): user is not in one of the acceptable stages!");
+        }
+
+        emergencyMesssage += "\n\n* Others also contacted with this info:" + getTCsNotifiedMessage();
+        return emergencyMesssage;
     }
 }

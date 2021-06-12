@@ -58,4 +58,6 @@ public interface MAFragmentsListener {
 
     void startTimer(boolean isInitialWait, long est);
     void stopTimer();
+    void setRequestTime(long time);
+    void showSnackBar();
 }

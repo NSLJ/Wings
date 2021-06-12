@@ -134,7 +134,7 @@ public class BuddyHomeFragment extends Fragment {
     private TextView tvTripInfoDestination;
     private ImageView ivTripInfoProfile;
     private ImageButton btnTripInfoExit;
-
+    private TextView tvLoad;
     public BuddyHomeFragment() {}
 
     @Override
@@ -256,6 +256,7 @@ public class BuddyHomeFragment extends Fragment {
         //views in this overlay:
         fabGoChooseBuddyFrag = view.findViewById(R.id.fabChooseBuddy);
         fabCancelBuddy = view.findViewById(R.id.fabCancelBuddy);
+        tvLoad = view.findViewById(R.id.tvLoad);
 
         //MeetUp overlay + views:
         confirmMeetingOverlay = view.findViewById(R.id.confirmMeetupOverlay);

@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.example.wings.R;
 import com.example.wings.databinding.FragmentWarningDialogBinding;
@@ -28,14 +29,14 @@ public class WarningDialog extends DialogFragment implements RequestTimeDialog.R
     private FragmentWarningDialogBinding binding;
     private Button btnNo;
     private Button btnRequestTime;
+    private ImageButton btnExit;
     public static WarningDialog thisFragInstance;
 
     public WarningDialog() {}
 
-    public static WarningDialog newInstance(String param1, String param2) {
+    public static WarningDialog newInstance() {
         WarningDialog fragment = new WarningDialog();
         Bundle args = new Bundle();
-
         fragment.setArguments(args);
         return fragment;
     }
@@ -70,8 +71,15 @@ public class WarningDialog extends DialogFragment implements RequestTimeDialog.R
 
         btnNo = binding.btnNo;
         btnRequestTime = binding.btnRequestTime;
+        btnExit = binding.btnExit;
 
         btnNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getDialog().dismiss();
+            }
+        });
+        btnExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getDialog().dismiss();
@@ -85,6 +93,7 @@ public class WarningDialog extends DialogFragment implements RequestTimeDialog.R
                 RequestTimeDialog dialog = RequestTimeDialog.newInstance();
                 dialog.setTargetFragment(thisFragInstance, 1);
                 dialog.show(getFragmentManager(), "RequestTimeDialogTag");
+                getDialog().dismiss();
             }
         });
     }
@@ -92,5 +101,9 @@ public class WarningDialog extends DialogFragment implements RequestTimeDialog.R
     @Override
     public void setRequestTime(long time) {
         listener.setRequestTime(time);
+    }
+    @Override
+    public void onClose(){
+        listener.showSnackBar();
     }
 }

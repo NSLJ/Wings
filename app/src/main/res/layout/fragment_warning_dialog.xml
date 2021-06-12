@@ -13,6 +13,18 @@ tools:context=".mainactivity.fragments.dialogs.WarningDialog">
     android:background="@color/gray_background"
     android:padding="10dp">
 
+    <ImageButton
+        android:id="@+id/btnExit"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="7dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/btn_circle"
+        android:backgroundTint="#E2FF0000"
+        android:src="@android:drawable/ic_menu_close_clear_cancel" />
+
     <TextView
         android:id="@+id/tvRequestTimeTitle"
         android:layout_width="match_parent"
@@ -28,12 +40,10 @@ tools:context=".mainactivity.fragments.dialogs.WarningDialog">
         android:id="@+id/btnRequestTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvBody2"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="14dp"
-        android:layout_marginEnd="15dp"
+        android:layout_below="@+id/btnNo"
+        android:layout_centerHorizontal="true"
         android:backgroundTint="@color/logo_teal"
-        android:text="Request more time" />
+        android:text="Request time" />
 
     <TextView
         android:id="@+id/tvNote"
@@ -42,9 +52,9 @@ tools:context=".mainactivity.fragments.dialogs.WarningDialog">
         android:layout_below="@id/tvRequestTimeTitle"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="50dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
         android:fontFamily="@font/lato"
         android:text="More than 10 minutes have passed since your expected time of arrival. "
         android:textAlignment="center"
@@ -55,9 +65,8 @@ tools:context=".mainactivity.fragments.dialogs.WarningDialog">
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvBody2"
-        android:layout_marginTop="14dp"
-        android:layout_marginEnd="30dp"
-        android:layout_toStartOf="@+id/btnSubmit"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="6dp"
         android:backgroundTint="@color/gray_100"
         android:text="I'll make it" />
 
@@ -66,9 +75,9 @@ tools:context=".mainactivity.fragments.dialogs.WarningDialog">
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvNote"
-        android:layout_marginStart="50dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="15dp"
-        android:layout_marginEnd="50dp"
+        android:layout_marginEnd="20dp"
         android:fontFamily="@font/lato"
         android:text="You have 10 MORE minutes to either: (1) Confrm your safe arrival or (2) Request more time before we NOTIFY your Trusted Contacts"
         android:textAlignment="center"

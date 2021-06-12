@@ -109,7 +109,7 @@ public class OtherProfileFragment extends Fragment {
 
             //2.) Populate views, EXCEPT for tvNumReviews --> waits until query is finished and updates there!:
             otherName.setText(localParseUser.getFirstName() + " " + localParseUser.getLastName());
-            otherUsername.setText("@"+localParseUser.getUsername());
+            otherUsername.setText("@"+localParseUser.getParseUsername());
             profileRating.setRating((float) localParseUser.getRating());
             tvNumRatings.setText("(" + localParseUser.getNumRatings() + " ratings)");
             tvMemberTime.setText("Member since:     " + TimeFormatter.getProperDate(otherUser.getCreatedAt().toString()));

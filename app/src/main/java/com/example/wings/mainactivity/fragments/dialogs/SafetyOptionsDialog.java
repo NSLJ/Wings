@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.wings.databinding.FragmentSafetyOptionsDialogBinding;
+import com.example.wings.mainactivity.MainActivity;
 import com.example.wings.models.User;
 import com.parse.ParseUser;
 
@@ -52,7 +53,7 @@ public class SafetyOptionsDialog extends DialogFragment {
     boolean waitingForOkay;                 //toggled to true by onCreateView() when need confirmSafetyContainer
 
     public interface SafetyToolkitListener{
-        void onNotifyContacts();
+        void onNotifyContacts(String messageType);
         void onEmergency();
         void onOkayNow();
     }
@@ -158,7 +159,7 @@ public class SafetyOptionsDialog extends DialogFragment {
                 if(attemptedPin.equals(correctPin)){
                     //Find which option selected:
                     if(cbNotify.isChecked() && !cbEmergency.isChecked()){
-                        listener.onNotifyContacts();
+                        listener.onNotifyContacts(MainActivity.USER_INVOKED);           //tell that the user invoked these notifications!
                         getDialog().dismiss();
                     }
                     else if(cbEmergency.isChecked()){           //doesn't matter if cbNotify is also checked as cbEmergency does all of the above
