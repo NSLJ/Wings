@@ -17,7 +17,7 @@ public class WingsGeoPoint extends ParseObject {
     public static final String KEY_LOCATION = "location";
     public static final String KEY_LATITUDE = "latitude";
     public static final String KEY_LONGITUDE = "longitude";
-
+    public static final String KEY_LOCATION_NAME = "locationName";
     private WingsGeoPoint wingsGeoPointInstance;
 
     //Purpose:      Set everything up here, include default values:
@@ -64,6 +64,12 @@ public class WingsGeoPoint extends ParseObject {
         return getNumber(KEY_LONGITUDE).doubleValue();
     }
 
+    public void setLocationName(String name){
+        put(KEY_LOCATION_NAME, name);
+    }
+    public String getLocationName(){
+        return getString(KEY_LOCATION_NAME);
+    }
     public void reset(){
         setLatitude(0);
         setLongitude(0);

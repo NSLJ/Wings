@@ -136,7 +136,7 @@
     </RelativeLayout>
 
     <View
-        android:id="@+id/divider"
+        android:id="@+id/topDivider"
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_below="@id/emailContainer"

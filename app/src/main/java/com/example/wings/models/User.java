@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.wings.models.inParseServer.Buddy;
 import com.example.wings.models.inParseServer.BuddyMeetUp;
 import com.example.wings.models.inParseServer.BuddyTrip;
+import com.example.wings.models.inParseServer.Review;
 import com.example.wings.models.inParseServer.TrustedContact;
 import com.example.wings.models.inParseServer.WingsGeoPoint;
 import com.parse.ParseClassName;
@@ -54,6 +55,10 @@ public class User extends ParseUser {
     public static final String KEY_ISBUDDY = "isBuddy";
     public static final String KEY_DESTINATIONSTR = "destinationString";
     public static final String KEY_BUDDY = "buddyInstance";
+    public static final String KEY_REVIEWS_RECEIVED = "reviewsReceived";
+    public static final String KEY_NUM_TRIPS = "numTrips";
+    public static final String KEY_ALL_RATINGS = "allRatings";
+
 
     //not sure if we will need this
     public static final String KEY_OBJECTID = "objectId";
@@ -88,14 +93,8 @@ public class User extends ParseUser {
     }
 
     //returns the username part of the cpp email (Example: billybronco@cpp.edu would return billybronco)
-    public String getUsername() {
-        String username = "";
-        //index of the '@' char
-        int atIndex = getEmail().indexOf("@");
-
-        //gets substring of email address until '@'
-        username = getEmail().substring(0, atIndex);
-        return username;
+    public String getParseUsername() {
+        return user.getString(KEY_USERNAME);
     }
 
     public void setUsername(String username) {
@@ -168,6 +167,22 @@ public class User extends ParseUser {
         return queriedDestination;
     }
 
+    public int getNumTrips(){
+        return (int) user.getNumber(KEY_NUM_TRIPS);
+    }
+    public List<Float> getAllRatings(){
+        return user.getList(KEY_ALL_RATINGS);
+    }
+    public int getNumRatings(){
+        return getAllRatings().size();
+    }
+    public int getNumReviews(){
+        return getReviewsReceived().size();
+    }
+
+    public List<Review> getReviewsReceived(){
+        return user.getList(KEY_REVIEWS_RECEIVED);
+    }
     public void setIsBuddy(boolean answer) {
         put(KEY_ISBUDDY, answer);
     }
@@ -542,5 +557,36 @@ public class User extends ParseUser {
     public String getArrivedMessage(){
         return "UPDATE: From Wing's Messaging Service: \n\n" + getFirstName() + " has confirmed their safe arrival at their destination with us. It is suggested to personally check in with them right now to truly ensure that.\n\nHere is their last location following their safety confirmation: \n"
                 + getLocationLink(getCurrentLocation());
+    }
+
+    //Purpose:      When the user hasn't entered an emergency but Wing's detects one!
+    public String getEmergencyNoResponseMessage(){
+        String fName = getFirstName();
+        String emergencyMesssage = "URGENT:  From Wing's EMERGENCY Service: \n\n" + fName + " has not responded to us for an extensive amount of time! Here is their current information. You will be notified again if " + fName + " can confirm their safety!\n\n\nINFORMATION:\n\n"
+                + getCurrentLocationMessage();
+
+        /*if(!getIsBuddy()){
+            notifyMesssage += "\n\n" +fName+" was NOT with a paired Buddy when they called for notification services.";
+        }
+        else if(getBuddyInstance().getHasBuddy()){
+            notifyMesssage += "\n\n" +fName+" was NOT with a paired Buddy when they called for notification services.";
+        }
+        else */
+        if (getBuddyInstance().getOnMeetup()) {
+            emergencyMesssage += "\n\n" + fName + " was MEETING with a paired Buddy. Here is their Buddy's information:\n"
+                    + getBuddyInfo()
+                    + "\n\n*Trip information:\n"
+                    + getTripInfo();
+        } else if (getBuddyInstance().getOnBuddyTrip()) {
+            emergencyMesssage += "\n\n" + fName + " was WALKING with a paired Buddy. Here is their Buddy's information:\n"
+                    + getBuddyInfo()
+                    + "\n\n*Trip information:\n"
+                    + getTripInfo();
+        } else {   //User doesn't fit in one of these stages --> must be an error
+            Log.e(TAG, "getEmergencyMessage(): user is not in one of the acceptable stages!");
+        }
+
+        emergencyMesssage += "\n\n* Others also contacted with this info:" + getTCsNotifiedMessage();
+        return emergencyMesssage;
     }
 }

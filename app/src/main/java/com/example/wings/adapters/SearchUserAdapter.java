@@ -30,7 +30,7 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
     private SearchUserOnClickListener listener;
 
     public interface SearchUserOnClickListener{
-        void onClick(String nameToDisplay);
+        void onClick(ParseUser user);               //to return which user was clicked on!
     }
     public SearchUserAdapter(Context context, List<ParseUser> users, SearchUserOnClickListener listener) {
         this.context = context;
@@ -87,7 +87,7 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
             rlContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    listener.onClick(user.getString(User.KEY_FIRSTNAME));
+                    listener.onClick(user);
                 }
             });
 

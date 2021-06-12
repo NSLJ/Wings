@@ -37,7 +37,7 @@ public class SendRequestStepsDialog extends DialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        btnOk = view.findViewById(R.id.btnConfirmSafety);
+        btnOk = view.findViewById(R.id.btnSubmit);
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

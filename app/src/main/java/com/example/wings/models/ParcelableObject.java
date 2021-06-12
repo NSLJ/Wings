@@ -35,6 +35,8 @@ public class ParcelableObject {
     String contextFrom = "";
     String meetUpId = "";
     boolean someBoolean = false;
+    boolean isTimerOn = false;
+
     List<TrustedContact> trustedContacts = new ArrayList<>();
 
     public ParcelableObject(){}
@@ -153,5 +155,10 @@ public class ParcelableObject {
     public void setBoolean(boolean bool){
         someBoolean = bool;
     }
-
+    public boolean getIsTimerOn(){
+        return isTimerOn;
+    }
+    public void setTimerOn(boolean bool){
+        isTimerOn = bool;
+    }
 }

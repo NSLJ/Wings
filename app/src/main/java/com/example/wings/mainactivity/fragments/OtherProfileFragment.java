@@ -6,7 +6,10 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,35 +23,38 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.wings.R;
+import com.example.wings.TimeFormatter;
+import com.example.wings.adapters.ReviewAdapter;
+import com.example.wings.databinding.FragmentOtherProfileBinding;
 import com.example.wings.mainactivity.MAFragmentsListener;
+import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.User;
+import com.example.wings.models.inParseServer.Review;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import org.parceler.Parcels;
 
-//All auto-filled stuff, just follow the samples I left behind!
+import java.util.ArrayList;
+import java.util.List;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link OtherProfileFragment# newInstance} factory method to
- * create an instance of this fragment.
- */
 public class OtherProfileFragment extends Fragment {
-
     public static final String TAG = "OtherProfileFragment";
+    public static final String KEY_OTHER_USER = "which user to show?";
 
+    private FragmentOtherProfileBinding binding;
     private MAFragmentsListener listener;
+    private ParseUser otherUser;
+    private User localParseUser;
 
-    private ImageView otherPic;
-    private TextView otherName;
-    private TextView otherEmail;
-    private TextView otherFriends;
-    private TextView distance;
-    private RatingBar profileRating;
-    private ImageButton editBtn;
-    private ImageButton deleteBtn;
-
+    private List<Review> reviews;
+    private RecyclerView rvReviews;
+    private ReviewAdapter reviewAdapter;
+    private TextView tvNumReviews;
 
     public OtherProfileFragment() {}         // Required empty public constructor
 
@@ -69,55 +75,87 @@ public class OtherProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(getArguments() != null){
+            ParcelableObject data = (ParcelableObject) Parcels.unwrap(getArguments().getParcelable(KEY_OTHER_USER));
+            otherUser = data.getOtherParseUser();
+            localParseUser = new User(otherUser);
+        }
+        else{
+            Log.e(TAG, "There was no user given for us to populate!");
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_other_profile, container, false);
+        binding = FragmentOtherProfileBinding.inflate(getLayoutInflater(), container, false);
+        return binding.getRoot();
     }
 
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        otherPic = view.findViewById(R.id.otherPic);
-        otherName = view.findViewById(R.id.otherName);
-        otherEmail = view.findViewById(R.id.otherEmail);
-        otherFriends = view.findViewById(R.id.otherFriends);
-        distance = view.findViewById(R.id.distance);
-        profileRating = view.findViewById(R.id.profileRating);
-        editBtn = view.findViewById(R.id.editBtn);
-        deleteBtn = view.findViewById(R.id.deleteBtn);
+        if(otherUser != null && localParseUser != null) {
+            //1.) Connect views:
+            ImageView otherPic = binding.otherPic;
+            TextView otherName = binding.otherName;
+            TextView otherUsername = binding.tvUsername;
+            RatingBar profileRating = binding.profileRating;
+            TextView tvNumRatings = binding.tvNumRatings;
+            TextView tvNumTrips = binding.tvNumTrips;
+            tvNumReviews = binding.tvNumReviews;
+            TextView tvMemberTime = binding.tvMemberTime;
+            rvReviews = binding.rvReviews;
 
-        ParseUser current = ParseUser.getCurrentUser();
-        otherName.setText(current.getString(User.KEY_FIRSTNAME));
-        otherEmail.setText(current.getString(User.KEY_EMAIL));
-        profileRating.setRating((float) current.getInt(User.KEY_RATING));
+            //2.) Populate views, EXCEPT for tvNumReviews --> waits until query is finished and updates there!:
+            otherName.setText(localParseUser.getFirstName() + " " + localParseUser.getLastName());
+            otherUsername.setText("@"+localParseUser.getParseUsername());
+            profileRating.setRating((float) localParseUser.getRating());
+            tvNumRatings.setText("(" + localParseUser.getNumRatings() + " ratings)");
+            tvMemberTime.setText("Member since:     " + TimeFormatter.getProperDate(otherUser.getCreatedAt().toString()));
+            tvNumTrips.setText("Total Completed Trips:   " + localParseUser.getNumTrips() + " trips");
+            ParseFile image = localParseUser.getProfilePic();
+            if (image != null) {
+                Glide.with(getContext())
+                        .load(image.getUrl())
+                        .fitCenter()
+                        .into(otherPic);
+            }
 
-        ParseFile image = current.getParseFile(User.KEY_PROFILEPICTURE);
-        if(image != null){
-            Glide.with(getContext())
-                    .load(image.getUrl())
-                    .override(400, 400)
-                    .fitCenter()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(otherPic);
+            //3.) Set up the recycler view:
+            reviews = new ArrayList<>();
+            reviewAdapter = new ReviewAdapter(getContext(), reviews);
+            rvReviews.setAdapter(reviewAdapter);
+            rvReviews.setLayoutManager(new LinearLayoutManager(getContext()));
+
+            //4.) Populate info into the modeL;
+            queryForReviews();
         }
+        else{
+            Toast.makeText(getContext(), "There was an error! Did not receive a user to populate :(", Toast.LENGTH_SHORT).show();
+        }
+    }
 
-        editBtn.setOnClickListener(new View.OnClickListener() {
+    private void queryForReviews(){
+        String forUserId = otherUser.getObjectId();
+        ParseQuery<Review> query = ParseQuery.getQuery(Review.class);
+        query.whereEqualTo(Review.KEY_FOR_USER, forUserId);
+        query.findInBackground(new FindCallback<Review>() {
             @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "Edit Button Clicked", Toast.LENGTH_SHORT).show();
+            public void done(List<Review> objects, ParseException e) {
+                if(e == null){
+                    Log.d(TAG, "query sucessful: object = " + objects.toString());
+                    if(objects == null || objects.size() == 0){
+                        Log.d(TAG, "Query did not return anything");
+                    }
+                    else{
+                        Log.d(TAG, "query found reviews for this person!");
+                        reviews.addAll(objects);
+                        reviewAdapter.notifyDataSetChanged();
+                        tvNumReviews.setText("(" + reviews.size() + " reviews)");
+                    }
+                }
             }
         });
-
-        deleteBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "Delete Button Clicked", Toast.LENGTH_SHORT).show();
-            }
-        });
-
     }
 }

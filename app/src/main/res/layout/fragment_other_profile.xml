@@ -1,102 +1,185 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
-    tools:context=".mainactivity.fragments.OtherProfileFragment">
+    android:backgroundTintMode="src_over"
+    android:fillViewport="true">
 
-    <ImageView
-        android:id="@+id/otherPic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp"
-        tools:src="@tools:sample/avatars" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#121212"
+        android:orientation="vertical"
+        tools:context=".mainactivity.fragments.OtherProfileFragment">
 
-    <TextView
-        android:id="@+id/otherName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="177dp"
-        android:fontFamily="@font/satisfy"
-        android:text="Annie"
-        android:textColor="@color/logo_teal"
-        android:textSize="38sp" />
+        <ImageView
+            android:id="@+id/otherPic"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="25dp"
+            android:adjustViewBounds="true"
+            android:cropToPadding="false"
+            android:scaleType="fitXY"
+            tools:src="@tools:sample/avatars" />
 
-    <TextView
-        android:id="@+id/otherEmail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/otherName"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="15dp"
-        android:text="annie@cpp.edu"
-        android:textColor="@color/gray"
-        android:textSize="18sp"/>
+        <TextView
+            android:id="@+id/otherName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/otherPic"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/satisfy"
+            android:textColor="@color/logo_teal"
+            android:textSize="38sp"
+            tools:text="Annie Lo" />
 
-    <!-- Text Link -->
-    <TextView
-        android:id="@+id/otherFriends"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/otherEmail"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="18dp"
-        android:text="My Friends"
-        android:textColor="@color/logo_teal"
-        android:textSize="18sp"/>
+        <TextView
+            android:id="@+id/tvUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/otherName"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="-10dp"
+            android:textColor="@color/gray"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:text="@annieLo34" />
 
-    <ImageButton
-        android:id="@+id/editBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/otherFriends"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="140dp"
-        android:layout_marginTop="20dp"
-        android:backgroundTint="#121212"
-        android:src="@android:drawable/ic_menu_edit" />
+        <RatingBar
+            android:id="@+id/profileRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvUsername"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="75dp"
+            android:layout_marginTop="5dp"
+            android:isIndicator="true"
+            android:numStars="5"
+            android:rating="3"
+            android:scaleX="0.9"
+            android:scaleY="0.9"
+            android:theme="@style/RatingBar" />
 
-    <ImageButton
-        android:id="@+id/deleteBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/otherFriends"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="140dp"
-        android:backgroundTint="#121212"
-        android:src="@android:drawable/ic_menu_close_clear_cancel" />
+        <TextView
+            android:id="@+id/tvNumRatings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="-5dp"
+            android:layout_marginTop="271dp"
+            android:layout_toEndOf="@+id/profileRating"
+            android:fontFamily="@font/lato"
+            android:textColor="@color/gray"
+            android:textSize="14sp"
+            tools:text="(43 ratings)" />
 
-    <TextView
-        android:id="@+id/distance"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/profileRating"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp"
-        android:text="0.2m away from you"
-        android:textColor="@color/gray"
-        android:textSize="18sp"/>
+        <View
+            android:id="@+id/topDivider"
+            android:layout_width="390dp"
+            android:layout_height="1dp"
+            android:layout_below="@id/profileRating"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="14dp"
+            android:background="@color/gray_100" />
 
-    <RatingBar
-        android:id="@+id/profileRating"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginEnd="85dp"
-        android:layout_marginBottom="100dp"
-        android:isIndicator="true"
-        android:numStars="5"
-        android:rating="3"
-        android:theme="@style/RatingBar" />
+        <TextView
+            android:id="@+id/tvNumTrips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ivMemberIcon"
+            android:layout_marginLeft="23dp"
+            android:layout_marginTop="16dp"
+            android:layout_toRightOf="@id/ivTripIcon"
+            android:fontFamily="@font/lato"
+            android:text="Total Completed Trips:   "
+            android:textAlignment="center"
+            android:textColor="@color/gray"
+            android:textSize="18sp"
+            tools:text="Total Completed Trips:   7 trips" />
 
-</RelativeLayout>
+        <ImageView
+            android:id="@+id/ivTripIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ivMemberIcon"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="7dp"
+            android:src="@android:drawable/ic_dialog_map" />
+
+        <ImageView
+            android:id="@+id/ivMemberIcon"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_below="@+id/topDivider"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="10dp"
+            android:src="@android:drawable/ic_menu_myplaces" />
+
+        <TextView
+            android:id="@+id/tvMemberTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/topDivider"
+            android:layout_marginLeft="21dp"
+            android:layout_marginTop="16dp"
+            android:layout_toRightOf="@id/ivMemberIcon"
+            android:fontFamily="@font/lato"
+            android:text="Member since:    "
+            android:textAlignment="center"
+            android:textColor="@color/gray"
+            android:textSize="18sp"
+            tools:text="Member since:     July 7, 2020" />
+
+        <View
+            android:id="@+id/bottomDivider"
+            android:layout_width="390dp"
+            android:layout_height="1dp"
+            android:layout_below="@id/ivTripIcon"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:background="@color/gray_100" />
+
+        <TextView
+            android:id="@+id/tvReviewTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/bottomDivider"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/lato"
+            android:text="All Reviews"
+            android:textColor="@color/gray"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvNumReviews"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/bottomDivider"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_toEndOf="@+id/tvReviewTitle"
+            android:fontFamily="@font/lato"
+            android:textColor="@color/gray"
+            tools:text="(24 reviews)" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvReviews"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/tvReviewTitle"
+            android:layout_marginBottom="100dp">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+    </RelativeLayout>
+</ScrollView>

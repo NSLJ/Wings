@@ -5,7 +5,7 @@ xmlns:app="http://schemas.android.com/apk/res-auto"
 xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
-tools:context=".mainactivity.fragments.dialogs.SeeFriendDialog">
+tools:context=".mainactivity.fragments.dialogs.AddFriendDialog">
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -26,7 +26,7 @@ tools:context=".mainactivity.fragments.dialogs.SeeFriendDialog">
             android:src="@android:drawable/ic_menu_close_clear_cancel" />
 
         <TextView
-            android:id="@+id/tvOptionsHeading"
+            android:id="@+id/tvRequestTimeTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/satisfy"
@@ -36,10 +36,10 @@ tools:context=".mainactivity.fragments.dialogs.SeeFriendDialog">
             android:textSize="30sp" />
 
         <Button
-            android:id="@+id/btnConfirmSafety"
+            android:id="@+id/btnSubmit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/tvOptionsHeading"
+            android:layout_below="@+id/tvRequestTimeTitle"
             android:layout_alignParentStart="false"
             android:layout_alignParentEnd="false"
             android:layout_centerHorizontal="true"

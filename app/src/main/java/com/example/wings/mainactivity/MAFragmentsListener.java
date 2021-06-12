@@ -47,7 +47,7 @@ public interface MAFragmentsListener {
     void toProfileSetupFragment(List<TrustedContact> trustedContacts);          //so EditTrustedContactsFrag may pass the finalized list of Trusted Contacts
     void toUserProfileFragment();
     void toSearchUserFragment();
-    void toOtherProfileFragment();
+    void toOtherProfileFragment(ParseUser userToShow);
     void toChooseBuddyFragment();
     void toSettingsFragment();
     void toEditTrustedContactsFragment(List<TrustedContact> trustedContacts);           //So can persist the same list of TrustedContacts during profile set up
@@ -55,4 +55,9 @@ public interface MAFragmentsListener {
     void toUserBuddyRequestFragment();
     void toReviewFragment(ParseUser userReviewFor);
     void sendArrivedMessage();
+
+    void startTimer(boolean isInitialWait, long est);
+    void stopTimer();
+    void setRequestTime(long time);
+    void showSnackBar();
 }

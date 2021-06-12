@@ -52,6 +52,8 @@ public class WingsRoute {
         this.lineOptions = lineOptions;
     }
     public void setEst(long est) {
+        //Calculate a very lenient est:     est + 1/2*est
+
         this.est = est;
     }
     public void setDistance(long distance) {

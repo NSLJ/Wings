@@ -129,6 +129,10 @@ public class UserBuddyRequestsFragment extends Fragment{
                 //I think position = corresponds to the indexes in the List<> models but may be backwards or something:
                 Toast.makeText(getContext(), "You are waiting for this Buddy to respond!", Toast.LENGTH_SHORT).show();
             }
+            @Override
+            public void goOtherProfile(ParseUser user){
+                listener.toOtherProfileFragment(user);
+            }
         };
 
         //2.) Create an ChooseBuddyAdapter.OnClickListener to create a ChooseBuddyAdapter -- will be used by both recycler views as tapping on any row does the same thing
@@ -147,6 +151,11 @@ public class UserBuddyRequestsFragment extends Fragment{
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
+            }
+
+            @Override
+            public void goOtherProfile(ParseUser user){
+                listener.toOtherProfileFragment(user);
             }
         };
 

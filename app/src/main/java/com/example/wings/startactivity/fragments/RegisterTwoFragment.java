@@ -28,6 +28,8 @@ import com.parse.SignUpCallback;
 
 import org.parceler.Parcels;
 
+import static com.example.wings.models.User.KEY_EMAIL;
+
 /**
  * RegisterTwoFragment.java
  * Purpose:         This displays the second screen of registering a new user/creating an account!
@@ -81,7 +83,15 @@ public class RegisterTwoFragment extends Fragment {
         if (getArguments() != null) {
             ParcelableObject pUser = Parcels.unwrap(getArguments().getParcelable(KEY_GET_USER));
             userToRegister = pUser.getUser();
-            Log.d(TAG, "onCreate(): userToRegister = " + userToRegister.getUsername());
+            //Get username from email:
+            String username = "";
+            //index of the '@' char
+            String email = userToRegister.getString(User.KEY_EMAIL);
+            int atIndex = email.indexOf("@");
+
+            //gets substring of email address until '@'
+            username = email.substring(0, atIndex);
+            Log.d(TAG, "onCreate(): userToRegister = " + username);
         }
     }
     @Override
@@ -223,7 +233,7 @@ public class RegisterTwoFragment extends Fragment {
      */
     private void createAccount() throws ParseException {
         Log.d(TAG, " in createAccount()");
-        password = userToRegister.getPassword();
+        password = userToRegister.getString(User.KEY_PASSWORD);;
         Log.d(TAG, "createAccount(): password=" + password);
 
         //3.) Attempt sign up in another thread, and set up callback handler:

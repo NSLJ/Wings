@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wings.R;
@@ -53,6 +54,7 @@ public class ChooseBuddyFragment extends Fragment {
     private RecyclerView recyclerView;
     private ChooseBuddyAdapter buddyAdapter;
     private Button btnBack;
+    private TextView tvLoadStatus;
 
     private  List<ParseUser> usersToDisplay;        //our models
     private List<Double> distancesList;
@@ -93,8 +95,9 @@ public class ChooseBuddyFragment extends Fragment {
         //1.) Connect views:
         usersToDisplay = new ArrayList<>();
         distancesList = new ArrayList<>();
-        recyclerView = view.findViewById(R.id.rvBuddies);
+        recyclerView = view.findViewById(R.id.rvReviews);
         btnBack = view.findViewById(R.id.btnBack);
+        tvLoadStatus = view.findViewById(R.id.tvLoadStatus);
 
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,6 +116,13 @@ public class ChooseBuddyFragment extends Fragment {
                 Log.d(TAG, "onClick(): position = " + position + "   objectId to send = " + objectId);
 
                 listener.toConfirmBuddyHomeFragment(ConfirmBuddyHomeFragment.KEY_SEND_MODE, objectId);
+            }
+
+            @Override
+            public void goOtherProfile(ParseUser userToShow){
+                listener.toOtherProfileFragment(userToShow);
+
+                //TODO: implement back button function
             }
         };
 
@@ -187,7 +197,10 @@ public class ChooseBuddyFragment extends Fragment {
                         //append data!
                         //postsAdapter.addAll(currPosts);
                         //Log.i(TAG, "queryPotentialBuddies():  success! posts appended= " + posts.toString());
-
+                        if(allUsers.size() == 0){
+                            tvLoadStatus.setVisibility(View.VISIBLE);
+                            tvLoadStatus.setText("No results");
+                        }
                         //2a.) Take out all of the Buddies in each user so we can query using the Buddy key: intendedDestination
                         List<String> potentialBuddyIds = new ArrayList<>();
                         for(int i = 0; i < allUsers.size(); i++){
@@ -245,6 +258,10 @@ public class ChooseBuddyFragment extends Fragment {
             public void done(List<Buddy> response, ParseException e) {
                 if(e == null){
                     Log.d(TAG, "queryPotentialBuddies(): success!:  response=" + response.toString());
+                    if(response.size() == 0){
+                        tvLoadStatus.setVisibility(View.VISIBLE);
+                        tvLoadStatus.setText("No results");
+                    }
                     //parseModel(response);       //to extract all "intendedDestination" fields and all User model objects from the List<Buddy>
                     parse(response);
                 }
@@ -327,6 +344,7 @@ public class ChooseBuddyFragment extends Fragment {
         Log.d(TAG, "parse() is done: usersToDisplay = " + usersToDisplay.toString());
         Log.d(TAG, "parse() is done: distances = " + distancesList.toString());
         buddyAdapter.notifyDataSetChanged();
+        tvLoadStatus.setVisibility(View.INVISIBLE);
     }
 
 }

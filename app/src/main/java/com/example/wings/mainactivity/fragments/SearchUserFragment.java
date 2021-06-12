@@ -5,25 +5,26 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SearchView;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wings.R;
 
 import com.example.wings.adapters.SearchUserAdapter;
+import com.example.wings.databinding.FragmentSearchUserBinding;
 import com.example.wings.mainactivity.MAFragmentsListener;
-import com.example.wings.mainactivity.fragments.dialogs.MakeRatingDialog;
-import com.example.wings.mainactivity.fragments.dialogs.SeeFriendDialog;
+import com.example.wings.mainactivity.fragments.dialogs.AddFriendDialog;
 import com.example.wings.models.User;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -41,12 +42,15 @@ import java.util.List;
 public class SearchUserFragment extends Fragment {
     public static final String TAG = "SearchUsersFragment";
 
+    FragmentSearchUserBinding binding;
     private MAFragmentsListener listener;
     private RecyclerView rvUsers;
+
     //make this a parseUser adapter
     protected SearchUserAdapter adapter;
     protected List<ParseUser> users;
     SearchView searchBar;
+    TextView tvNoResults;
 
     public SearchUserFragment() {}
 
@@ -62,28 +66,35 @@ public class SearchUserFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search_user, container, false);
+        binding = FragmentSearchUserBinding.inflate(getLayoutInflater(), container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        rvUsers = view.findViewById(R.id.rvsearchforfriends);
+        rvUsers = binding.rvsearchforfriends;
         users = new ArrayList<>();
-        searchBar = view.findViewById(R.id.searchbarFriends);
+        searchBar = binding.searchBar;
+        tvNoResults = binding.tvNoResults;                 //Shown by default --> toggle visibilitiy when query
+
+        //Editing some colors on the searchbar here as I couldn't do it on the layout.xml!
+        EditText searchEditText = (EditText) searchBar.findViewById(androidx.appcompat.R.id.search_src_text);
+        searchEditText.setTextColor(getResources().getColor(R.color.gray, null));
+        searchEditText.setHintTextColor(getResources().getColor(R.color.gray_background, null));
 
         //Create a SearchUserOnclickListener to create the adapter!
         adapter = new SearchUserAdapter(getContext(), users, new SearchUserAdapter.SearchUserOnClickListener() {
             @Override
-            public void onClick(String nameToDisplay) {
-                Log.d(TAG, "row in SearchUserAdapter was clicked!");
-
+            public void onClick(ParseUser userClickedOn) {
                 //Go to dialog to display friend information + ask if want to add the friend
-                SeeFriendDialog dialog = SeeFriendDialog.newInstance(nameToDisplay);
+               /* AddFriendDialog dialog = AddFriendDialog.newInstance(nameToDisplay);
                 dialog.setTargetFragment(SearchUserFragment.this, 1);
-                dialog.show(getFragmentManager(), "SeeFriendDialog");
+                dialog.show(getFragmentManager(), "SeeFriendDialog");*/
+
+                //go to OtherProfileFrag to see this person's profile!
+                listener.toOtherProfileFragment(userClickedOn);
             }
         });
 
@@ -106,12 +117,11 @@ public class SearchUserFragment extends Fragment {
         });
     }
 
+    //TODO: allow querying for usernames, actual names, emails, etc, and automatic querying without having to click on search
     private void queryForUsers(String queriedUsername) {
         Log.d(TAG, "queryUsers()");
         ParseQuery<ParseUser> query = ParseUser.getQuery();
 
-        //do we want a limit?
-        //order it maybe by who is closest? for now just order by when the user was made
         query.whereEqualTo(User.KEY_USERNAME, queriedUsername);
         query.findInBackground(new FindCallback<ParseUser>() {
             @Override
@@ -128,10 +138,14 @@ public class SearchUserFragment extends Fragment {
                         }
                         adapter.clear();
                         adapter.addAll(objects);
+                        tvNoResults.setVisibility(View.INVISIBLE);
                     }
 
                     else{
-                        Toast.makeText(getContext(), "There were no users with that username!", Toast.LENGTH_SHORT).show();
+                        Toast toast = Toast.makeText(getContext(), "There were no users with that username!", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.TOP, 0, 0);
+                        toast.show();
+                        tvNoResults.setVisibility(View.VISIBLE);
                         //erase what was previously displayed if anything:
                         adapter.clear();
                     }

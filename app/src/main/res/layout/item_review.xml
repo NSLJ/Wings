@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/gray_background">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/et_rounded_corners_style">
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="10dp"
+            android:layout_toRightOf="@id/ivPic"
+            android:fontFamily="@font/lato"
+            android:text="Abby Who"
+            android:textColor="@color/gray"
+            android:textSize="20sp" />
+
+        <ImageView
+            android:id="@+id/ivPic"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="10dp"
+            android:adjustViewBounds="true"
+            android:cropToPadding="false"
+            android:scaleType="fitXY"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/tvMemberSince"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvName"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:layout_toEndOf="@+id/ivPic"
+            android:fontFamily="@font/lato"
+            android:text="Member since:      07/07/2020"
+            android:textColor="@color/gray"
+            android:textSize="12sp" />
+
+        <RatingBar
+            android:id="@+id/ratingBar"
+            style="@android:style/Widget.DeviceDefault.Light.RatingBar.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ivPic"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="31dp"
+            android:layout_marginTop="8dp"
+            android:isIndicator="true"
+            android:progressBackgroundTint="@color/gray"
+            android:progressTint="@color/logo_teal"
+            android:rating="3.5"
+            android:scaleX="1.4"
+            android:scaleY="1.4"
+            android:stepSize="0.5" />
+
+        <TextView
+            android:id="@+id/tvReviewDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvMemberSince"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="11dp"
+            android:layout_toEndOf="@+id/ratingBar"
+            android:fontFamily="@font/lato"
+            android:textColor="@color/gray"
+            android:textSize="12sp"
+            tools:text="2 days ago" />
+
+        <View
+            android:id="@+id/bottomDivider"
+            android:layout_width="337dp"
+            android:layout_height="1dp"
+            android:layout_below="@id/tvReviewDate"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="13dp"
+            android:background="@color/gray_100" />
+
+        <TextView
+            android:id="@+id/tvBody"
+            android:layout_width="360dp"
+            android:layout_height="85dp"
+            android:layout_below="@+id/bottomDivider"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="20dp"
+            android:minHeight="85dp"
+            android:textColor="@color/gray"
+            tools:text="Everything was just a okay and blsdfjsk sdklfj" />
+    </RelativeLayout>
+</LinearLayout>

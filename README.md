@@ -1,8 +1,8 @@
 # Wings: With Wings, You Never Walk Alone
 
-## Demo: Walkthrough (Updated 5/29/2021), to be updated again soon!
-<img src="History of walkthroughs/5-29-walkthrough.gif">
-**Notes:    The map settings on the right is shown to display how to imitate a user's current location! 
+## Demo: Walkthrough (Updated 6/12/2021)
+**Note:    The map settings on the right is shown to display how to imitate a user's current location! 
+<img src="History of walkthroughs/6-12-walkthrough.gif">
 <br>
 
 ## Table of Contents
@@ -46,7 +46,7 @@ Users who are connected are confirmed to be safe "walking buddies" for each othe
 - [x] User can search for other users.
 - [x] User can set up their Trusted Contacts with a max. of 5 contacts.
 - [x] User can cancel the Buddy Trip at any time.
-- [ ] Buddy Trips and Meetups must be completed within a given lenient ETA. The ETA may be extended with the consent + confirmation of both Buddies.
+- [x] Buddy Trips and Meetups must be completed within a given lenient ETA. The ETA may be extended with the consent + confirmation of both Buddies.
 - [x] User can see the most current information about the Buddy Trip at any time.
 - [x] User can use the Safety Toolkit to notify Trusted Contacts at ANY time (during or not during a Buddy Trip):
    - [x] Safety Toolkit can only be used with confirmation of PIN.
@@ -56,7 +56,7 @@ Users who are connected are confirmed to be safe "walking buddies" for each othe
    - [x] All applicable relevant information is sent: All Buddies' current locations, intended destinations, their Buddy's general information, all other contacted Trusted Contacts
    - [ ] All sent locations via text message always shows real time locations. 
    - [x] After being invoked, Safety Toolkit waits for the user to confirm their safety once again via PIN, and then automatically sends all Trusted Contacts an updated message of their safety. 
-   - [ ] If the user has NOT confirmed safety after reaching their destination and after a lenient time period, Safety Toolkit notifies/updates all Trusted Contacts. 
+   - [x] If the user has NOT confirmed safety after reaching their destination and after a lenient time period, Safety Toolkit notifies/updates all Trusted Contacts. 
 - [x] Buddies can rate and review each other after a Buddy Trip. 
 - [ ] Users are banned if their rating is too low. 
 

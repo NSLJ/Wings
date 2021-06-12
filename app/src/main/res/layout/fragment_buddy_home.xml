@@ -14,6 +14,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <TextView
+            android:id="@+id/tvLoad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="420dp"
+            android:fontFamily="@font/lato"
+            android:text="Loading..."
+            android:textColor="@color/gray_100"
+            android:textSize="18sp"
+            android:visibility="invisible" />
+
         <fragment
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -67,6 +79,7 @@
                 android:textSize="14sp"
                 android:textStyle="bold"
                 app:backgroundTint="@color/red" />
+
         </RelativeLayout>
 
         <!-- Option 2:  User is on a BuddyMeetUp, this is visible when the user gets close distance to their buddy -->
@@ -79,19 +92,19 @@
                     android:background="@color/gray_background"
                     android:paddingBottom="10dp">
 
-                    <ImageButton
-                        android:id="@+id/btnOptionsExit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentTop="true"
-                        android:layout_alignParentEnd="true"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginEnd="15dp"
-                        android:background="@drawable/btn_circle"
-                        android:backgroundTint="#E2FF0000"
-                        android:src="@android:drawable/ic_menu_close_clear_cancel" />
+            <ImageButton
+                android:id="@+id/btnOptionsExit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/btn_circle"
+                android:backgroundTint="#E2FF0000"
+                android:src="@android:drawable/ic_menu_close_clear_cancel" />
 
-                    <ImageView
+            <ImageView
                         android:id="@+id/ivProfilePic"
                         android:layout_width="95dp"
                         android:layout_height="92dp"
@@ -101,33 +114,33 @@
                         android:layout_marginTop="8dp"
                         tools:src="@tools:sample/avatars" />
 
-                    <TextView
-                        android:id="@+id/tvName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentTop="true"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginStart="45dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_toEndOf="@+id/ivProfilePic"
-                        android:fontFamily="@font/satisfy"
-                        android:text="Annie"
-                        android:textColor="@color/gray"
-                        android:textSize="30sp" />
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginStart="45dp"
+                android:layout_marginTop="10dp"
+                android:layout_toEndOf="@+id/ivProfilePic"
+                android:fontFamily="@font/satisfy"
+                android:textColor="@color/gray"
+                android:textSize="30sp"
+                tools:text="Annie" />
 
-                    <TextView
-                        android:id="@+id/tvTripStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/tvName"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginStart="32dp"
-                        android:layout_marginTop="-5dp"
-                        android:layout_toEndOf="@+id/ivProfilePic"
-                        android:fontFamily="@font/lato"
-                        android:text="Trip Status: On meeting up"
-                        android:textColor="@color/logo_teal"
-                        android:textSize="16sp" />
+            <TextView
+                android:id="@+id/tvTripStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvName"
+                android:layout_centerHorizontal="true"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="-5dp"
+                android:layout_toEndOf="@+id/ivProfilePic"
+                android:fontFamily="@font/lato"
+                android:text="Trip Status: On meeting up"
+                android:textColor="@color/logo_teal"
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/tvUserBuddyId"
@@ -143,10 +156,10 @@
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
                 android:paddingBottom="5dp"
-                android:text="Your ID: LOLOLOLOLOL"
                 android:textAlignment="center"
                 android:textColor="@color/gray"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="Your ID: LOLOLOLOLOL" />
 
             <TextView
                 android:id="@+id/tvOtherBuddyId"
@@ -162,10 +175,10 @@
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
                 android:paddingBottom="5dp"
-                android:text="Their ID: KOKOKOKOKOK"
                 android:textAlignment="center"
                 android:textColor="@color/gray"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="Their ID: KOKOKOKOKOK" />
 
                     <EditText
                         android:id="@+id/etPin"
@@ -256,9 +269,9 @@
                 android:layout_marginTop="7dp"
                 android:layout_toRightOf="@id/ivTripInfoProfilePic"
                 android:fontFamily="@font/lato"
-                android:text="Your Buddy:  Annie"
                 android:textColor="@color/gray"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="Your Buddy:  Annie" />
 
             <TextView
                 android:id="@+id/tvTripInfoOtherUserId"
@@ -269,9 +282,9 @@
                 android:layout_marginTop="7dp"
                 android:layout_toRightOf="@id/ivTripInfoProfilePic"
                 android:fontFamily="@font/lato"
-                android:text="Their ID:  KOKOKOKOKO"
                 android:textColor="@color/gray"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="Their ID:  KOKOKOKOKO" />
 
             <TextView
                 android:id="@+id/tvTripInfoTripDestination"
@@ -287,9 +300,9 @@
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
                 android:paddingBottom="5dp"
-                android:text="Trip Destination:  (111.111, 111.111)"
                 android:textColor="@color/gray"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="Trip Destination:  (111.111, 111.111)" />
 
             <ImageView
                 android:id="@+id/ivTripInfoProfilePic"
@@ -347,9 +360,9 @@
                 android:layout_marginTop="7dp"
                 android:layout_toRightOf="@id/ivConfirmArrivalProfilePic"
                 android:fontFamily="@font/lato"
-                android:text="Your Buddy:  Annie"
                 android:textColor="@color/gray"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="Your Buddy:  Annie" />
 
             <TextView
                 android:id="@+id/tvConfirmArrivalOtherUserId"
@@ -360,9 +373,9 @@
                 android:layout_marginTop="7dp"
                 android:layout_toRightOf="@id/ivConfirmArrivalProfilePic"
                 android:fontFamily="@font/lato"
-                android:text="Their ID:  KOKOKOKOKO"
                 android:textColor="@color/gray"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="Their ID:  KOKOKOKOKO" />
 
             <TextView
                 android:id="@+id/tvConfirmArrivalTripDestination"
@@ -377,9 +390,9 @@
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
                 android:paddingBottom="5dp"
-                android:text="Trip Destination:  (111.111, 111.111)"
                 android:textColor="@color/gray"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="Trip Destination:  (111.111, 111.111)" />
 
             <ImageView
                 android:id="@+id/ivConfirmArrivalProfilePic"

@@ -35,12 +35,14 @@
 
     <ImageView
         android:id="@+id/profilePic"
-        android:layout_width="144dp"
-        android:layout_height="142dp"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:adjustViewBounds="true"
+        android:cropToPadding="false"
+        android:scaleType="fitXY"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="25dp"
-        android:background="#FF0000"
         tools:src="@tools:sample/avatars" />
 
     <TextView
