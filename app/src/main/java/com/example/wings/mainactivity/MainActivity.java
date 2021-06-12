@@ -284,8 +284,8 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
             }
         }
 
-        if(requestCode == REQUEST_CODE_CALL_PHONE_AND_TEXT && grantResults.length>2){
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+        if(requestCode == REQUEST_CODE_CALL_PHONE_AND_TEXT && grantResults.length>2/*3*/){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED && grantResults[2] == PackageManager.PERMISSION_GRANTED /*&& grantResults[3] == PackageManager.PERMISSION_GRANTED*/) {
                 //makePhoneCall()
                 Toast.makeText(this, "Please try again for now! This will be fixed soon!", Toast.LENGTH_SHORT).show();
             }
@@ -1078,8 +1078,9 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         if((ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED)
                 || (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
                 || (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED)
+                /*|| (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PRIVILEGED) != PackageManager.PERMISSION_GRANTED)*/
                 ){
-            ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS}, REQUEST_CODE_CALL_PHONE_AND_TEXT);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS/*, Manifest.permission.CALL_PRIVILEGED*/}, REQUEST_CODE_CALL_PHONE_AND_TEXT);
         }
         else{
             makeSnackBar("All Trusted Contacts notified!", "Ok", new View.OnClickListener() {
@@ -1089,8 +1090,12 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
             //1.) Call Emergency services: 911 or campus phone, etc
             Intent intent = new Intent(Intent.ACTION_CALL);
-            intent.setData(Uri.parse("tel:9169528086"));
+            intent.setData(Uri.parse("tel:9098693070"));
             startActivity(intent);
+            /*Uri callUri = Uri.parse("tel://911");
+            Intent callIntent = new Intent(Intent.ACTION_CALL,callUri);
+            callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_NO_USER_ACTION);
+            startActivity(callIntent);*/
 
             //2.) Text message every one of the user's trusted contacts:
             User currLocalUser = new User(currUser);
