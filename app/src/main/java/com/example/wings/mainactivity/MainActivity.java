@@ -648,7 +648,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         onInitialWait = isInitalWait;
         //If this is the first time we are waiting for a trip/meetup --> wait for the est + 10 extra minutes
         if(isInitalWait){
-            startTimerWorker(est+600);      //10 min * 60sec = 600 sec added
+            startTimerWorker(est/*+600*/);      //10 min * 60sec = 600 sec added
             //TODO: ensure to uncomment the added 10 min! Commented for testing reasons..
         }
 
@@ -876,7 +876,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
 
                                         //1c.) Restart timer for 10 more min & ensure to toggle onInitialWait to off
                                         stopTimer();
-                                        startTimer(false, /*10**/60);       //TODO: ensure to remove commenting here (commented for testing!)
+                                        startTimer(false, 10/**60*/);       //TODO: ensure to remove commenting here (commented for testing!)
                                     }
 
                                     //2.) else --> tell them we're notifying all Trusted Contacts, and then do it, then stopTimer(). (But CheProximityWorker is still on btw)
