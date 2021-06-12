@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 
@@ -32,6 +33,7 @@ import com.example.wings.SheetsAndJava;
 import com.example.wings.mainactivity.fragments.BuddyTripStatusFragment;
 import com.example.wings.mainactivity.fragments.EditTrustedContactsFragment;
 import com.example.wings.mainactivity.fragments.ReviewFragment;
+import com.example.wings.mainactivity.fragments.dialogs.RequestTimeDialog;
 import com.example.wings.mainactivity.fragments.dialogs.SafetyOptionsDialog;
 import com.example.wings.models.ParcelableObject;
 import com.example.wings.models.inParseServer.BuddyMeetUp;
@@ -59,6 +61,7 @@ import com.example.wings.models.User;
 import com.example.wings.startactivity.StartActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.parse.ParseException;
@@ -88,11 +91,10 @@ import java.util.concurrent.TimeUnit;
  *
  * Layout file: activity_main.xml
  */
-public class MainActivity extends AppCompatActivity implements MAFragmentsListener, SafetyOptionsDialog.SafetyToolkitListener {
+public class MainActivity extends AppCompatActivity implements MAFragmentsListener, SafetyOptionsDialog.SafetyToolkitListener, RequestTimeDialog.RequestDialogListener {
     private static final String TAG = "MainActivity";
     private static final String CHECK_PROXIMITY_WORKER_TAG = "checkProximityWorkers";       //these two are needed to stop workers when necessary
     private static final String TIMER_WORKER_TAG = "timerWorkers";
-
 
     //MainActivity specific constants --> to label which HomeFragment currUser needs to go to/previously have gone to:
     public static final String DEFAULT_HOME = "DefaultHomeFragment";
@@ -135,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     Buddy userBuddyInstance;
 
     final FragmentManager fragmentManager = getSupportFragmentManager();
+    FrameLayout fragmentContainer;
     private BottomNavigationView bottomNavigationView;
     private FloatingActionButton fabBuddyRequests;            //used to display the BuddyRequest control button above all fragments when applicable!
     private boolean restrictUserScreen = false;
@@ -161,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         Log.d(TAG, "in onCreate():");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        fragmentContainer = findViewById(R.id.flFragmentContainer);
         bottomNavigationView = findViewById(R.id.bottomNavigation);
         fabBuddyRequests = findViewById(R.id.fabBuddyRequests);
         fabBuddyRequests.setVisibility(View.INVISIBLE);             //by default so other fragments may choose to toggle if they choose, also has no handler by default!
@@ -298,6 +302,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
      */
     private void stopAllRequests(CountDownLatch latch){
         keepTracking= false;
+        timerOn = false;
         WorkManager.getInstance(getApplicationContext()).cancelAllWork();       //probably will need to refine by Tags so specific requests get canceled
         latch.countDown();
         //textView.setText("All request stopping..");
@@ -448,7 +453,6 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     }
     @Override
     public void toBuddyHomeFragment(ParcelableObject data) {
-        Log.d(TAG, "toBuddyHomeFrag(ParcelableObject");
         //Always update this before sending it off! --> ensures BuddyHomeFrag will always know whether or not the timer is on --> will not accidentally start the timer again
         data.setTimerOn(timerOn);
 
@@ -646,7 +650,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         onInitialWait = isInitalWait;
         //If this is the first time we are waiting for a trip/meetup --> wait for the est + 10 extra minutes
         if(isInitalWait){
-            startTimerWorker(est+600);      //10 min * 60sec = 600 sec added
+            startTimerWorker(est/*+600*/);      //10 min * 60sec = 600 sec added
         }
 
         //Otherwise we are starting the timer due to a reqest --> do NOT give them extra time.
@@ -661,6 +665,14 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         onInitialWait = false;
         WorkManager.getInstance(getApplicationContext()).cancelAllWorkByTag(TIMER_WORKER_TAG);
         Log.d(TAG, "timer stopped.");
+        Toast.makeText(this, "Timer was stopped", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    //Purpose:          Called when the users have request and confirmed additional time to arrive. Stop the timmer, and start again from this new time:
+    public void setRequestTime(long time) {
+        stopTimer();
+        startTimer(false, time);
     }
 
 
@@ -831,8 +843,30 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
                             if (workInfo.getState().isFinished()) {
                                 if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
                                     Log.d(TAG, "Request succeeded ");
-                                    Toast.makeText(getApplicationContext(), "timer is done!!", Toast.LENGTH_SHORT).show();
-                                    //Do more stuff later
+                                    Toast.makeText(getApplicationContext(), "Timer is done!!", Toast.LENGTH_SHORT).show();
+
+                                    //1.) If onInitialWait --> user still deserves a warning:  Show Dialog warning and constant SnackBar:
+                                    if(onInitialWait) {
+                                        //1b.) Click listener --> re-show the Dialog needed to make request for more time!
+                                        View.OnClickListener listenerToRequestTimeDialog = new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                RequestTimeDialog dialog = RequestTimeDialog.newInstance();
+                                                dialog.show(fragmentManager, "RequestTimeDialogTag");
+                                            }
+                                        };
+                                        Snackbar.make(fragmentContainer, "URGENT: Confirm arrival or Request more time within 10 MIN!", Snackbar.LENGTH_INDEFINITE)
+                                                .setAction("Request more time", listenerToRequestTimeDialog)
+                                                .setActionTextColor(getResources().getColor(R.color.red, null))
+                                                .show(); // Don’t forget to show!
+                                        //1c.) Restart timer for 10 more min & ensure to toggle onInitialWait to off
+                                        stopTimer();
+                                        startTimer(false, 10*60);
+                                    }
+                                    // else --> tell them we're notifying all Trusted Contacts, and then do it, then stopTimer(). (But CheProximityWorker is still on btw)
+                                    else{
+
+                                    }
                                 }
                             }
                         }
@@ -844,6 +878,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     //                  handling WorkerRequests when on success! (WorkerRequests keep checking certain fields for when closeEnough can = true!)
     private Fragment makeBuddyHomeFragmentMeetUp(BuddyMeetUp meetUpInstance, boolean closeEnough){
         ParcelableObject sendData = new ParcelableObject();
+        sendData.setTimerOn(timerOn);
         Bundle bundle = new Bundle();
         Fragment frag = new BuddyHomeFragment();
 
@@ -875,6 +910,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     //                  handling WorkerRequests when on success! (WorkerRequests keep checking certain fields for when closeEnough can = true!)
     private Fragment makeBuddyHomeFragmentBuddyTrip(BuddyTrip buddyTripInstance, boolean closeEnough){
         ParcelableObject sendData = new ParcelableObject();
+        sendData.setTimerOn(timerOn);
         Bundle bundle = new Bundle();
         Fragment frag = new BuddyHomeFragment();
 
@@ -936,7 +972,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
     @Override
     //Purpose:          Toggle flag "sToolkitWaitingForOkay" so we wait for user to confirm their safety. Text all trusted contacts of current info.
     public void onNotifyContacts() {
-        //To test google sheets API:
+        //WAS testing google sheets API:
         /*try {
             SheetsAndJava sheetsAndJavaObject = new SheetsAndJava();
             Sheets sheetsService = sheetsAndJavaObject.getSheetsService(this);
@@ -958,10 +994,8 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
         }*/
 
         //testing setStartTimer() + startTimerWorker():
-        startTimer(true, 30);        //start timer fr 30 sec
 
-        //Un comment all of this later:
-       /* sToolkitWaitingForOkay = true;
+        sToolkitWaitingForOkay = true;
 
         //Check permissions for it:   don't needthe call permision but still. TODO: should probably ask for permissions in onCreate() btw
         if((ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED)
@@ -975,7 +1009,7 @@ public class MainActivity extends AppCompatActivity implements MAFragmentsListen
             User currLocalUser = new User(currUser);
             String message = currLocalUser.getNotifyMessage();
             messageAllTC(message);
-        }*/
+        }
     }
 
     @Override

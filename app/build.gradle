@@ -107,12 +107,15 @@ dependencies {
     //For AsyncHttpClient --> network calls
     implementation 'com.codepath.libraries:asynchttpclient:2.0.0'
 
-    //For Firebase BoM
+    //Not actually used, but may use later: For Firebase BoM
     implementation platform('com.google.firebase:firebase-bom:28.1.0')
     implementation 'com.google.firebase:firebase-analytics'
 
-    //Google sheets api:
+    //Not actually used YET:  Google sheets api:
     implementation 'com.google.api-client:google-api-client:1.30.4'
     implementation 'com.google.oauth-client:google-oauth-client-jetty:1.30.6'
     implementation 'com.google.apis:google-api-services-sheets:v4-rev581-1.25.0'
+
+    //For SnackBar:
+    implementation "com.google.android.material:material:1.1.0"
 }

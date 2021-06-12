@@ -68,7 +68,7 @@ public class BuddyHomeFragment extends Fragment {
     private static String otherUserId;
     private static String meetUpId;
     private boolean closeEnough = false;
-    private boolean isTimerOn = false;
+    private static boolean isTimerOn = false;
 
     //General fields:
     static ParseUser currUser = ParseUser.getCurrentUser();
@@ -178,7 +178,6 @@ public class BuddyHomeFragment extends Fragment {
                     Log.d(TAG, "onCreate(): curBuddy=" + (curBuddyInstance!= null));
 
                     if(mode.equals(KEY_MEET_BUDDY_MODE)){
-                        Log.d(TAG, "onCreate(): mode= onMeetUp");
                         meetUpInstance = dataReceived.getBuddyMeetUp();
                     }
                     else{
@@ -220,6 +219,7 @@ public class BuddyHomeFragment extends Fragment {
                         setOnTripMode();
                     }
                     else if(mode.equals(KEY_MEET_BUDDY_MODE)){
+
                         wingsMap = new WingsMap(googleMap, getContext(), getViewLifecycleOwner(), false, false);        //automatically constantly shows current location
                         wingsMap.setIsTimed(true);          //yo map, its time to start taking this seriously bc we're actually going to track this route this time, save your etas
                         wingsMap.setMAFragmentListener(listener);
@@ -245,6 +245,7 @@ public class BuddyHomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setMapFragment();
+
         resources = getResources();                         //Used for statically calling from CheckProximityWorker
         context = getContext();
         fragManager = getFragmentManager();
@@ -427,12 +428,6 @@ public class BuddyHomeFragment extends Fragment {
         }
         else{           //we need to begin tracking this meetup
             listener.startCheckingProximity(100, meetUpInstance);               //tells MainActivity to start CheckProximityWorker --> responds whether currUser is close enough to meeting up with their Buddy
-
-            //if timer not yet on --> Start timer for this meetup:
-            if(!isTimerOn) {
-                isTimerOn = true;
-                listener.startTimer(true, wingsMap.getCurrentEst());     //true = we are starting a meetUp
-            }
         }
     }
 
@@ -455,9 +450,6 @@ public class BuddyHomeFragment extends Fragment {
         else{           //Otherwise --> show the tripInfoOverlay (just displays overall significant info at beginning of BuddyTrip)
             tripInfoOverlay.setVisibility(View.VISIBLE);
             listener.startCheckingProximity(100, meetUpInstance);               //tells MainActivity to start CheckProximityWorker --> responds whether currUser is close enough to meeting up with their Buddy
-            if(!isTimerOn) {
-                listener.startTimer(true, wingsMap.getCurrentEst());
-            }
         }
 
         //4.) Set all onClick listener's need for both trip overlays:
@@ -559,6 +551,7 @@ public class BuddyHomeFragment extends Fragment {
         Toast.makeText(context, "You confirmed Meet up with your buddy!", Toast.LENGTH_LONG).show();
         listener.stopCheckingProximity();
         listener.stopTimer();
+        isTimerOn = false;
 
         //Create a BuddyTrip instance!
         WingsGeoPoint currLocation = (WingsGeoPoint) currUser.getParseObject(User.KEY_CURRENTLOCATION);
@@ -705,17 +698,34 @@ public class BuddyHomeFragment extends Fragment {
 
         //Buddy Trip is finished --> reset both users + show dialog asking if they'd like to rate each other:
         MakeRatingDialog dialog = MakeRatingDialog.newInstance(otherUser);
-        Log.d("Jo", "onConfirmArrival(): otherUser = " + otherUser.getObjectId());
         dialog.setTargetFragment(thisFragInstance, 1);
         dialog.show(fragManager, "MakeRatingDialogTag");
         listener.sendArrivedMessage();                      //tells all the user's trusted contacts that the user supposedly safely arrived home --> only in the case user had invoked the safety toolkit at all
         fabCancelBuddy.performClick();                                      //needs to reset both users completely (including deleting BuddyTrip) and go back to DefaultHomeFrag
     }
 
+
+    //Helper methodsfor both onMeetUp and onBuddyTrip modes:
     public static boolean checkNearEnough(){
         Log.d(TAG, "checkNearEnough(), distanceFromCurrLocation = " + wingsMap.getDistanceFromCurLocation());
         boolean result = wingsMap.isNearEnough(100);                //unsure if wingsMap will continue to update is all
         Log.d(TAG, "checkNearEnough(), result = " + result );//+ "      meetUpOverlayEnabled =" + meetUpOverlayEnabled);
         return result;
+    }
+
+    //Purpose:          called by wingsMap statically to let us know that there is now an eta initialized IF we even want to use it -->only  start a timer if we haven't yet
+    public static void etaInitialized(long eta){
+        Log.d("jo", "etaInitialized(): eta = " + eta);
+        //if timer not yet on --> Start timer for this meetup:
+        if(!isTimerOn) {
+            isTimerOn = true;
+            listener.startTimer(true, wingsMap.getCurrentEst());     //true = we are starting a meetUp
+        }
+    }
+
+    public static void etaChanged(long eta){
+        Log.d("jo", "etaChanged(): eta = " + eta);
+        listener.stopTimer();
+        listener.startTimer(false, eta);
     }
 }

@@ -254,11 +254,15 @@ public class WingsMap {
 
                             //Do we need to change/initialize the currentEst?
                             if (currentEst == -1 || thisEta > currentEst) {              //if this is the first time we are using it or if the new route --> a higher est than the old one
-                                setCurrentEst(thisEta);
-                                if((thisEta > currentEst) && listener != null) {
+                                Log.d("jo", "WingsMap: currentEst = " + thisEta);
+                                if(currentEst == -1){
+                                    setCurrentEst(thisEta);
+                                    BuddyHomeFragment.etaInitialized(thisEta);
+                                }
+                                else{       //(thisEta > currentEst) {
                                     //Then we changed the previous Eta --> clear the timer + restart with new eta!
-                                    listener.stopTimer();
-                                    listener.startTimer(false, currentEst);             //false --> this is NOT timing the whole trip
+                                    setCurrentEst(thisEta);
+                                    BuddyHomeFragment.etaChanged(thisEta);
                                 }
                             }
                         }

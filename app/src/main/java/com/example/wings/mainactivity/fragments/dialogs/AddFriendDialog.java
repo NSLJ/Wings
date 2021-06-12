@@ -61,8 +61,8 @@ public class AddFriendDialog extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
         btnExit = view.findViewById(R.id.btnOptionsExit);
-        btnAdd = view.findViewById(R.id.btnConfirmSafety);
-        tvHeading = view.findViewById(R.id.tvOptionsHeading);
+        btnAdd = view.findViewById(R.id.btnSubmit);
+        tvHeading = view.findViewById(R.id.tvRequestTimeTitle);
 
         tvHeading.setText("Add " + otherName+"?");
         btnExit.setOnClickListener(new View.OnClickListener() {

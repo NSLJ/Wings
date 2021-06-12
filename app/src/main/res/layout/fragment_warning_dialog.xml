@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context=".mainactivity.fragments.dialogs.WarningDialog">
+
+<RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/gray_background"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/tvRequestTimeTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/lato"
+        android:text="WARNING"
+        android:textAlignment="center"
+        android:textColor="@color/red"
+        android:textSize="32sp"
+        android:textStyle="italic" />
+
+    <Button
+        android:id="@+id/btnRequestTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvBody2"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="15dp"
+        android:backgroundTint="@color/logo_teal"
+        android:text="Request more time" />
+
+    <TextView
+        android:id="@+id/tvNote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvRequestTimeTitle"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="50dp"
+        android:fontFamily="@font/lato"
+        android:text="More than 10 minutes have passed since your expected time of arrival. "
+        android:textAlignment="center"
+        android:textColor="@color/white" />
+
+    <Button
+        android:id="@+id/btnNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvBody2"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="30dp"
+        android:layout_toStartOf="@+id/btnSubmit"
+        android:backgroundTint="@color/gray_100"
+        android:text="I'll make it" />
+
+    <TextView
+        android:id="@+id/tvBody2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvNote"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="50dp"
+        android:fontFamily="@font/lato"
+        android:text="You have 10 MORE minutes to either: (1) Confrm your safe arrival or (2) Request more time before we NOTIFY your Trusted Contacts"
+        android:textAlignment="center"
+        android:textColor="@color/white" />
+
+</RelativeLayout>
+</RelativeLayout>

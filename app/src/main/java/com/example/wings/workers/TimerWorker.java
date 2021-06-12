@@ -2,6 +2,7 @@ package com.example.wings.workers;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.work.Data;
@@ -15,8 +16,10 @@ public class TimerWorker extends Worker {
     private static String TAG = "TimerWorker";
     public static String KEY_TIME_WAIT_FOR = "how much time to wait for?";
 
+    Context context;
     public TimerWorker(@NonNull @NotNull Context context, @NonNull @NotNull WorkerParameters workerParams) {
         super(context, workerParams);
+        this.context = context;
     }
 
     @NonNull

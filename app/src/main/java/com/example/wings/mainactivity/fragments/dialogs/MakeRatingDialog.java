@@ -77,7 +77,7 @@ public class MakeRatingDialog extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         //Views:
-        Button btnSubmit = binding.btnConfirmSafety;
+        Button btnSubmit = binding.btnSubmit;
         Button btnNo = binding.btnNo;
         TextView tvGoReviewFrag = binding.tvToReviewFrag;
         ratingBar = binding.ratingBar;
